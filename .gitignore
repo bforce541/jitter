@@ -1,0 +1,8 @@
+/build/
+/build-*/
+/results/
+/traces/
+/CMakeUserPresets.json
+.DS_Store
+*.profraw
+*.profdata
