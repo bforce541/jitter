@@ -6,6 +6,7 @@ import subprocess
 
 from .metrics import analyze_run
 from .spec import ExperimentError
+from .storage import write_json
 
 
 class SharedIndexAdapter:
@@ -21,6 +22,18 @@ class SharedIndexAdapter:
                 result = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=180)
             if result.returncode:
                 raise ExperimentError(f"{name} failed; see {logs}")
+        selected = {"CMAKE_BUILD_TYPE", "CMAKE_CXX_COMPILER", "CMAKE_CXX_FLAGS", "CMAKE_CXX_FLAGS_RELEASE",
+                    "CMAKE_EXE_LINKER_FLAGS", "CMAKE_EXE_LINKER_FLAGS_RELEASE", "CMAKE_GENERATOR",
+                    "CMAKE_MAKE_PROGRAM", "CMAKE_OSX_ARCHITECTURES", "CMAKE_OSX_DEPLOYMENT_TARGET",
+                    "CMAKE_OSX_SYSROOT", "CMAKE_TOOLCHAIN_FILE", "CMAKE_CXX_COMPILER_TARGET"}
+        cache = {}
+        for line in (build_dir / "CMakeCache.txt").read_text().splitlines():
+            if "=" in line and ":" in line and not line.startswith(("#", "//")):
+                definition, value = line.split("=", 1)
+                key = definition.split(":", 1)[0]
+                if key in selected:
+                    cache[key] = value
+        write_json(logs / "build-config.json", cache)
         binary = build_dir / "jitter"
         return binary, [command for _, command in commands]
 

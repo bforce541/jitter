@@ -12,7 +12,7 @@ import uuid
 from .adapters import get_adapter
 from .metrics import summarize_runs
 from .spec import ExperimentError, load_json, load_spec
-from .storage import git_output, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, write_json
+from .storage import git_output, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
 from .workload import encode_workload, generate
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -65,6 +65,15 @@ def verify_bundle(path):
     if summary != load_json(path / "summary.json"):
         raise ExperimentError("aggregate summary differs from raw evidence")
     metadata = load_json(path / "metadata.json")
+    if not isinstance(metadata, dict) or not isinstance(metadata.get("source"), dict) or not isinstance(metadata.get("build"), dict):
+        raise ExperimentError("invalid provenance metadata")
+    if metadata.get("workload_sha256") != sha256(path / "workload.csv"):
+        raise ExperimentError("recorded workload identity mismatch")
+    if metadata.get("source_archive_sha256") != sha256(path / "source.tar.gz"):
+        raise ExperimentError("recorded source archive identity mismatch")
+    if metadata["build"].get("contract") != spec["application"]["adapter"]:
+        raise ExperimentError("recorded build contract mismatch")
+    verify_source_archive(path / "source.tar.gz", metadata["source"].get("files"))
     if metadata.get("engine_sha256") != sha256(path / "engine" / "jitter"):
         raise ExperimentError("recorded executable identity mismatch")
     if manifest["status"] != summary["status"]:

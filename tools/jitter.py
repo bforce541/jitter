@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import tarfile
 
 from jitter_runner.runner import run_experiment, verify_bundle
 from jitter_runner.spec import ExperimentError, load_spec
@@ -42,7 +43,7 @@ def main(argv=None):
             else:
                 print(f"Bundle integrity, request correctness, accounting, and summaries verified: {args.bundle.resolve()}")
         return 0
-    except (ExperimentError, OSError, ValueError, KeyError) as error:
+    except (ExperimentError, OSError, ValueError, KeyError, tarfile.TarError) as error:
         print(f"jitter: {error}", file=sys.stderr)
         return 1
 

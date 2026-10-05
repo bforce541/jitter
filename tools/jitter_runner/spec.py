@@ -20,7 +20,7 @@ def integer(value, minimum, maximum, location):
 
 
 def real(value, minimum, maximum, location):
-    if type(value) not in (int, float) or not math.isfinite(value) or not minimum <= value <= maximum:
+    if type(value) not in (int, float) or not minimum <= value <= maximum or not math.isfinite(value):
         raise ExperimentError(f"{location} must be a finite number in [{minimum}, {maximum}]")
 
 

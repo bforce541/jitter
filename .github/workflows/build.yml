@@ -11,14 +11,24 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
-        run: cmake --build build --parallel
-      - name: Run foundation executable
-        run: ./build/jitter
+        run: cmake --build build --parallel 2
+      - name: Test foundation
+        run: ctest --test-dir build --output-on-failure
+      - name: Run baseline
+        run: python3 tools/jitter.py run examples/baseline.json --output results/ci-baseline
+      - name: Verify saved evidence
+        run: python3 tools/jitter.py verify results/ci-baseline
+      - name: Reproduce baseline
+        run: python3 tools/jitter.py reproduce results/ci-baseline --output results/ci-reproduction

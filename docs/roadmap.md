@@ -2,11 +2,11 @@
 
 Phase 0 establishes the build, repository conventions, and CI. It contains no performance research functionality.
 
-## Phase 1: Experiment foundation
+## Phase 1: Experiment foundation (implemented)
 
 Application adapters, controlled workloads, baseline latency and resource metrics, correctness contracts, experiment specifications, and reproducible result storage.
 
-Acceptance: repeatable baseline runs account for every request and can be reproduced from a saved specification.
+Acceptance: repeatable baseline runs account for every request and can be reproduced from a saved specification. See [Phase 1 usage and contracts](phase1.md).
 
 ## Phase 2: Observation and bottleneck analysis
 

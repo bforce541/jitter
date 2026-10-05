@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tarfile
@@ -65,18 +66,20 @@ def snapshot_source(root, destination):
 
 def seal_bundle(root, status):
     artifacts = {str(path.relative_to(root)): sha256(path)
-                 for path in sorted(root.rglob("*")) if path.is_file() and path.name != "manifest.json"}
+                 for path in sorted(root.rglob("*")) if path.is_file() and path != root / "manifest.json"}
     write_json(root / "manifest.json", {"schema_version": 1, "status": status, "artifacts": artifacts})
 
 
 def verify_integrity(root):
     root = Path(root).resolve()
     manifest = load_json(root / "manifest.json")
-    if manifest.get("schema_version") != 1 or not isinstance(manifest.get("artifacts"), dict):
+    if not isinstance(manifest, dict) or manifest.get("schema_version") != 1 or not isinstance(manifest.get("artifacts"), dict):
         raise ExperimentError("invalid bundle manifest")
     if manifest.get("status") != "complete":
         raise ExperimentError("bundle is incomplete or failed; inspect its logs and summary")
     for name, expected in manifest["artifacts"].items():
+        if not isinstance(expected, str) or re.fullmatch(r"[0-9a-f]{64}", expected) is None:
+            raise ExperimentError(f"invalid artifact checksum: {name}")
         relative = Path(name)
         if relative.is_absolute() or ".." in relative.parts or not relative.parts:
             raise ExperimentError("unsafe artifact path in manifest")
@@ -85,10 +88,30 @@ def verify_integrity(root):
             raise ExperimentError(f"missing or unsafe artifact: {name}")
         if sha256(path) != expected:
             raise ExperimentError(f"artifact checksum mismatch: {name}")
-    actual = {str(path.relative_to(root)) for path in root.rglob("*") if path.is_file() and path.name != "manifest.json"}
+    actual = {str(path.relative_to(root)) for path in root.rglob("*") if path.is_file() and path != root / "manifest.json"}
     if actual != set(manifest["artifacts"]):
         raise ExperimentError("bundle has unrecorded or missing files")
     for required in ("spec.json", "workload.csv", "metadata.json", "summary.json", "engine/jitter", "source.tar.gz"):
         if required not in manifest["artifacts"]:
             raise ExperimentError(f"bundle missing required artifact: {required}")
     return manifest
+
+
+def verify_source_archive(path, expected_files):
+    if not isinstance(expected_files, dict) or not expected_files:
+        raise ExperimentError("invalid source inventory")
+    with tarfile.open(path, "r:gz") as archive:
+        members = archive.getmembers()
+        names = [member.name for member in members]
+        if len(names) != len(set(names)) or set(names) != set(expected_files):
+            raise ExperimentError("source archive inventory differs from recorded source")
+        for member in members:
+            name = Path(member.name)
+            if not member.isfile() or name.is_absolute() or ".." in name.parts:
+                raise ExperimentError("unsafe source archive entry")
+            with archive.extractfile(member) as stream:
+                digest = hashlib.sha256()
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            if digest.hexdigest() != expected_files[member.name]:
+                raise ExperimentError(f"source archive content differs from recorded source: {member.name}")

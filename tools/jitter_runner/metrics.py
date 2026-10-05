@@ -12,11 +12,14 @@ RESOURCE_FIELDS = ("phase", "arrival_window_ns", "elapsed_ns", "cpu_user_ns", "c
 
 
 def read_csv(path, fields):
-    with Path(path).open(newline="", encoding="ascii") as stream:
-        reader = csv.DictReader(stream)
-        if reader.fieldnames != list(fields):
-            raise ExperimentError(f"unexpected CSV header: {path}")
-        rows = list(reader)
+    try:
+        with Path(path).open(newline="", encoding="ascii") as stream:
+            reader = csv.DictReader(stream)
+            if reader.fieldnames != list(fields):
+                raise ExperimentError(f"unexpected CSV header: {path}")
+            rows = list(reader)
+    except csv.Error as error:
+        raise ExperimentError(f"invalid CSV: {path}") from error
     if any(set(row) != set(fields) or any(value is None for value in row.values()) for row in rows):
         raise ExperimentError(f"malformed CSV row: {path}")
     return rows
