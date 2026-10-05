@@ -230,6 +230,9 @@ RunOutput run_application(const ApplicationConfig& config,
 }
 
 void write_output(const std::filesystem::path& path, const RunOutput& output) {
+    if (std::filesystem::exists(path / "requests.csv") || std::filesystem::exists(path / "resources.csv")) {
+        throw std::runtime_error("refusing to overwrite application evidence");
+    }
     std::filesystem::create_directories(path);
     std::ofstream requests(path / "requests.csv");
     requests << "id,phase,scheduled_ns,key,heavy,status,submitted_ns,started_ns,completed_ns,value\n";

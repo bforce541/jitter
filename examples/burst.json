@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "application": {
+    "adapter": "shared-index-v1",
+    "workers": 4,
+    "queue_capacity": 32,
+    "key_count": 256,
+    "dataset_seed": 17,
+    "light_rounds": 256,
+    "heavy_rounds": 131072
+  },
+  "workload": {
+    "seed": 42,
+    "arrival": "burst",
+    "rate_per_second": 4000,
+    "warmup_ms": 250,
+    "measurement_ms": 1000,
+    "heavy_fraction": 0.02,
+    "burst_size": 128
+  },
+  "objective": {
+    "metric": "p99_latency_ns",
+    "min_throughput_per_second": 3000,
+    "max_peak_rss_bytes": 134217728,
+    "max_cpu_cores": 4.0,
+    "max_rejection_fraction": 0.0,
+    "max_scheduler_lag_p99_ns": 10000000
+  },
+  "repetitions": 3,
+  "timeout_seconds": 30
+}

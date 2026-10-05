@@ -8,11 +8,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+if(CMAKE_CONFIGURATION_TYPES)
+    message(FATAL_ERROR "Phase 1 requires a single-configuration CMake generator")
+endif()
+
 find_package(Threads REQUIRED)
 find_package(Git QUIET)
 set(JITTER_SOURCE_REVISION "unknown")
 set(JITTER_SOURCE_DIRTY "true")
-if(Git_FOUND)
+if(Git_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" OUTPUT_VARIABLE JITTER_SOURCE_REVISION OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND "${GIT_EXECUTABLE}" status --porcelain
@@ -46,4 +50,10 @@ if(BUILD_TESTING)
     target_link_libraries(jitter_core_tests PRIVATE jitter_core)
     set_target_properties(jitter_core_tests PROPERTIES CXX_EXTENSIONS OFF)
     add_test(NAME core COMMAND jitter_core_tests)
+    find_package(Python3 3.9 REQUIRED COMPONENTS Interpreter)
+    add_test(NAME foundation COMMAND "${CMAKE_COMMAND}" -E env
+        "JITTER_TEST_BINARY=$<TARGET_FILE:jitter>"
+        "${Python3_EXECUTABLE}" -m unittest discover
+        -s "${CMAKE_SOURCE_DIR}/tests" -p "test_*.py" -v)
+    set_tests_properties(core foundation PROPERTIES TIMEOUT 60)
 endif()
