@@ -1,10 +1,13 @@
 import csv
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import random
 import subprocess
 import sys
+import tarfile
 import tempfile
 import unittest
 
@@ -13,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from jitter_runner.metrics import REQUEST_FIELDS, RESOURCE_FIELDS, analyze_run, distribution
 from jitter_runner.runner import ROOT, run_experiment, verify_bundle
 from jitter_runner.spec import ExperimentError, load_spec, validate_spec
-from jitter_runner.storage import seal_bundle, write_json
+from jitter_runner.storage import seal_bundle, verify_integrity, verify_source_archive, write_json
 from jitter_runner.workload import MASK, MULTIPLIER, encode_workload, expected_value, generate, mix64, GOLDEN
 
 
@@ -153,6 +156,20 @@ class MeasurementTests(unittest.TestCase):
             self.assertFalse(result["feasible"])
             self.assertEqual(result["correctness"], "passed")
 
+    def test_empty_completion_sample_is_infeasible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            spec = fixture_spec()
+            spec["objective"]["max_rejection_fraction"] = 1
+            workload, rows, _ = synthetic_run(path, spec)
+            for row in rows:
+                row.update(status="rejected", started_ns=-1, completed_ns=-1, value=0)
+            write_csv(path / "requests.csv", REQUEST_FIELDS, rows)
+            result = analyze_run(spec, workload, path)
+            self.assertIsNone(result["phases"]["measurement"]["latency_ns"]["p99"])
+            self.assertFalse(result["constraints"]["latency_observed"])
+            self.assertFalse(result["feasible"])
+
     def test_corrupt_outputs_fail(self):
         mutations = [lambda rows: rows.pop(), lambda rows: rows.append(rows[0]),
                      lambda rows: rows[1].update(id=0), lambda rows: rows[0].update(value=1),
@@ -180,6 +197,41 @@ class MeasurementTests(unittest.TestCase):
                 result = analyze_run(spec, workload, path)
                 self.assertFalse(result["constraints"][check])
                 self.assertFalse(result["feasible"])
+
+
+
+class StorageTests(unittest.TestCase):
+    def test_source_archive_is_checked_against_inventory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "source.tar.gz"
+            contents = b"source snapshot\n"
+            entry = tarfile.TarInfo("src/example.cpp")
+            entry.size = len(contents)
+            with tarfile.open(path, "w:gz") as archive:
+                archive.addfile(entry, io.BytesIO(contents))
+            expected = {entry.name: hashlib.sha256(contents).hexdigest()}
+            verify_source_archive(path, expected)
+            with self.assertRaises(ExperimentError):
+                verify_source_archive(path, {entry.name: "0" * 64})
+            with self.assertRaises(ExperimentError):
+                verify_source_archive(path, {"different.cpp": expected[entry.name]})
+            entry = tarfile.TarInfo("src/link")
+            entry.type = tarfile.SYMTYPE
+            entry.linkname = "/tmp/elsewhere"
+            with tarfile.open(path, "w:gz") as archive:
+                archive.addfile(entry)
+            with self.assertRaises(ExperimentError):
+                verify_source_archive(path, {entry.name: hashlib.sha256(b"").hexdigest()})
+
+    def test_invalid_manifest_and_unsafe_paths_fail(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            write_json(path / "manifest.json", [])
+            with self.assertRaises(ExperimentError):
+                verify_integrity(path)
+            write_json(path / "manifest.json", {"schema_version": 1, "status": "complete", "artifacts": {"../outside": "0" * 64}})
+            with self.assertRaises(ExperimentError):
+                verify_integrity(path)
 
 
 @unittest.skipUnless(os.environ.get("JITTER_TEST_BINARY"), "set JITTER_TEST_BINARY to run C++ integration tests")
@@ -257,6 +309,21 @@ class IntegrationTests(unittest.TestCase):
         summary = json.loads(summary_path.read_text())
         summary["phases"]["measurement"]["latency_ns"]["p99"] = 0
         write_json(summary_path, summary)
+        seal_bundle(original, "complete")
+        with self.assertRaises(ExperimentError):
+            verify_bundle(original)
+
+    def test_unrecorded_files_and_provenance_mismatches_fail(self):
+        original, _ = self.execute()
+        extra = original / "run-001" / "manifest.json"
+        extra.write_text("{}")
+        with self.assertRaises(ExperimentError):
+            verify_bundle(original)
+        extra.unlink()
+        metadata_path = original / "metadata.json"
+        metadata = json.loads(metadata_path.read_text())
+        metadata["source"]["files"]["src/main.cpp"] = "0" * 64
+        write_json(metadata_path, metadata)
         seal_bundle(original, "complete")
         with self.assertRaises(ExperimentError):
             verify_bundle(original)

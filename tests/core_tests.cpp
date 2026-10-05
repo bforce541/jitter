@@ -55,14 +55,30 @@ void check_accounting() {
 void check_parser() {
     const auto path = std::filesystem::temp_directory_path() /
         ("jitter-core-" + std::to_string(getpid()) + ".csv");
+    const std::vector<std::string> invalid{
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,0,0,0\n0,measurement,1,0,0\n",
+        "invalid header\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,1000,0,0\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,0,256,0\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,0,0,2\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,2,0,0\n1,measurement,1,0,0\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,-1,0,0\n",
+        "id,phase,scheduled_ns,key,heavy\n0,measurement,0,0,0\n1,warmup,0,0,0\n"
+    };
+    for (const auto& contents : invalid) {
+        { std::ofstream out(path); out << contents; }
+        bool threw = false;
+        try { jitter::read_workload(path, {}, 1000, 1000); }
+        catch (const std::invalid_argument&) { threw = true; }
+        check(threw, "invalid workload must fail");
+    }
     {
         std::ofstream out(path);
-        out << "id,phase,scheduled_ns,key,heavy\n0,measurement,0,0,0\n0,measurement,1,0,0\n";
+        out << "id,phase,scheduled_ns,key,heavy\n0,warmup,5,0,1\n1,measurement,0,1,0\n";
     }
-    bool threw = false;
-    try { jitter::read_workload(path, {}, 0, 1000); } catch (const std::invalid_argument&) { threw = true; }
+    const auto valid = jitter::read_workload(path, {}, 1000, 1000);
+    check(valid.size() == 2 && !valid[0].measured && valid[1].measured, "phase schedule reset");
     std::filesystem::remove(path);
-    check(threw, "duplicate request IDs must fail");
 }
 }
 
