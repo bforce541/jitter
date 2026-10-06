@@ -12,4 +12,4 @@ python3 tools/jitter.py overhead examples/contention.json --output results/overh
 
 Requires Linux/macOS, a C++20 compiler, CMake 3.20+, Git, and Python 3.9+.
 
-[Observation and overhead](docs/phase2.md) · [Baseline contracts](docs/phase1.md) · [Five-phase roadmap](docs/roadmap.md)
+[Observation and overhead](docs/phase2.md) · [Verification record](docs/phase2-validation.md) · [Baseline contracts](docs/phase1.md) · [Five-phase roadmap](docs/roadmap.md)

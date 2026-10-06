@@ -187,4 +187,4 @@ Linux/macOS CI exercises capture, diagnosis, request inspection, reproduction, o
 - `tools/jitter_runner/diagnostics.py`: component evidence and testable hypotheses.
 - `tools/jitter_runner/overhead.py`: paired execution, integrity, comparisons, and reproduction.
 
-[Phase 1 contracts](phase1.md) · [Roadmap](roadmap.md)
+[Verification record](phase2-validation.md) · [Phase 1 contracts](phase1.md) · [Roadmap](roadmap.md)

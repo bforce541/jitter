@@ -64,4 +64,4 @@ python3 tools/jitter.py reproduce results/baseline --output results/reproduction
 python3 tools/jitter.py run examples/burst.json --output results/burst
 ```
 
-Phase 2 has not started. Lock-wait tracing, dependency graphs, observation-overhead analysis, autonomous search, and independent-software evaluation remain outside this milestone.
+At the Phase 1 milestone, lock-wait tracing, dependency graphs, observation-overhead analysis, autonomous search, and independent-software evaluation were outside scope. Observation and analysis are now covered by [the Phase 2 verification record](phase2-validation.md).
