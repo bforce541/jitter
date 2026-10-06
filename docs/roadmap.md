@@ -8,11 +8,11 @@ Application adapters, controlled workloads, baseline latency and resource metric
 
 Acceptance: repeatable baseline runs account for every request and can be reproduced from a saved specification. See [Phase 1 usage and contracts](phase1.md).
 
-## Phase 2: Observation and bottleneck analysis
+## Phase 2: Observation and bottleneck analysis (implemented)
 
 Efficient C++ instrumentation, trace loss accounting, cross-thread dependencies, hypothesis generation, and observation overhead measurement.
 
-Acceptance: controlled scenarios produce relevant, testable hypotheses with documented overhead and trace limitations.
+Acceptance: controlled scenarios produce relevant, testable hypotheses with documented overhead and trace limitations. See [Phase 2 usage and contracts](phase2.md).
 
 ## Phase 3: Autonomous investigation
 

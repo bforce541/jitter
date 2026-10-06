@@ -2,7 +2,7 @@
 
 Jitter can build a supported multithreaded C++ application, run a controlled workload, check every response, measure baseline performance, and reproduce saved inputs. The C++ engine handles the application, worker pool, scheduling, and measurements. A Python standard-library driver handles specifications, build/run orchestration, the independent response oracle, and persistence.
 
-Autonomous search, lock tracing, dependency analysis, proposed patches, and HTML reports belong to later phases. No optimization or significance claim is made by Phase 1.
+Phase 2 adds [lock tracing, dependency analysis, hypotheses, and overhead studies](phase2.md). Autonomous search, proposed patches, and HTML reports remain later-phase work. No optimization or significance claim is made by Phase 1.
 
 ## Requirements and first run
 
