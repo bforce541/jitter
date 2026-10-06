@@ -131,6 +131,8 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
         shutil.copy2(source_binary, path / "engine" / "jitter")
         saved_binary = path / "engine" / "jitter"
         metadata["build"] = adapter.build_info(saved_binary)
+        if spec["schema_version"] == 2 and metadata["build"].get("trace_format") != 1:
+            raise ExperimentError("schema version 2 requires a trace-format-1 engine")
         metadata["engine_sha256"] = sha256(saved_binary)
         metadata["source_archive_sha256"] = sha256(path / "source.tar.gz")
         if original:

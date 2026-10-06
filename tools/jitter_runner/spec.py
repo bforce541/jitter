@@ -25,8 +25,11 @@ def real(value, minimum, maximum, location):
 
 
 def validate_spec(spec):
-    object_keys(spec, ("schema_version", "application", "workload", "objective", "repetitions", "timeout_seconds"), "spec")
-    integer(spec["schema_version"], 1, 1, "schema_version")
+    if not isinstance(spec, dict):
+        raise ExperimentError("spec must be an object")
+    integer(spec.get("schema_version"), 1, 2, "schema_version")
+    required = ("schema_version", "application", "workload", "objective", "repetitions", "timeout_seconds")
+    object_keys(spec, required + (("instrumentation",) if spec["schema_version"] == 2 else ()), "spec")
     app = spec["application"]
     object_keys(app, ("adapter", "workers", "queue_capacity", "key_count", "dataset_seed", "light_rounds", "heavy_rounds"), "application")
     if app["adapter"] != "shared-index-v1":
@@ -34,6 +37,14 @@ def validate_spec(spec):
     for key, low, high in (("workers", 1, 256), ("queue_capacity", 1, 1000000), ("key_count", 1, 65536),
                            ("dataset_seed", 0, (1 << 64) - 1), ("light_rounds", 1, 10000000), ("heavy_rounds", 1, 10000000)):
         integer(app[key], low, high, f"application.{key}")
+    if spec["schema_version"] == 2:
+        tracing = spec["instrumentation"]
+        object_keys(tracing, ("enabled", "events_per_thread"), "instrumentation")
+        if type(tracing["enabled"]) is not bool:
+            raise ExperimentError("instrumentation.enabled must be boolean")
+        integer(tracing["events_per_thread"], 1, 1000000, "instrumentation.events_per_thread")
+        if tracing["enabled"] and tracing["events_per_thread"] * (app["workers"] + 1) * 32 > 268435456:
+            raise ExperimentError("trace buffers exceed the 256 MiB allocation limit")
     workload = spec["workload"]
     object_keys(workload, ("seed", "arrival", "rate_per_second", "warmup_ms", "measurement_ms", "heavy_fraction", "burst_size"), "workload")
     integer(workload["seed"], 0, (1 << 64) - 1, "workload.seed")

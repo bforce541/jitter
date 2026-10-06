@@ -53,6 +53,9 @@ class SharedIndexAdapter:
             command.extend(["--" + name.replace("_", "-"), str(app[name])])
         for name in ("warmup", "measurement"):
             command.extend([f"--{name}-ns", str(spec["workload"][f"{name}_ms"] * 1000000)])
+        if spec["schema_version"] == 2:
+            tracing = spec["instrumentation"]
+            command.extend(["--trace", str(int(tracing["enabled"])), "--trace-capacity", str(tracing["events_per_thread"])])
         return command
 
     def validate(self, spec, workload, output):
