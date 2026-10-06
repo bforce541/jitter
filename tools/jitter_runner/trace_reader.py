@@ -1,6 +1,6 @@
 """Validate the trace contract before attributing any delay."""
 
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from pathlib import Path
 
 from .metrics import REQUEST_FIELDS, numeric, read_csv
@@ -47,6 +47,29 @@ def _worker_grammar(events, dropped):
                 state = WORKER_STAGES[index + 1] if index + 1 < len(WORKER_STAGES) else "worker_wait_begin"
     if not dropped:
         require(state == "stopped", "lossless worker trace is unfinished")
+
+
+def validate_queue(events, capacity):
+    """Check a FIFO linearization; equal-clock events permit compatible orders."""
+    buckets = defaultdict(list)
+    for event in events:
+        if event["kind"] in ("queue_enter", "queue_exit", "request_reject"):
+            buckets[event["timestamp_ns"]].append(event)
+    queue = deque()
+    for _, bucket in sorted(buckets.items()):
+        producer = deque(sorted((event for event in bucket if event["thread_id"] == 0), key=lambda event: event["sequence"]))
+        exits = {event["request_id"] for event in bucket if event["kind"] == "queue_exit"}
+        while producer or exits:
+            next_event = producer[0] if producer else None
+            if next_event and next_event["kind"] == "request_reject" and len(queue) == capacity:
+                producer.popleft()
+            elif next_event and next_event["kind"] == "queue_enter" and len(queue) < capacity:
+                queue.append(producer.popleft()["request_id"])
+            elif queue and queue[0] in exits:
+                exits.remove(queue.popleft())
+            else:
+                require(False, "queue events contradict FIFO order, capacity, or rejection state")
+    require(not queue, "queue did not drain")
 
 
 def read_trace(spec, run_dir, baseline):
@@ -173,6 +196,7 @@ def read_trace(spec, run_dir, baseline):
             require(len(events) == len(producer_expected), "lossless producer trace is unfinished")
     dropped = sum(counts["dropped"] for counts in totals.values())
     if dropped == 0:
+        validate_queue([event for events in thread_events.values() for event in events], spec["application"]["queue_capacity"])
         for request in requests.values():
             required = {"request_submit", "queue_enter", *WORKER_STAGES} if request["status"] == "completed" else {"request_submit", "request_reject"}
             require(set(groups[request["id"]]) == required, "lossless request has missing stages")

@@ -53,7 +53,7 @@ def hypotheses(spec, baseline, evidence):
             {"kind": "diagnostic_workload_comparison", "parameter": "workload.heavy_fraction", "values": [0, 1],
              "prediction": "Holding application behavior fixed, isolate request classes to test their region/ownership durations. This is a diagnostic test, not an optimization comparison."},
             "Wall time in this region includes preemption and tracing. Changing digest rounds changes the response contract and is not a proposed optimization.")
-    if fraction("other_service_ns") >= .25 or not result:
+    if fraction("other_service_ns") >= .25 or (not result and components["other_service_ns"] > 0):
         add("unresolved_service_delay", "Existing regions leave service time unexplained by mutex waiting or digest execution.", "other_service_ns",
             {"unclassified_service_ns": components["other_service_ns"]},
             {"kind": "instrumentation_extension", "prediction": "Add a supported execution region or scheduling measurement around the residual interval, then measure its overhead."},

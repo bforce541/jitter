@@ -19,7 +19,7 @@ from jitter_runner.overhead import compare_pairs, plan, run_overhead, verify_ove
 from jitter_runner.runner import run_experiment, verify_bundle
 from jitter_runner.spec import ExperimentError, load_spec, validate_spec
 from jitter_runner.storage import seal_bundle, write_json
-from jitter_runner.trace_reader import EVENT_FIELDS, ORIGIN_FIELDS, NO_REQUEST, PHASES, RESOURCES, read_trace
+from jitter_runner.trace_reader import EVENT_FIELDS, ORIGIN_FIELDS, NO_REQUEST, PHASES, RESOURCES, read_trace, validate_queue
 from jitter_runner.workload import expected_value, generate
 from test_foundation import fixture_spec, write_csv
 
@@ -250,6 +250,20 @@ class TraceContractTests(unittest.TestCase):
         spec["application"]["workers"] = 256
         with self.assertRaises(ExperimentError):
             validate_spec(spec)
+
+    def test_queue_capacity_fifo_and_equal_clock_order(self):
+        def event(kind, request, time, sequence, thread):
+            return {"kind": kind, "request_id": request, "timestamp_ns": time, "sequence": sequence, "thread_id": thread}
+        simultaneous = [event("queue_enter", 0, 1, 0, 0), event("queue_enter", 1, 1, 1, 0),
+                        event("request_reject", 2, 1, 2, 0), event("queue_exit", 0, 1, 0, 1), event("queue_exit", 1, 1, 0, 2)]
+        validate_queue(simultaneous, 1)
+        validate_queue(simultaneous, 2)
+        with self.assertRaises(ExperimentError):
+            validate_queue(simultaneous, 3)
+        invalid = [event("queue_enter", 0, 1, 0, 0), event("queue_enter", 1, 2, 1, 0),
+                   event("queue_exit", 1, 3, 0, 2), event("queue_exit", 0, 4, 0, 1)]
+        with self.assertRaises(ExperimentError):
+            validate_queue(invalid, 2)
 
     def test_interval_index_handles_touching_and_zero_spans(self):
         intervals = Intervals([{"start_ns": 0, "end_ns": 10}, {"start_ns": 10, "end_ns": 20}])
