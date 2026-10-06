@@ -278,6 +278,10 @@ class TraceContractTests(unittest.TestCase):
             self.assertFalse(report["all_pairs_comparable"])
             self.assertIsNone(report["paired_deltas"])
             self.assertEqual(len(report["pairs"]), 1)
+            on["observation"]["complete"] = True
+            report = compare_pairs([{"off": off, "on": on, "off_host": {"logical_cpus": 2}, "on_host": {"logical_cpus": 4}}])
+            self.assertFalse(report["all_pairs_comparable"])
+            self.assertTrue(any("host" in reason for reason in report["pairs"][0]["limitations"]))
 
 
 @unittest.skipUnless(os.environ.get("JITTER_TEST_BINARY"), "set JITTER_TEST_BINARY for real-engine observation tests")

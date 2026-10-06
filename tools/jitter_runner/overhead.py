@@ -25,10 +25,14 @@ def child_spec(spec, mode):
 
 def compare_pairs(pairs):
     comparisons = []
+    hosts = [pair.get(mode + "_host", {}) for pair in pairs for mode in ("off", "on")]
+    host_changes = any(host != hosts[0] for host in hosts) if hosts else False
     for index, pair in enumerate(pairs):
         off, on = pair["off"], pair["on"]
         before, after = off["phases"]["measurement"], on["phases"]["measurement"]
         reasons = []
+        if host_changes:
+            reasons.append("recorded host properties changed within the study")
         if not on["observation"]["complete"]:
             reasons.append("traced events were dropped")
         if before["rejected"] or after["rejected"] or before["completed"] != after["completed"]:
@@ -48,7 +52,8 @@ def compare_pairs(pairs):
                             "peak_rss_bytes": delta(before["peak_rss_bytes"], after["peak_rss_bytes"]),
                             "trace_reserved_bytes": on["observation"]["reserved_bytes"],
                             "trace_events_written": on["observation"]["written"], "trace_events_dropped": on["observation"]["dropped"],
-                            "off_feasible": off["feasible"], "on_feasible": on["feasible"]})
+                            "off_feasible": off["feasible"], "on_feasible": on["feasible"],
+                            "off_host": pair.get("off_host", {}), "on_host": pair.get("on_host", {})})
     all_comparable = all(pair["comparable"] for pair in comparisons)
     # No filtering of noisy pairs into a convenient headline estimate.
     estimates = {key: distribution([pair[key]["delta"] for pair in comparisons if pair[key]["delta"] is not None])
@@ -81,6 +86,7 @@ def verify_overhead(path):
         if (identity, source, workload) != (metadata["engine_sha256"], metadata["source"]["files"], metadata["workload_sha256"]):
             raise ExperimentError("overhead pairs do not share executable, source snapshot content, and inputs")
         pairs[entry["pair"] - 1][entry["mode"]] = summary["runs"][0]
+        pairs[entry["pair"] - 1][entry["mode"] + "_host"] = metadata["host"]
     report = compare_pairs(pairs)
     if report != load_json(path / "comparison.json"):
         raise ExperimentError("overhead report differs from validated paired evidence")
@@ -113,6 +119,7 @@ def run_overhead(spec, output=None, binary=None, build_dir=None, reproduce_from=
                                            reproduce_from=original / entry["bundle"] if original else None)
             pinned_binary = path / "engine" / "jitter"
             pairs[entry["pair"] - 1][entry["mode"]] = summary["runs"][0]
+            pairs[entry["pair"] - 1][entry["mode"] + "_host"] = load_json(path / "metadata.json")["host"]
         report = compare_pairs(pairs)
         write_json(root / "comparison.json", report)
         seal_bundle(root, "complete")

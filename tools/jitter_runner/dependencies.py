@@ -109,6 +109,7 @@ def build_dependencies(trace, workers, selected_request=None):
             node_ids.add(span["request_id"])
             graph["edges"].append({"source": f"request:{span['request_id']}", "target": f"request:{stage['request_id']}",
                                    "kind": kind, "resource_id": resource, "overlap_ns": overlap,
+                                   "source_thread_id": span["thread_id"], "target_thread_id": stage["thread_id"],
                                    "start_ns": max(start, span["start_ns"]), "end_ns": min(end, span["end_ns"])})
         wait_start, wait_end = group["lock_wait"]["timestamp_ns"], group["lock_acquire"]["timestamp_ns"]
         overlap_total = 0
@@ -130,7 +131,8 @@ def build_dependencies(trace, workers, selected_request=None):
                     require(span["request_id"] != stage["request_id"], "request blocks its own queued admission")
                     add_edge("worker_capacity", span, overlap, 2, start, end)
     graph["nodes"] = [{"id": f"request:{request_id}", "kind": "request", "request_id": request_id,
-                       "heavy": bool(requests[request_id]["heavy"]), "phase": requests[request_id]["phase"]}
+                       "heavy": bool(requests[request_id]["heavy"]), "phase": requests[request_id]["phase"],
+                       "thread_id": groups.get(request_id, {}).get("request_start", {}).get("thread_id")}
                       for request_id in sorted(node_ids)]
     for thread in range(1, workers + 1):
         graph["nodes"].append({"id": f"thread:{thread}", "kind": "worker", "thread_id": thread})
