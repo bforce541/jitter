@@ -55,13 +55,13 @@ std::uint64_t rss(const rusage& value) {
 
 class WorkerPool {
 public:
-    explicit WorkerPool(const ApplicationConfig& config) : app_(config), capacity_(config.queue_capacity) {
+    WorkerPool(const ApplicationConfig& config, TraceSession& trace) : app_(config), trace_(trace), capacity_(config.queue_capacity) {
         if (config.workers == 0 || capacity_ == 0) {
             throw std::invalid_argument("worker count and queue capacity must be positive");
         }
         try {
             for (std::uint32_t i = 0; i < config.workers; ++i) {
-                workers_.emplace_back([this] { work(); });
+                workers_.emplace_back([this, i] { work(i + 1); });
             }
             std::unique_lock lock(mutex_);
             ready_.wait(lock, [this, &config] { return ready_count_ == config.workers; });
@@ -79,11 +79,15 @@ public:
         std::lock_guard lock(mutex_);
         // Submission time includes contention with the queue's admission lock.
         result.submitted_ns = since(start);
+        const TraceContext context{trace_.buffer(0), result.request.measured ? TracePhase::measurement : TracePhase::warmup, result.request.id};
+        context.emit(EventKind::request_submit, 0, trace_.timestamp(start) + result.submitted_ns);
         if (queue_.size() >= capacity_) {
             result.status = "rejected";
+            context.emit(EventKind::request_reject, request_queue);
             return false;
         }
         queue_.push_back({&result, start});
+        context.emit(EventKind::queue_enter, request_queue);
         ++outstanding_;
         available_.notify_one();
         return true;
@@ -106,7 +110,9 @@ private:
         }
     }
 
-    void work() {
+    void work(std::uint32_t thread_id) {
+        auto* buffer = trace_.buffer(thread_id);
+        if (buffer) buffer->emit(EventKind::thread_start);
         {
             std::lock_guard lock(mutex_);
             ++ready_count_;
@@ -116,20 +122,30 @@ private:
             std::pair<RequestResult*, Clock::time_point> item;
             {
                 std::unique_lock lock(mutex_);
+                if (buffer) buffer->emit(EventKind::worker_wait_begin, TracePhase::lifecycle, no_request, request_queue);
                 available_.wait(lock, [this] { return stopping_ || !queue_.empty(); });
-                if (queue_.empty()) return;
+                if (buffer) buffer->emit(EventKind::worker_wait_end, TracePhase::lifecycle, no_request, request_queue);
+                if (queue_.empty()) {
+                    if (buffer) buffer->emit(EventKind::thread_stop);
+                    return;
+                }
                 item = queue_.front();
                 queue_.pop_front();
+                TraceContext{buffer, item.first->request.measured ? TracePhase::measurement : TracePhase::warmup,
+                             item.first->request.id}.emit(EventKind::queue_exit, request_queue);
             }
             auto& result = *item.first;
+            const TraceContext context{buffer, result.request.measured ? TracePhase::measurement : TracePhase::warmup, result.request.id};
             result.started_ns = since(item.second);
+            context.emit(EventKind::request_start, 0, trace_.timestamp(item.second) + result.started_ns);
             try {
-                result.value = app_.lookup(result.request.key, result.request.heavy);
+                result.value = app_.lookup(result.request.key, result.request.heavy, context);
                 result.status = "completed";
             } catch (...) {
                 result.status = "error";
             }
             result.completed_ns = since(item.second);
+            context.emit(EventKind::request_complete, 0, trace_.timestamp(item.second) + result.completed_ns);
             {
                 std::lock_guard lock(mutex_);
                 --outstanding_;
@@ -139,6 +155,7 @@ private:
     }
 
     SharedIndex app_;
+    TraceSession& trace_;
     std::size_t capacity_;
     std::mutex mutex_;
     std::condition_variable available_, drained_, ready_;
@@ -202,11 +219,13 @@ std::vector<Request> read_workload(const std::filesystem::path& path,
 
 RunOutput run_application(const ApplicationConfig& config,
                           const std::vector<Request>& requests,
-                          std::int64_t warmup_ns, std::int64_t measurement_ns) {
+                          std::int64_t warmup_ns, std::int64_t measurement_ns, TraceConfig tracing) {
     RunOutput output;
     output.requests.reserve(requests.size());
     for (const auto& request : requests) output.requests.push_back({request});
-    WorkerPool pool(config);
+    TraceSession trace(tracing, config.workers + 1);
+    {
+    WorkerPool pool(config, trace);
     for (const bool measured : {false, true}) {
         const auto duration = measured ? measurement_ns : warmup_ns;
         if (duration == 0) continue;
@@ -222,10 +241,13 @@ RunOutput run_application(const ApplicationConfig& config,
         pool.drain(); // No warmup work leaks into the measurement phase.
         const auto elapsed = since(start);
         const auto after = usage();
+        trace.phase(measured ? TracePhase::measurement : TracePhase::warmup, start, elapsed);
         output.phases.push_back({measured ? "measurement" : "warmup", duration, elapsed,
             nanos(after.ru_utime) - nanos(before.ru_utime),
             nanos(after.ru_stime) - nanos(before.ru_stime), rss(after)});
     }
+    } // Join every writer before reading its trace buffer.
+    output.trace = trace.take();
     return output;
 }
 
@@ -251,6 +273,7 @@ void write_output(const std::filesystem::path& path, const RunOutput& output) {
     requests.flush();
     resources.flush();
     if (!requests || !resources) throw std::runtime_error("cannot write experiment output");
+    write_trace(path, output.trace);
 }
 
 } // namespace jitter

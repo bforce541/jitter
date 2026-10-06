@@ -38,6 +38,7 @@ struct PhaseResources {
 struct RunOutput {
     std::vector<RequestResult> requests;
     std::vector<PhaseResources> phases;
+    TraceOutput trace;
 };
 
 std::vector<Request> read_workload(const std::filesystem::path& path,
@@ -45,7 +46,8 @@ std::vector<Request> read_workload(const std::filesystem::path& path,
                                  std::int64_t warmup_ns, std::int64_t measurement_ns);
 RunOutput run_application(const ApplicationConfig& config,
                           const std::vector<Request>& requests,
-                          std::int64_t warmup_ns, std::int64_t measurement_ns);
+                          std::int64_t warmup_ns, std::int64_t measurement_ns,
+                          TraceConfig tracing = {});
 void write_output(const std::filesystem::path& path, const RunOutput& output);
 
 } // namespace jitter

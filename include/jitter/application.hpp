@@ -1,5 +1,7 @@
 #pragma once
 
+#include "jitter/trace.hpp"
+
 #include <cstdint>
 #include <mutex>
 #include <vector>
@@ -24,7 +26,7 @@ std::uint64_t initial_value(std::uint64_t seed, std::uint32_t key);
 class SharedIndex {
 public:
     explicit SharedIndex(const ApplicationConfig& config);
-    std::uint64_t lookup(std::uint32_t key, bool heavy);
+    std::uint64_t lookup(std::uint32_t key, bool heavy, TraceContext context = {});
 
 private:
     ApplicationConfig config_;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(jitter VERSION 0.1.0 LANGUAGES CXX)
+project(jitter VERSION 0.2.0 LANGUAGES CXX)
 
 if(NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(FATAL_ERROR "Phase 1 resource collection supports Linux and macOS")
@@ -31,7 +31,7 @@ string(REPLACE "\\" "\\\\" JITTER_INFO_FLAGS "${JITTER_INFO_FLAGS}")
 string(REPLACE "\"" "\\\"" JITTER_INFO_FLAGS "${JITTER_INFO_FLAGS}")
 configure_file(include/jitter/build_info.hpp.in generated/jitter/build_info.hpp @ONLY)
 
-add_library(jitter_core src/application.cpp src/experiment.cpp)
+add_library(jitter_core src/application.cpp src/experiment.cpp src/trace.cpp)
 target_include_directories(jitter_core PUBLIC include)
 target_compile_features(jitter_core PUBLIC cxx_std_20)
 set_target_properties(jitter_core PROPERTIES CXX_EXTENSIONS OFF)

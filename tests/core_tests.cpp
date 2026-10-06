@@ -52,6 +52,41 @@ void check_accounting() {
     check(output.phases.size() == 1 && output.phases[0].elapsed_ns >= 1000000, "arrival window and drain");
 }
 
+void check_tracing() {
+    jitter::TraceBuffer buffer(7, 2, jitter::TraceClock::now());
+    for (int i = 0; i < 5; ++i) buffer.emit(jitter::EventKind::request_submit, jitter::TracePhase::measurement, i, 0, i);
+    const auto snapshot = buffer.take();
+    check(snapshot.events.size() == 2 && snapshot.events[0].sequence == 0 && snapshot.events[1].sequence == 1,
+          "bounded trace preserves its prefix");
+    check(snapshot.counts[2].attempted == 5 && snapshot.counts[2].written == 2 && snapshot.counts[2].dropped == 3,
+          "trace loss accounting");
+    jitter::ApplicationConfig config;
+    config.workers = 2;
+    config.heavy_rounds = 100;
+    std::vector<jitter::Request> input{{0, false, 0, 0, true}, {1, true, 0, 1, false}};
+    const auto enabled = jitter::run_application(config, input, 1000000, 1000000, {true, 128});
+    check(enabled.trace.buffers.size() == 3 && enabled.trace.phases.size() == 2, "trace writers and phase origins");
+    std::size_t acquire = 0, release = 0, region = 0;
+    for (const auto& writer : enabled.trace.buffers) {
+        for (const auto& event : writer.events) {
+            if (event.kind == jitter::EventKind::lock_acquire) ++acquire;
+            if (event.kind == jitter::EventKind::lock_release) ++release;
+            if (event.kind == jitter::EventKind::region_begin) ++region;
+        }
+        for (const auto& counts : writer.counts) check(counts.dropped == 0, "small trace is lossless");
+    }
+    check(acquire == 2 && release == 2 && region == 2, "every lookup records ownership and its digest region");
+    const auto disabled = jitter::run_application(config, input, 1000000, 1000000);
+    check(!disabled.trace.enabled && disabled.trace.reserved_bytes == 0 && disabled.trace.buffers.empty(),
+          "disabled tracing allocates no event buffers");
+    check(enabled.requests[0].value == disabled.requests[0].value && enabled.requests[1].value == disabled.requests[1].value,
+          "tracing preserves responses");
+    bool threw = false;
+    try { jitter::TraceSession too_large({true, 1000000}, 256); }
+    catch (const std::invalid_argument&) { threw = true; }
+    check(threw, "trace memory bounds");
+}
+
 void check_parser() {
     const auto path = std::filesystem::temp_directory_path() /
         ("jitter-core-" + std::to_string(getpid()) + ".csv");
@@ -87,6 +122,7 @@ int main() {
         check_digest();
         check_accounting();
         check_parser();
+        check_tracing();
         return 0;
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';

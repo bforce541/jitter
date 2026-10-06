@@ -24,11 +24,12 @@ std::uint64_t parse(const std::string& value, std::uint64_t minimum, std::uint64
 int main(int argc, char** argv) {
     try {
         if (argc == 1 || (argc == 2 && std::string_view(argv[1]) == "--help")) {
-            std::cout << "Jitter Phase 1 application engine\n"
+            std::cout << "Jitter Phase 2 application engine\n"
                       << "Use: python3 tools/jitter.py run examples/baseline.json\n"
                       << "Engine: jitter --workload FILE --output DIR --workers N --queue-capacity N\n"
                       << "        --key-count N --dataset-seed N --light-rounds N --heavy-rounds N\n"
                       << "        --warmup-ns N --measurement-ns N\n"
+                      << "        [--trace 0|1 --trace-capacity N]\n"
                       << "Metadata: jitter --build-info\n";
             return 0;
         }
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
             {"--workload", true}, {"--output", true}, {"--workers", true},
             {"--queue-capacity", true}, {"--key-count", true}, {"--dataset-seed", true},
             {"--light-rounds", true}, {"--heavy-rounds", true},
-            {"--warmup-ns", true}, {"--measurement-ns", true}};
+            {"--warmup-ns", true}, {"--measurement-ns", true}, {"--trace", true}, {"--trace-capacity", true}};
         for (int i = 1; i < argc; i += 2) {
             const std::string name(argv[i]);
             if (i + 1 >= argc || !allowed.contains(name) || options.contains(name)) {
@@ -49,7 +50,16 @@ int main(int argc, char** argv) {
             }
             options.emplace(name, argv[i + 1]);
         }
-        if (options.size() != allowed.size()) throw std::invalid_argument("all engine options are required");
+        jitter::TraceConfig tracing;
+        if (options.contains("--trace")) {
+            tracing.enabled = parse(options.at("--trace"), 0, 1) == 1;
+            options.erase("--trace");
+        }
+        if (options.contains("--trace-capacity")) {
+            tracing.events_per_thread = static_cast<std::uint32_t>(parse(options.at("--trace-capacity"), 1, 1000000));
+            options.erase("--trace-capacity");
+        }
+        if (options.size() != 10) throw std::invalid_argument("all application engine options are required");
         jitter::ApplicationConfig config;
         config.workers = static_cast<std::uint32_t>(parse(options.at("--workers"), 1, 256));
         config.queue_capacity = static_cast<std::uint32_t>(parse(options.at("--queue-capacity"), 1, 1000000));
@@ -60,7 +70,7 @@ int main(int argc, char** argv) {
         const auto warmup = static_cast<std::int64_t>(parse(options.at("--warmup-ns"), 0, UINT64_C(3600000000000)));
         const auto measurement = static_cast<std::int64_t>(parse(options.at("--measurement-ns"), 1, UINT64_C(3600000000000)));
         const auto requests = jitter::read_workload(options.at("--workload"), config, warmup, measurement);
-        const auto output = jitter::run_application(config, requests, warmup, measurement);
+        const auto output = jitter::run_application(config, requests, warmup, measurement, tracing);
         jitter::write_output(options.at("--output"), output);
         return 0;
     } catch (const std::exception& error) {

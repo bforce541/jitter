@@ -24,11 +24,12 @@ SharedIndex::SharedIndex(const ApplicationConfig& config) : config_(config) {
     }
 }
 
-std::uint64_t SharedIndex::lookup(std::uint32_t key, bool heavy) {
+std::uint64_t SharedIndex::lookup(std::uint32_t key, bool heavy, TraceContext context) {
     if (key >= values_.size()) {
         throw std::out_of_range("lookup key is outside the dataset");
     }
-    std::lock_guard lock(mutex_);
+    TracedLock lock(mutex_, context, index_lock);
+    TracedRegion region(context, digest_region);
     auto value = values_[key];
     const auto increment = (static_cast<std::uint64_t>(key) + 1) | UINT64_C(1);
     const auto rounds = heavy ? config_.heavy_rounds : config_.light_rounds;
