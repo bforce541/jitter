@@ -150,7 +150,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
                 result = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=spec["timeout_seconds"])
             if result.returncode:
                 raise ExperimentError(f"application exited with status {result.returncode}; see {run_dir / 'stderr.log'}")
-            run = adapter.validate(spec, workload, run_dir)
+            run = adapter.validate(spec, workload, run_dir, persist=True)
             write_json(run_dir / "summary.json", run)
             runs.append(run)
             measurement = run["phases"]["measurement"]

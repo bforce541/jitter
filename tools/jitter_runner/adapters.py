@@ -7,7 +7,8 @@ import subprocess
 from .metrics import analyze_run
 from .spec import ExperimentError
 from .storage import write_json
-from .trace_reader import read_trace
+from .diagnostics import diagnose
+from .spec import load_json
 
 
 class SharedIndexAdapter:
@@ -59,10 +60,15 @@ class SharedIndexAdapter:
             command.extend(["--trace", str(int(tracing["enabled"])), "--trace-capacity", str(tracing["events_per_thread"])])
         return command
 
-    def validate(self, spec, workload, output):
+    def validate(self, spec, workload, output, persist=False):
         baseline = analyze_run(spec, workload, output)
         if spec["schema_version"] == 2:
-            baseline["observation"] = read_trace(spec, output, baseline)["quality"]
+            report = diagnose(spec, output, baseline)
+            baseline["observation"] = report["trace_quality"]
+            if persist:
+                write_json(Path(output) / "diagnostics.json", report)
+            elif report != load_json(Path(output) / "diagnostics.json"):
+                raise ExperimentError("saved diagnostics differ from raw trace evidence")
         return baseline
 
 
