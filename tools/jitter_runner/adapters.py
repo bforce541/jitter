@@ -7,6 +7,7 @@ import subprocess
 from .metrics import analyze_run
 from .spec import ExperimentError
 from .storage import write_json
+from .trace_reader import read_trace
 
 
 class SharedIndexAdapter:
@@ -59,7 +60,10 @@ class SharedIndexAdapter:
         return command
 
     def validate(self, spec, workload, output):
-        return analyze_run(spec, workload, output)
+        baseline = analyze_run(spec, workload, output)
+        if spec["schema_version"] == 2:
+            baseline["observation"] = read_trace(spec, output, baseline)["quality"]
+        return baseline
 
 
 ADAPTERS = {SharedIndexAdapter.name: SharedIndexAdapter()}
