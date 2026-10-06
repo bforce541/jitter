@@ -9,6 +9,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from jitter_runner.dependencies import Intervals, build_dependencies
@@ -31,12 +32,20 @@ def observation_spec():
     return spec
 
 
-def controlled_case(path, capacity=128):
+def controlled_case(path, capacity=128, scenario="mixed"):
     """Three known responses: lock overlap=80 ns, saturation queue time=82 ns."""
     spec = observation_spec()
     spec["instrumentation"]["events_per_thread"] = capacity
+    if scenario != "mixed":
+        spec["application"]["workers"] = 1
+    if scenario == "region":
+        spec["workload"].update(arrival="steady", burst_size=1)
     workload = generate(spec)
     times = [(0, 10, 102), (2, 20, 112), (4, 116, 126)]
+    if scenario == "region":
+        times = [(i * 1000000, i * 1000000 + 10, i * 1000000 + 102) for i in range(3)]
+    elif scenario == "queue":
+        times = [(0, 10, 102), (2, 114, 206), (4, 218, 310)]
     responses = []
     for request, (submit, start, complete) in zip(workload, times):
         responses.append({**request, "status": "completed", "submitted_ns": submit, "started_ns": start,
@@ -45,7 +54,8 @@ def controlled_case(path, capacity=128):
     write_csv(path / "resources.csv", RESOURCE_FIELDS, [{"phase": "measurement", "arrival_window_ns": 3000000,
               "elapsed_ns": 3000000, "cpu_user_ns": 100000, "cpu_system_ns": 0, "peak_rss_bytes": 1000000}])
     write_csv(path / "trace-phases.csv", ORIGIN_FIELDS, [{"phase": "measurement", "start_ns": 1000, "end_ns": 3001000}])
-    streams = [[], [], []]
+    thread_count = spec["application"]["workers"] + 1
+    streams = [[] for _ in range(thread_count)]
     def emit(thread, kind, time, request=None):
         streams[thread].append({"thread_id": thread, "sequence": len(streams[thread]),
                                "phase": "measurement" if request is not None else "lifecycle",
@@ -57,7 +67,7 @@ def controlled_case(path, capacity=128):
         emit(0, "request_submit", times[request][0], request)
         emit(0, "queue_enter", times[request][0] + 1, request)
     emit(0, "thread_stop", 3001005)
-    for thread in (1, 2):
+    for thread in range(1, thread_count):
         emit(thread, "thread_start", 500)
         emit(thread, "worker_wait_begin", 501)
     def operation(thread, request, exit_time, wait_end, wait, acquire, begin, end, release, complete):
@@ -68,10 +78,14 @@ def controlled_case(path, capacity=128):
                            ("region_end", end), ("lock_release", release), ("request_complete", complete)):
             emit(thread, kind, time, request)
         emit(thread, "worker_wait_begin", 1000 + complete + 1)
-    operation(1, 0, 9, 8, 11, 12, 13, 100, 101, 102)
-    operation(2, 1, 19, 18, 21, 103, 104, 110, 111, 112)
-    operation(1, 2, 115, 114, 117, 118, 119, 124, 125, 126)
-    for thread in (1, 2):
+    if scenario == "mixed":
+        operation(1, 0, 9, 8, 11, 12, 13, 100, 101, 102)
+        operation(2, 1, 19, 18, 21, 103, 104, 110, 111, 112)
+        operation(1, 2, 115, 114, 117, 118, 119, 124, 125, 126)
+    else:
+        for request, (_, start, complete) in enumerate(times):
+            operation(1, request, start - 1, start - 2, start + 1, start + 2, start + 3, complete - 2, complete - 1, complete)
+    for thread in range(1, thread_count):
         emit(thread, "worker_wait_end", 3001000 + thread)
         emit(thread, "thread_stop", 3001002 + thread)
     buffers, retained = [], []
@@ -85,7 +99,7 @@ def controlled_case(path, capacity=128):
         retained.extend(stream[:capacity])
     write_csv(path / "events.csv", EVENT_FIELDS, retained)
     write_json(path / "trace-info.json", {"schema_version": 1, "enabled": True, "event_size_bytes": 32,
-               "capacity_per_thread": capacity, "thread_count": 3, "reserved_bytes": 3 * capacity * 32,
+               "capacity_per_thread": capacity, "thread_count": thread_count, "reserved_bytes": thread_count * capacity * 32,
                "clock": "steady_clock_nanoseconds", "retention": "prefix_drop_new", "buffers": buffers})
     return spec, workload, retained
 
@@ -115,6 +129,44 @@ class TraceContractTests(unittest.TestCase):
             self.assertTrue(all(hypothesis["causal_status"] == "hypothesis" for hypothesis in report["hypotheses"]))
             for stage in report["requests"]:
                 self.assertEqual(stage["latency_ns"], sum(stage[key] for key in ("scheduler_ns", "queue_ns", "lock_wait_ns", "digest_ns", "other_service_ns")))
+
+    def test_isolated_region_and_queue_controls_do_not_invent_contention(self):
+        for scenario, expected in (("region", "digest_execution"), ("queue", "queue_pressure")):
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory)
+                spec, workload, _ = controlled_case(path, scenario=scenario)
+                report = diagnose(spec, path, analyze_run(spec, workload, path))
+                names = {hypothesis["id"] for hypothesis in report["hypotheses"]}
+                self.assertIn(expected, names)
+                self.assertNotIn("shared_lock_contention", names)
+                self.assertFalse(any(edge["kind"] == "observed_lock_owner" for edge in report["graph"]["edges"]))
+
+    def test_scheduler_delay_control_is_ranked_without_blaming_application(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            spec, workload, events = controlled_case(path)
+            from jitter_runner.metrics import read_csv
+            responses = read_csv(path / "requests.csv", REQUEST_FIELDS)
+            for row in responses:
+                for key in ("submitted_ns", "started_ns", "completed_ns"):
+                    row[key] = int(row[key]) + 1000000
+            for event in events:
+                if 1000 <= event["timestamp_ns"] < 3001000:
+                    event["timestamp_ns"] += 1000000
+            write_csv(path / "requests.csv", REQUEST_FIELDS, responses)
+            write_csv(path / "events.csv", EVENT_FIELDS, events)
+            report = diagnose(spec, path, analyze_run(spec, workload, path))
+            self.assertEqual(report["hypotheses"][0]["id"], "workload_delivery_delay")
+            self.assertGreater(report["hypotheses"][0]["tail_component_fraction"], .99)
+
+    def test_graph_budget_reports_truncation(self):
+        with tempfile.TemporaryDirectory() as directory, patch("jitter_runner.dependencies.MAX_EDGES", 1):
+            path = Path(directory)
+            spec, workload, _ = controlled_case(path)
+            report = diagnose(spec, path, analyze_run(spec, workload, path))
+            self.assertTrue(report["graph"]["edges_truncated"])
+            self.assertEqual(len(report["graph"]["edges"]), 1)
+            self.assertTrue(any("truncated" in limitation for limitation in report["limitations"]))
 
     def test_report_is_deterministic_and_request_selection_is_bounded(self):
         with tempfile.TemporaryDirectory() as directory:

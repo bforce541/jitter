@@ -32,3 +32,15 @@ jobs:
         run: python3 tools/jitter.py verify results/ci-baseline
       - name: Reproduce baseline
         run: python3 tools/jitter.py reproduce results/ci-baseline --output results/ci-reproduction
+      - name: Capture observation evidence
+        run: python3 tools/jitter.py run examples/contention.json --output results/ci-observation
+      - name: Inspect hypotheses and request dependencies
+        run: |
+          python3 tools/jitter.py diagnose results/ci-observation --run 1 > results/ci-diagnosis.json
+          python3 tools/jitter.py diagnose results/ci-observation --run 1 --request 50 > results/ci-request.json
+      - name: Reproduce observation
+        run: python3 tools/jitter.py reproduce results/ci-observation --output results/ci-observation-replay
+      - name: Measure observation overhead
+        run: python3 tools/jitter.py overhead examples/contention.json --output results/ci-overhead
+      - name: Verify paired study
+        run: python3 tools/jitter.py verify results/ci-overhead

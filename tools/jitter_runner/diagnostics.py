@@ -1,5 +1,6 @@
 """Observed dependencies yield hypotheses, never automatic causal conclusions."""
 
+from .metrics import distribution
 from .dependencies import build_dependencies
 from .trace_reader import read_trace
 
@@ -33,8 +34,8 @@ def hypotheses(spec, baseline, evidence):
         if measurement["rejected"]:
             capacity = spec["application"]["queue_capacity"]
             experiment = {"kind": "configuration_comparison", "parameter": "application.queue_capacity",
-                          "values": sorted({capacity, min(1000000, capacity * 2)}),
-                          "prediction": "More waiting capacity may reduce rejection but increase latency; validate both and respect the memory budget."}
+                          "values": sorted({capacity, min(1000000, capacity * 2) if capacity < 1000000 else capacity // 2}),
+                          "prediction": "Changing waiting capacity should alter rejection and queueing; compare latency and throughput and respect the memory budget."}
         add("queue_pressure", "Requests accumulate in the bounded queue or are rejected at admission.", "queue_ns",
             {"rejected": measurement["rejected"], "all_workers_busy_queue_ns": sum(stage["all_workers_busy_queue_ns"] for stage in tail)},
             experiment, "Parallel worker overlaps are not additive delay. More workers can worsen shared-lock contention.")
@@ -46,7 +47,6 @@ def hypotheses(spec, baseline, evidence):
     if fraction("digest_ns") >= .1:
         heavy = [stage["observed_hold_ns"] for stage in evidence["requests"] if stage["heavy"]]
         light = [stage["observed_hold_ns"] for stage in evidence["requests"] if not stage["heavy"]]
-        from .metrics import distribution
         add("digest_execution", "The selected digest region accounts for a substantial part of slow-request latency.", "digest_ns",
             {"heavy_hold_ns": distribution(heavy), "light_hold_ns": distribution(light),
              "heavy_blocking_holders": sum(holder["heavy"] for holder in evidence["blocking_holders"])},
