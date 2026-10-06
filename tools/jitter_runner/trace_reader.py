@@ -58,15 +58,21 @@ def validate_queue(events, capacity):
     queue = deque()
     for _, bucket in sorted(buckets.items()):
         producer = deque(sorted((event for event in bucket if event["thread_id"] == 0), key=lambda event: event["sequence"]))
-        exits = {event["request_id"] for event in bucket if event["kind"] == "queue_exit"}
-        while producer or exits:
+        exits = defaultdict(deque)
+        exit_owner = {}
+        for event in bucket:
+            if event["kind"] == "queue_exit":
+                exits[event["thread_id"]].append(event["request_id"])
+                exit_owner[event["request_id"]] = event["thread_id"]
+        while producer or exit_owner:
             next_event = producer[0] if producer else None
             if next_event and next_event["kind"] == "request_reject" and len(queue) == capacity:
                 producer.popleft()
             elif next_event and next_event["kind"] == "queue_enter" and len(queue) < capacity:
                 queue.append(producer.popleft()["request_id"])
-            elif queue and queue[0] in exits:
-                exits.remove(queue.popleft())
+            elif queue and queue[0] in exit_owner and exits[exit_owner[queue[0]]][0] == queue[0]:
+                owner = exit_owner.pop(queue.popleft())
+                exits[owner].popleft()
             else:
                 require(False, "queue events contradict FIFO order, capacity, or rejection state")
     require(not queue, "queue did not drain")

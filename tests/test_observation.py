@@ -264,6 +264,10 @@ class TraceContractTests(unittest.TestCase):
                    event("queue_exit", 1, 3, 0, 2), event("queue_exit", 0, 4, 0, 1)]
         with self.assertRaises(ExperimentError):
             validate_queue(invalid, 2)
+        reversed_worker = [event("queue_enter", 0, 1, 0, 0), event("queue_enter", 1, 1, 1, 0),
+                           event("queue_exit", 1, 1, 0, 1), event("queue_exit", 0, 1, 1, 1)]
+        with self.assertRaises(ExperimentError):
+            validate_queue(reversed_worker, 2)
 
     def test_interval_index_handles_touching_and_zero_spans(self):
         intervals = Intervals([{"start_ns": 0, "end_ns": 10}, {"start_ns": 10, "end_ns": 20}])
