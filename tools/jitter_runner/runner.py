@@ -11,7 +11,7 @@ import uuid
 
 from .adapters import get_adapter
 from .metrics import summarize_runs
-from .spec import ExperimentError, load_json, load_spec
+from .spec import ExperimentError, load_json, load_spec, validate_spec
 from .storage import git_output, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
 from .workload import encode_workload, generate
 
@@ -82,6 +82,7 @@ def verify_bundle(path):
 
 
 def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None):
+    validate_spec(spec)
     adapter = get_adapter(spec["application"]["adapter"])
     original = None
     if reproduce_from:

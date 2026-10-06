@@ -70,7 +70,7 @@ def seal_bundle(root, status):
     write_json(root / "manifest.json", {"schema_version": 1, "status": status, "artifacts": artifacts})
 
 
-def verify_integrity(root):
+def verify_integrity(root, required=("spec.json", "workload.csv", "metadata.json", "summary.json", "engine/jitter", "source.tar.gz")):
     root = Path(root).resolve()
     manifest = load_json(root / "manifest.json")
     if not isinstance(manifest, dict) or manifest.get("schema_version") != 1 or not isinstance(manifest.get("artifacts"), dict):
@@ -91,9 +91,9 @@ def verify_integrity(root):
     actual = {str(path.relative_to(root)) for path in root.rglob("*") if path.is_file() and path != root / "manifest.json"}
     if actual != set(manifest["artifacts"]):
         raise ExperimentError("bundle has unrecorded or missing files")
-    for required in ("spec.json", "workload.csv", "metadata.json", "summary.json", "engine/jitter", "source.tar.gz"):
-        if required not in manifest["artifacts"]:
-            raise ExperimentError(f"bundle missing required artifact: {required}")
+    for name in required:
+        if name not in manifest["artifacts"]:
+            raise ExperimentError(f"bundle missing required artifact: {name}")
     return manifest
 
 
