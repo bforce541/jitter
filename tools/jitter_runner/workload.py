@@ -46,6 +46,14 @@ def encode_workload(rows):
 
 def expected_value(app, key, heavy):
     """Exponentiate an affine map; intentionally different from the C++ loop."""
+    if app["adapter"] == "json-projection-v1":
+        # Construct and parse with a different implementation from the C++ DOM.
+        import json
+        count = app["heavy_fields"] if heavy else app["light_fields"]
+        base = app["dataset_seed"] + GOLDEN * (key + 1)
+        document = {f"f{index}": mix64(base + GOLDEN * (index + 1)) % 1000000007 for index in range(count)}
+        parsed = json.loads(json.dumps(document))
+        return sum((index + 1) * parsed[f"f{index}"] for index in range(count)) & MASK
     value = mix64(app["dataset_seed"] + GOLDEN * (key + 1))
     rounds = app["heavy_rounds"] if heavy else app["light_rounds"]
     multiplier = MULTIPLIER

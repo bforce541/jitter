@@ -43,7 +43,7 @@ def source_files(root):
     for name in sorted(set(filter(None, names))):
         path = root / name
         # Capture the supported source tree, not arbitrary personal files.
-        if name not in ("CMakeLists.txt", ".gitignore", "README.md") and Path(name).parts[0] not in ("src", "include", "tools", "tests", "examples", "docs", ".github"):
+        if name not in ("CMakeLists.txt", ".gitignore", "README.md", "pyproject.toml", "LICENSE") and Path(name).parts[0] not in ("src", "include", "tools", "tests", "examples", "docs", ".github", "third_party"):
             continue
         if path.is_symlink():
             raise ExperimentError(f"source snapshot does not support symlinks: {name}")

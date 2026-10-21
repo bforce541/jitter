@@ -7,6 +7,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import time
 import uuid
 
 from .adapters import get_adapter
@@ -72,7 +73,7 @@ def verify_bundle(path):
         raise ExperimentError("recorded workload identity mismatch")
     if metadata.get("source_archive_sha256") != sha256(path / "source.tar.gz"):
         raise ExperimentError("recorded source archive identity mismatch")
-    if metadata["build"].get("contract") != spec["application"]["adapter"]:
+    if spec["application"]["adapter"] not in metadata["build"].get("contracts", [metadata["build"].get("contract")]):
         raise ExperimentError("recorded build contract mismatch")
     verify_source_archive(path / "source.tar.gz", metadata["source"].get("files"))
     if metadata.get("engine_sha256") != sha256(path / "engine" / "jitter"):
@@ -82,7 +83,7 @@ def verify_bundle(path):
     return spec, summary, metadata
 
 
-def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None):
+def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None, source_context=None, deadline=None):
     validate_spec(spec)
     adapter = get_adapter(spec["application"]["adapter"])
     original = None
@@ -116,8 +117,11 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
             metadata["build_commands"] = original_metadata["build_commands"]
             metadata["binary_origin"] = "saved executable"
         else:
-            hashes = snapshot_source(ROOT, path / "source.tar.gz")
-            metadata["source"] = {"revision": git_output(ROOT, ["rev-parse", "HEAD"]).decode().strip(),
+            root = Path(source_context["root"]) if source_context else ROOT
+            hashes = source_context["source"]["files"] if source_context else snapshot_source(ROOT, path / "source.tar.gz")
+            if source_context:
+                shutil.copy2(source_context["archive"], path / "source.tar.gz")
+            metadata["source"] = source_context["source"] if source_context else {"revision": git_output(ROOT, ["rev-parse", "HEAD"]).decode().strip(),
                                   "dirty": bool(git_output(ROOT, ["status", "--porcelain"]).strip()),
                                   "files": hashes}
             if binary:
@@ -125,16 +129,18 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
                 metadata["build_commands"] = []
                 metadata["binary_origin"] = "supplied executable; source correspondence is not guaranteed"
             else:
-                source_binary, commands = adapter.build(ROOT, Path(build_dir).resolve() if build_dir else path / "build", path / "build-logs")
+                source_binary, commands = adapter.build(root, Path(build_dir).resolve() if build_dir else path / "build", path / "build-logs")
                 metadata["build_commands"] = commands
                 metadata["binary_origin"] = "built from current checkout"
-            if hashes != source_hashes(ROOT):
+            if not source_context and hashes != source_hashes(ROOT):
                 raise ExperimentError("source changed during setup; rerun with a stable checkout")
         shutil.copy2(source_binary, path / "engine" / "jitter")
         saved_binary = path / "engine" / "jitter"
         metadata["build"] = adapter.build_info(saved_binary)
-        if spec["schema_version"] == 2 and metadata["build"].get("trace_format") != 1:
+        if spec["schema_version"] >= 2 and metadata["build"].get("trace_format") != 1:
             raise ExperimentError("schema version 2 requires a trace-format-1 engine")
+        if spec["schema_version"] >= 3 and metadata["build"].get("compiled_variant", "any") not in ("any", spec["application"]["implementation"]):
+            raise ExperimentError("saved executable was built for a different implementation")
         metadata["engine_sha256"] = sha256(saved_binary)
         metadata["source_archive_sha256"] = sha256(path / "source.tar.gz")
         if original:
@@ -149,7 +155,8 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
             write_json(run_dir / "execution.json", {"command": command, "timeout_seconds": spec["timeout_seconds"]})
             print(f"Running repetition {index + 1}/{spec['repetitions']}...", flush=True)
             with (run_dir / "stdout.log").open("w") as stdout, (run_dir / "stderr.log").open("w") as stderr:
-                result = run_command(command, stdout=stdout, stderr=stderr, timeout=spec["timeout_seconds"])
+                available = spec["timeout_seconds"] if deadline is None else min(spec["timeout_seconds"], max(.001, deadline - time.monotonic()))
+                result = run_command(command, stdout=stdout, stderr=stderr, timeout=available)
             if result.returncode:
                 raise ExperimentError(f"application exited with status {result.returncode}; see {run_dir / 'stderr.log'}")
             run = adapter.validate(spec, workload, run_dir, persist=True)
@@ -173,4 +180,6 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
         write_json(path / "metadata.json", metadata)
         write_json(path / "summary.json", summary)
         seal_bundle(path, "failed")
+        if isinstance(error, KeyboardInterrupt):
+            raise
         raise ExperimentError(f"experiment failed: {error}; evidence retained at {path}") from error

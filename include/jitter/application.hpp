@@ -3,7 +3,9 @@
 #include "jitter/trace.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 namespace jitter {
@@ -15,6 +17,10 @@ struct ApplicationConfig {
     std::uint64_t dataset_seed{17};
     std::uint32_t light_rounds{256};
     std::uint32_t heavy_rounds{131072};
+    std::string adapter{"shared-index-v1"};
+    std::string implementation{"coarse"};
+    std::uint32_t light_fields{8};
+    std::uint32_t heavy_fields{256};
 };
 
 // SplitMix64's finalizer: specified integer operations, independent of std::hash.
@@ -26,12 +32,15 @@ std::uint64_t initial_value(std::uint64_t seed, std::uint32_t key);
 class SharedIndex {
 public:
     explicit SharedIndex(const ApplicationConfig& config);
+    ~SharedIndex();
     std::uint64_t lookup(std::uint32_t key, bool heavy, TraceContext context = {});
 
 private:
     ApplicationConfig config_;
     std::vector<std::uint64_t> values_;
     std::mutex mutex_;
+    struct JsonDocuments;
+    std::unique_ptr<JsonDocuments> json_;
 };
 
 } // namespace jitter

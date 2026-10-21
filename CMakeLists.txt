@@ -1,5 +1,17 @@
 cmake_minimum_required(VERSION 3.20)
-project(jitter VERSION 0.2.0 LANGUAGES CXX)
+project(jitter VERSION 1.0.0 LANGUAGES CXX)
+
+set(JITTER_VARIANT "any" CACHE STRING "Restrict engine to one registered implementation")
+set_property(CACHE JITTER_VARIANT PROPERTY STRINGS any coarse narrow map ordered)
+if(NOT JITTER_VARIANT MATCHES "^(any|coarse|narrow|map|ordered)$")
+    message(FATAL_ERROR "Unsupported JITTER_VARIANT: ${JITTER_VARIANT}")
+endif()
+message(STATUS "Jitter compiled variant: ${JITTER_VARIANT}")
+file(SHA256 "${CMAKE_SOURCE_DIR}/third_party/nlohmann/json.hpp" JITTER_JSON_SHA256)
+if(NOT JITTER_JSON_SHA256 STREQUAL "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63")
+    message(FATAL_ERROR "Vendored nlohmann/json header does not match pinned upstream release")
+endif()
+message(STATUS "nlohmann/json 3.12.0: ${JITTER_JSON_SHA256}")
 
 if(NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(FATAL_ERROR "Phase 1 resource collection supports Linux and macOS")
@@ -33,6 +45,8 @@ configure_file(include/jitter/build_info.hpp.in generated/jitter/build_info.hpp 
 
 add_library(jitter_core src/application.cpp src/experiment.cpp src/trace.cpp)
 target_include_directories(jitter_core PUBLIC include)
+target_include_directories(jitter_core SYSTEM PRIVATE third_party)
+target_compile_definitions(jitter_core PRIVATE JITTER_COMPILED_VARIANT="${JITTER_VARIANT}")
 target_compile_features(jitter_core PUBLIC cxx_std_20)
 set_target_properties(jitter_core PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_options(jitter_core PRIVATE -Wall -Wextra -Wpedantic)

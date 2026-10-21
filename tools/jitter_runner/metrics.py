@@ -34,14 +34,17 @@ def numeric(value, minimum=0, maximum=(1 << 64) - 1):
     return parsed
 
 
-def distribution(values):
+def distribution(values, extended=False):
     if not values:
-        return {"count": 0, "min": None, "p50": None, "p95": None, "p99": None, "max": None}
+        return {"count": 0, "min": None, "p50": None, "p95": None, "p99": None, "max": None, **({"p999": None} if extended else {})}
     ordered = sorted(values)
     def quantile(percentile):
         return ordered[max(0, math.ceil(len(ordered) * percentile) - 1)]
-    return {"count": len(values), "min": ordered[0], "p50": quantile(.5),
-            "p95": quantile(.95), "p99": quantile(.99), "max": ordered[-1]}
+    result = {"count": len(values), "min": ordered[0], "p50": quantile(.5),
+              "p95": quantile(.95), "p99": quantile(.99), "max": ordered[-1]}
+    if extended:
+        result["p999"] = quantile(.999)
+    return result
 
 
 def analyze_run(spec, workload, run_dir):
@@ -103,7 +106,7 @@ def analyze_run(spec, workload, run_dir):
             "offered": len(phase_rows), "completed": len(completed), "rejected": rejected, "errors": 0,
             "completion_fraction": len(completed) / len(phase_rows) if phase_rows else 0,
             "rejection_fraction": rejected / len(phase_rows) if phase_rows else 0,
-            "latency_ns": distribution([row["completed_ns"] - row["scheduled_ns"] for row in completed]),
+            "latency_ns": distribution([row["completed_ns"] - row["scheduled_ns"] for row in completed], extended=spec["schema_version"] >= 3),
             "response_latency_ns": distribution([row["completed_ns"] - row["submitted_ns"] for row in completed]),
             "queue_delay_ns": distribution([row["started_ns"] - row["submitted_ns"] for row in completed]),
             "service_time_ns": distribution([row["completed_ns"] - row["started_ns"] for row in completed]),

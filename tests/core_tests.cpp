@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <unistd.h>
 
 namespace {
@@ -25,6 +26,91 @@ void check_digest() {
     bool threw = false;
     try { app.lookup(2, false); } catch (const std::out_of_range&) { threw = true; }
     check(threw, "out-of-range lookup must fail");
+}
+
+void check_variants() {
+    jitter::ApplicationConfig coarse;
+    coarse.key_count = 8;
+    coarse.light_rounds = 7;
+    coarse.heavy_rounds = 100;
+    auto narrow = coarse;
+    narrow.implementation = "narrow";
+    jitter::SharedIndex first(coarse), second(narrow);
+    for (std::uint32_t key = 0; key < coarse.key_count; ++key) {
+        for (bool heavy : {false, true}) {
+            check(first.lookup(key, heavy) == second.lookup(key, heavy), "lock scope preserves digest contract");
+        }
+    }
+    const auto events_for = [](const jitter::ApplicationConfig& config) {
+        jitter::SharedIndex app(config);
+        jitter::TraceBuffer buffer(1, 16, jitter::TraceClock::now());
+        app.lookup(0, false, {&buffer, jitter::TracePhase::measurement, 0});
+        std::vector<jitter::EventKind> events;
+        for (const auto& event : buffer.take().events) events.push_back(event.kind);
+        return events;
+    };
+    using Kind = jitter::EventKind;
+    check(events_for(coarse) == std::vector<Kind>{Kind::lock_wait, Kind::lock_acquire,
+          Kind::region_begin, Kind::region_end, Kind::lock_release}, "coarse trace scope");
+    const std::vector<Kind> narrow_order{Kind::lock_wait, Kind::lock_acquire, Kind::lock_release,
+                                        Kind::region_begin, Kind::region_end};
+    check(events_for(narrow) == narrow_order, "narrow releases before digest");
+
+    jitter::ApplicationConfig json;
+    json.adapter = "json-projection-v1";
+    json.implementation = "map";
+    json.key_count = 8;
+    json.light_fields = 1;
+    json.heavy_fields = 256;
+    auto ordered = json;
+    ordered.implementation = "ordered";
+    jitter::SharedIndex map_app(json), ordered_app(ordered);
+    check(map_app.lookup(0, false) == UINT64_C(444051756), "JSON light independent golden value");
+    check(map_app.lookup(0, true) == UINT64_C(16464020396125), "JSON heavy independent golden value");
+    for (std::uint32_t key = 0; key < json.key_count; ++key) {
+        for (bool heavy : {false, true}) {
+            check(map_app.lookup(key, heavy) == ordered_app.lookup(key, heavy), "JSON variants preserve projection");
+        }
+    }
+    check(events_for(json) == narrow_order && events_for(ordered) == narrow_order,
+          "JSON parsing occurs after document lock release");
+    auto maximum = json;
+    maximum.light_fields = 8;
+    maximum.heavy_fields = 4096;
+    jitter::SharedIndex maximum_app(maximum);
+    check(maximum_app.lookup(1, false) == UINT64_C(17208641377), "JSON multi-field golden value");
+    check(maximum_app.lookup(7, true) == UINT64_C(4194286716285739), "JSON maximum-field golden value");
+    std::vector<std::thread> threads;
+    std::vector<std::uint64_t> responses(8);
+    for (std::size_t i = 0; i < responses.size(); ++i) {
+        threads.emplace_back([&, i] {
+            for (int repeat = 0; repeat < 10; ++repeat) {
+                responses[i] = ordered_app.lookup(static_cast<std::uint32_t>(i), true);
+            }
+        });
+    }
+    for (auto& thread : threads) thread.join();
+    for (std::size_t i = 0; i < responses.size(); ++i) {
+        check(responses[i] == map_app.lookup(static_cast<std::uint32_t>(i), true), "concurrent JSON immutable access");
+    }
+    for (const auto& invalid : {std::string("not-an-adapter"), std::string("shared-index-v1")}) {
+        auto bad = json;
+        bad.adapter = invalid;
+        bool threw = false;
+        try { jitter::SharedIndex app(bad); } catch (const std::invalid_argument&) { threw = true; }
+        check(threw, "unsupported adapter or implementation rejected");
+    }
+    auto excessive = json;
+    excessive.key_count = 65536;
+    excessive.light_fields = excessive.heavy_fields = 4096;
+    bool threw = false;
+    try { jitter::SharedIndex app(excessive); } catch (const std::invalid_argument&) { threw = true; }
+    check(threw, "JSON preparation memory bound");
+    excessive = json;
+    excessive.heavy_fields = 4097;
+    threw = false;
+    try { jitter::SharedIndex app(excessive); } catch (const std::invalid_argument&) { threw = true; }
+    check(threw, "JSON field bound");
 }
 
 void check_accounting() {
@@ -120,6 +206,7 @@ void check_parser() {
 int main() {
     try {
         check_digest();
+        check_variants();
         check_accounting();
         check_parser();
         check_tracing();

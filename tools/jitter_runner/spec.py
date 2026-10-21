@@ -27,17 +27,30 @@ def real(value, minimum, maximum, location):
 def validate_spec(spec):
     if not isinstance(spec, dict):
         raise ExperimentError("spec must be an object")
-    integer(spec.get("schema_version"), 1, 2, "schema_version")
+    integer(spec.get("schema_version"), 1, 3, "schema_version")
     required = ("schema_version", "application", "workload", "objective", "repetitions", "timeout_seconds")
-    object_keys(spec, required + (("instrumentation",) if spec["schema_version"] == 2 else ()), "spec")
+    object_keys(spec, required + (("instrumentation",) if spec["schema_version"] >= 2 else ()), "spec")
     app = spec["application"]
-    object_keys(app, ("adapter", "workers", "queue_capacity", "key_count", "dataset_seed", "light_rounds", "heavy_rounds"), "application")
-    if app["adapter"] != "shared-index-v1":
-        raise ExperimentError("only the shared-index-v1 application adapter is supported")
+    if not isinstance(app, dict):
+        raise ExperimentError("application must be an object")
+    json_app = app.get("adapter") == "json-projection-v1"
+    if app.get("adapter") not in ("shared-index-v1", "json-projection-v1") or (json_app and spec["schema_version"] < 3):
+        raise ExperimentError("unsupported adapter or schema; JSON projection requires schema version 3")
+    behavior = ("light_fields", "heavy_fields") if json_app else ("light_rounds", "heavy_rounds")
+    object_keys(app, ("adapter", "workers", "queue_capacity", "key_count", "dataset_seed", *behavior) +
+                (("implementation",) if spec["schema_version"] == 3 else ()), "application")
     for key, low, high in (("workers", 1, 256), ("queue_capacity", 1, 1000000), ("key_count", 1, 65536),
-                           ("dataset_seed", 0, (1 << 64) - 1), ("light_rounds", 1, 10000000), ("heavy_rounds", 1, 10000000)):
+                           ("dataset_seed", 0, (1 << 64) - 1)):
         integer(app[key], low, high, f"application.{key}")
-    if spec["schema_version"] == 2:
+    for key in behavior:
+        integer(app[key], 1, 4096 if json_app else 10000000, f"application.{key}")
+    if json_app and app["key_count"] * (32 * (app["light_fields"] + app["heavy_fields"]) + 128) > 268435456:
+        raise ExperimentError("JSON corpus exceeds its conservative 256 MiB storage bound")
+    if spec["schema_version"] == 3:
+        choices = ("map", "ordered") if json_app else ("coarse", "narrow")
+        if app["implementation"] not in choices:
+            raise ExperimentError(f"implementation must be one of {choices}")
+    if spec["schema_version"] >= 2:
         tracing = spec["instrumentation"]
         object_keys(tracing, ("enabled", "events_per_thread"), "instrumentation")
         if type(tracing["enabled"]) is not bool:

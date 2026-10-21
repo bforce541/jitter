@@ -22,7 +22,7 @@ def require(condition, message):
         raise ExperimentError("invalid trace: " + message)
 
 
-def _worker_grammar(events, dropped):
+def _worker_grammar(events, dropped, stages=WORKER_STAGES):
     state, active = "thread_start", None
     for event in events:
         kind = event["kind"]
@@ -43,8 +43,8 @@ def _worker_grammar(events, dropped):
                 state = "after_wait"
             else:
                 require(event["request_id"] == active, "worker changed requests mid-operation")
-                index = WORKER_STAGES.index(kind)
-                state = WORKER_STAGES[index + 1] if index + 1 < len(WORKER_STAGES) else "worker_wait_begin"
+                index = stages.index(kind)
+                state = stages[index + 1] if index + 1 < len(stages) else "worker_wait_begin"
     if not dropped:
         require(state == "stopped", "lossless worker trace is unfinished")
 
@@ -85,6 +85,9 @@ def read_trace(spec, run_dir, baseline):
     object_keys(info, ("schema_version", "enabled", "event_size_bytes", "capacity_per_thread", "thread_count",
                        "reserved_bytes", "clock", "retention", "buffers"), "trace metadata")
     tracing = spec["instrumentation"]
+    stages = WORKER_STAGES
+    if spec["application"].get("implementation", "coarse") != "coarse":
+        stages = ("queue_exit", "request_start", "lock_wait", "lock_acquire", "lock_release", "region_begin", "region_end", "request_complete")
     threads = spec["application"]["workers"] + 1
     require(type(info["enabled"]) is bool and info["enabled"] == tracing["enabled"], "mode differs from specification")
     for key, expected in (("schema_version", 1), ("event_size_bytes", 32),
@@ -197,7 +200,7 @@ def read_trace(spec, run_dir, baseline):
         for phase in PHASES:
             require(observed_counts[thread][phase] == buffer["phases"][phase]["written"], "written ledger differs from event rows")
         if thread:
-            _worker_grammar(events, sum(counts["dropped"] for counts in buffer["phases"].values()))
+            _worker_grammar(events, sum(counts["dropped"] for counts in buffer["phases"].values()), stages)
         elif not sum(counts["dropped"] for counts in buffer["phases"].values()):
             require(len(events) == len(producer_expected), "lossless producer trace is unfinished")
     dropped = sum(counts["dropped"] for counts in totals.values())
