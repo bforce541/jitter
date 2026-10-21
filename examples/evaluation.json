@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "seeds": [
+    1
+  ],
+  "strategies": [
+    "guided",
+    "random",
+    "grid",
+    "local",
+    "unguided"
+  ],
+  "scenarios": [
+    {
+      "name": "shared-contention",
+      "investigation": {
+        "schema_version": 1,
+        "experiment": {
+          "schema_version": 3,
+          "application": {
+            "adapter": "shared-index-v1",
+            "workers": 4,
+            "queue_capacity": 4096,
+            "key_count": 8,
+            "dataset_seed": 17,
+            "light_rounds": 64,
+            "heavy_rounds": 131072,
+            "implementation": "coarse"
+          },
+          "workload": {
+            "seed": 42,
+            "arrival": "burst",
+            "rate_per_second": 20000,
+            "warmup_ms": 10,
+            "measurement_ms": 100,
+            "heavy_fraction": 0.05,
+            "burst_size": 16
+          },
+          "objective": {
+            "metric": "p99_latency_ns",
+            "min_throughput_per_second": 0,
+            "max_peak_rss_bytes": 536870912,
+            "max_cpu_cores": 8,
+            "max_rejection_fraction": 0,
+            "max_scheduler_lag_p99_ns": 10000000
+          },
+          "repetitions": 1,
+          "timeout_seconds": 10,
+          "instrumentation": {
+            "enabled": false,
+            "events_per_thread": 65536
+          }
+        },
+        "search": {
+          "strategy": "guided",
+          "seed": 1,
+          "parameters": {
+            "workers": [
+              2,
+              4
+            ],
+            "implementation": [
+              "coarse",
+              "narrow"
+            ]
+          },
+          "exclude": []
+        },
+        "sampling": {
+          "exploration_pairs": 2,
+          "max_exploration_pairs": 2,
+          "confirmation_pairs": 8
+        },
+        "comparison": {
+          "metric": "p99",
+          "min_effect": 0.05,
+          "confidence": 0.95,
+          "max_throughput_loss": 0.05,
+          "min_tail_observations": 20,
+          "max_baseline_spread": 3
+        },
+        "budget": {
+          "max_candidates": 2,
+          "max_runs": 25,
+          "max_builds": 2,
+          "max_failures": 2,
+          "wall_seconds": 120
+        },
+        "diagnostic": true
+      }
+    },
+    {
+      "name": "json-small",
+      "investigation": {
+        "schema_version": 1,
+        "experiment": {
+          "schema_version": 3,
+          "application": {
+            "adapter": "json-projection-v1",
+            "workers": 4,
+            "queue_capacity": 4096,
+            "key_count": 8,
+            "dataset_seed": 17,
+            "implementation": "map",
+            "light_fields": 4,
+            "heavy_fields": 16
+          },
+          "workload": {
+            "seed": 42,
+            "arrival": "burst",
+            "rate_per_second": 20000,
+            "warmup_ms": 10,
+            "measurement_ms": 100,
+            "heavy_fraction": 0.05,
+            "burst_size": 16
+          },
+          "objective": {
+            "metric": "p99_latency_ns",
+            "min_throughput_per_second": 0,
+            "max_peak_rss_bytes": 536870912,
+            "max_cpu_cores": 8,
+            "max_rejection_fraction": 0,
+            "max_scheduler_lag_p99_ns": 10000000
+          },
+          "repetitions": 1,
+          "timeout_seconds": 10,
+          "instrumentation": {
+            "enabled": false,
+            "events_per_thread": 65536
+          }
+        },
+        "search": {
+          "strategy": "guided",
+          "seed": 1,
+          "parameters": {
+            "workers": [
+              2,
+              4
+            ],
+            "implementation": [
+              "map",
+              "ordered"
+            ]
+          },
+          "exclude": []
+        },
+        "sampling": {
+          "exploration_pairs": 2,
+          "max_exploration_pairs": 2,
+          "confirmation_pairs": 8
+        },
+        "comparison": {
+          "metric": "p99",
+          "min_effect": 0.05,
+          "confidence": 0.95,
+          "max_throughput_loss": 0.05,
+          "min_tail_observations": 20,
+          "max_baseline_spread": 3
+        },
+        "budget": {
+          "max_candidates": 2,
+          "max_runs": 25,
+          "max_builds": 2,
+          "max_failures": 2,
+          "wall_seconds": 120
+        },
+        "diagnostic": true
+      }
+    },
+    {
+      "name": "json-large",
+      "investigation": {
+        "schema_version": 1,
+        "experiment": {
+          "schema_version": 3,
+          "application": {
+            "adapter": "json-projection-v1",
+            "workers": 4,
+            "queue_capacity": 4096,
+            "key_count": 8,
+            "dataset_seed": 17,
+            "implementation": "ordered",
+            "light_fields": 128,
+            "heavy_fields": 512
+          },
+          "workload": {
+            "seed": 42,
+            "arrival": "burst",
+            "rate_per_second": 20000,
+            "warmup_ms": 10,
+            "measurement_ms": 100,
+            "heavy_fraction": 0.05,
+            "burst_size": 16
+          },
+          "objective": {
+            "metric": "p99_latency_ns",
+            "min_throughput_per_second": 0,
+            "max_peak_rss_bytes": 536870912,
+            "max_cpu_cores": 8,
+            "max_rejection_fraction": 0,
+            "max_scheduler_lag_p99_ns": 10000000
+          },
+          "repetitions": 1,
+          "timeout_seconds": 10,
+          "instrumentation": {
+            "enabled": false,
+            "events_per_thread": 65536
+          }
+        },
+        "search": {
+          "strategy": "guided",
+          "seed": 1,
+          "parameters": {
+            "workers": [
+              2,
+              4
+            ],
+            "implementation": [
+              "map",
+              "ordered"
+            ]
+          },
+          "exclude": []
+        },
+        "sampling": {
+          "exploration_pairs": 2,
+          "max_exploration_pairs": 2,
+          "confirmation_pairs": 8
+        },
+        "comparison": {
+          "metric": "p99",
+          "min_effect": 0.05,
+          "confidence": 0.95,
+          "max_throughput_loss": 0.05,
+          "min_tail_observations": 20,
+          "max_baseline_spread": 3
+        },
+        "budget": {
+          "max_candidates": 2,
+          "max_runs": 25,
+          "max_builds": 2,
+          "max_failures": 2,
+          "wall_seconds": 120
+        },
+        "diagnostic": true
+      }
+    }
+  ]
+}
