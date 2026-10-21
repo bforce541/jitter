@@ -72,6 +72,8 @@ def seal_bundle(root, status):
 
 def verify_integrity(root, required=("spec.json", "workload.csv", "metadata.json", "summary.json", "engine/jitter", "source.tar.gz")):
     root = Path(root).resolve()
+    if any(path.is_symlink() for path in root.rglob("*")):
+        raise ExperimentError("bundle must not contain symlinks")
     manifest = load_json(root / "manifest.json")
     if not isinstance(manifest, dict) or manifest.get("schema_version") != 1 or not isinstance(manifest.get("artifacts"), dict):
         raise ExperimentError("invalid bundle manifest")

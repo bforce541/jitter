@@ -14,6 +14,7 @@ from .metrics import summarize_runs
 from .spec import ExperimentError, load_json, load_spec, validate_spec
 from .storage import git_output, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
 from .workload import encode_workload, generate
+from .process import run_command
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -124,7 +125,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
                 metadata["build_commands"] = []
                 metadata["binary_origin"] = "supplied executable; source correspondence is not guaranteed"
             else:
-                source_binary, commands = adapter.build(ROOT, Path(build_dir).resolve() if build_dir else ROOT / "build", path / "build-logs")
+                source_binary, commands = adapter.build(ROOT, Path(build_dir).resolve() if build_dir else path / "build", path / "build-logs")
                 metadata["build_commands"] = commands
                 metadata["binary_origin"] = "built from current checkout"
             if hashes != source_hashes(ROOT):
@@ -148,7 +149,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
             write_json(run_dir / "execution.json", {"command": command, "timeout_seconds": spec["timeout_seconds"]})
             print(f"Running repetition {index + 1}/{spec['repetitions']}...", flush=True)
             with (run_dir / "stdout.log").open("w") as stdout, (run_dir / "stderr.log").open("w") as stderr:
-                result = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=spec["timeout_seconds"])
+                result = run_command(command, stdout=stdout, stderr=stderr, timeout=spec["timeout_seconds"])
             if result.returncode:
                 raise ExperimentError(f"application exited with status {result.returncode}; see {run_dir / 'stderr.log'}")
             run = adapter.validate(spec, workload, run_dir, persist=True)

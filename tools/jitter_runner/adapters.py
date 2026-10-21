@@ -2,13 +2,13 @@
 
 import json
 from pathlib import Path
-import subprocess
 
 from .metrics import analyze_run
 from .spec import ExperimentError
 from .storage import write_json
 from .diagnostics import diagnose
 from .spec import load_json
+from .process import run_command
 
 
 class SharedIndexAdapter:
@@ -21,7 +21,7 @@ class SharedIndexAdapter:
         ]
         for name, command in commands:
             with (logs / f"{name}.stdout.log").open("w") as stdout, (logs / f"{name}.stderr.log").open("w") as stderr:
-                result = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=180)
+                result = run_command(command, stdout=stdout, stderr=stderr, timeout=180)
             if result.returncode:
                 raise ExperimentError(f"{name} failed; see {logs}")
         selected = {"CMAKE_BUILD_TYPE", "CMAKE_CXX_COMPILER", "CMAKE_CXX_FLAGS", "CMAKE_CXX_FLAGS_RELEASE",
@@ -40,7 +40,7 @@ class SharedIndexAdapter:
         return binary, [command for _, command in commands]
 
     def build_info(self, binary):
-        result = subprocess.run([str(binary), "--build-info"], capture_output=True, text=True, timeout=10, check=True)
+        result = run_command([str(binary), "--build-info"], capture_output=True, text=True, timeout=10, check=True)
         info = json.loads(result.stdout)
         required = {"version", "compiler_id", "compiler_version", "build_type", "cxx_flags",
                     "source_revision", "source_dirty", "system", "processor", "contract"}
