@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "experiment": {
+    "schema_version": 3,
+    "application": {
+      "adapter": "json-projection-v1",
+      "workers": 4,
+      "queue_capacity": 4096,
+      "key_count": 16,
+      "dataset_seed": 17,
+      "implementation": "ordered",
+      "light_fields": 8,
+      "heavy_fields": 512
+    },
+    "workload": {
+      "seed": 42,
+      "arrival": "burst",
+      "rate_per_second": 20000,
+      "warmup_ms": 10,
+      "measurement_ms": 100,
+      "heavy_fraction": 0.25,
+      "burst_size": 32
+    },
+    "objective": {
+      "metric": "p99_latency_ns",
+      "min_throughput_per_second": 0,
+      "max_peak_rss_bytes": 268435456,
+      "max_cpu_cores": 12,
+      "max_rejection_fraction": 0.0,
+      "max_scheduler_lag_p99_ns": 50000000
+    },
+    "repetitions": 1,
+    "timeout_seconds": 30,
+    "instrumentation": {
+      "enabled": false,
+      "events_per_thread": 65536
+    }
+  },
+  "search": {
+    "strategy": "guided",
+    "seed": 42,
+    "parameters": {
+      "workers": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "queue_capacity": [
+        4096
+      ],
+      "implementation": [
+        "map",
+        "ordered"
+      ]
+    },
+    "exclude": []
+  },
+  "sampling": {
+    "exploration_pairs": 2,
+    "max_exploration_pairs": 3,
+    "confirmation_pairs": 8
+  },
+  "comparison": {
+    "metric": "p99",
+    "min_effect": 0.05,
+    "confidence": 0.95,
+    "max_throughput_loss": 0.05,
+    "min_tail_observations": 20,
+    "max_baseline_spread": 3
+  },
+  "budget": {
+    "max_candidates": 4,
+    "max_runs": 49,
+    "max_builds": 2,
+    "max_failures": 2,
+    "wall_seconds": 300
+  },
+  "diagnostic": true
+}

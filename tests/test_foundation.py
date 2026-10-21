@@ -54,7 +54,16 @@ def synthetic_run(path, spec):
 class SpecificationTests(unittest.TestCase):
     def test_examples_validate(self):
         for path in (ROOT / "examples").glob("*.json"):
-            load_spec(path)
+            from jitter_runner.spec import load_json
+            value = load_json(path)
+            if "scenarios" in value:
+                from jitter_runner.evaluation import validate_evaluation
+                validate_evaluation(value)
+            elif "experiment" in value:
+                from jitter_runner.investigation_spec import validate_investigation
+                validate_investigation(value)
+            else:
+                load_spec(path)
 
     def test_unknown_fields_and_invalid_values_fail(self):
         for section, key, value in (("application", "workers", 0), ("application", "workers", True),

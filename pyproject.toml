@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jitter-research"
+version = "1.0.0"
+description = "Bounded, evidence-driven C++ tail latency investigations"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+jitter = "jitter_runner.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "tools"}
+packages = ["jitter_runner"]
