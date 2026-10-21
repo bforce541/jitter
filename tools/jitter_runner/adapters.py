@@ -18,7 +18,7 @@ class SharedIndexAdapter:
     def build(self, root, build_dir, logs, implementation="any", timeout=180):
         deadline = time.monotonic() + timeout
         commands = [
-            ("configure", ["cmake", "-S", str(root), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release", f"-DJITTER_VARIANT={implementation}"]),
+            ("configure", ["cmake", "-S", str(root), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_TESTING=OFF", f"-DJITTER_VARIANT={implementation}"]),
             ("build", ["cmake", "--build", str(build_dir), "--parallel", "2", "--target", "jitter"]),
         ]
         for name, command in commands:
@@ -41,8 +41,8 @@ class SharedIndexAdapter:
         binary = build_dir / "jitter"
         return binary, [command for _, command in commands]
 
-    def build_info(self, binary):
-        result = run_command([str(binary), "--build-info"], capture_output=True, text=True, timeout=10, check=True)
+    def build_info(self, binary, timeout=10):
+        result = run_command([str(binary), "--build-info"], capture_output=True, text=True, timeout=timeout, check=True)
         info = json.loads(result.stdout)
         required = {"version", "compiler_id", "compiler_version", "build_type", "cxx_flags",
                     "source_revision", "source_dirty", "system", "processor", "contract"}

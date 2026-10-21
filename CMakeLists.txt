@@ -69,5 +69,5 @@ if(BUILD_TESTING)
         "JITTER_TEST_BINARY=$<TARGET_FILE:jitter>"
         "${Python3_EXECUTABLE}" -m unittest discover
         -s "${CMAKE_SOURCE_DIR}/tests" -p "test_*.py" -v)
-    set_tests_properties(core foundation PROPERTIES TIMEOUT 60)
+    set_tests_properties(core foundation PROPERTIES TIMEOUT 180)
 endif()

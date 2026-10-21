@@ -136,7 +136,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
                 raise ExperimentError("source changed during setup; rerun with a stable checkout")
         shutil.copy2(source_binary, path / "engine" / "jitter")
         saved_binary = path / "engine" / "jitter"
-        metadata["build"] = adapter.build_info(saved_binary)
+        metadata["build"] = adapter.build_info(saved_binary, timeout=10 if deadline is None else max(.001, min(10, deadline - time.monotonic())))
         if spec["schema_version"] >= 2 and metadata["build"].get("trace_format") != 1:
             raise ExperimentError("schema version 2 requires a trace-format-1 engine")
         if spec["schema_version"] >= 3 and metadata["build"].get("compiled_variant", "any") not in ("any", spec["application"]["implementation"]):

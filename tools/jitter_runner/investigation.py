@@ -186,17 +186,23 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
             state["cost"]["builds"] += 1
             state["builds"][name] = {"status": "running"}
             persist()
-            supplied = original / "engines" / name / "jitter" if original and name in original_state["builds"] else binary
-            # A replay cannot silently compile an unarchived implementation.
-            if original and not supplied:
-                raise ExperimentError("replay selected an implementation with no saved executable")
+            before_build = time.monotonic()
             try:
+                supplied = original / "engines" / name / "jitter" if original and name in original_state["builds"] else binary
+                # A replay cannot silently compile an unarchived implementation.
+                if original and not supplied:
+                    raise ExperimentError("replay selected an implementation with no saved executable")
                 result = build_variant(spec["experiment"]["application"]["adapter"], name, context,
                                        root / "engines" / name, timeout=max(.001, min(180, remaining())), supplied=supplied)
                 state["builds"][name] = result
                 state["cost"]["build_seconds"] += result["seconds"]
             except (Exception, KeyboardInterrupt) as error:
                 state["builds"][name] = {"status": "failed", "error": str(error)}
+                directory = root / "engines" / name
+                directory.mkdir(exist_ok=True)
+                if not (directory / "build.json").exists():
+                    write_json(directory / "build.json", state["builds"][name])
+                state["cost"]["build_seconds"] += time.monotonic() - before_build
                 state["cost"]["failures"] += 1
                 persist()
                 raise
@@ -263,7 +269,7 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
                 state["hypotheses"] = load_json(root / name / "run-001/diagnostics.json")["hypotheses"]
             except BudgetExhausted:
                 raise
-            except Exception:
+            except (Exception, KeyboardInterrupt):
                 attempted = [name for name, record in state["records"].items() if record["stage"] == "diagnostic"]
                 if attempted:
                     state["diagnostic"] = attempted[-1]
@@ -315,6 +321,9 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
             # Freeze the finalist and fixed confirmation size durably BEFORE any
             # holdout observations; no second finalist is allowed after failure.
             persist()
+            duration = sum(spec["experiment"]["workload"][key] for key in ("warmup_ms", "measurement_ms")) / 1000
+            if remaining() < 2 * spec["sampling"]["confirmation_pairs"] * duration:
+                raise BudgetExhausted()
             collect(state["confirmation"], spec["sampling"]["confirmation_pairs"], "confirmation")
             accepted = state["confirmation"]["comparison"]["accepted"]
             state["stop_reason"] = "confirmed_improvement" if accepted else "confirmation_not_accepted"

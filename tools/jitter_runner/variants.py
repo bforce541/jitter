@@ -76,7 +76,7 @@ def build_variant(adapter, implementation, context, directory, timeout=180, supp
             binary = directory / "jitter"
         if supplied:
             shutil.copy2(binary, directory / "jitter")
-        info = get_adapter(adapter).build_info(directory / "jitter")
+        info = get_adapter(adapter).build_info(directory / "jitter", timeout=max(.001, min(10, timeout - (time.monotonic() - start))))
         if info.get("compiled_variant", "any") not in ("any", implementation):
             raise ExperimentError("candidate executable implementation does not match its registration")
         result = {"status": "complete", "implementation": implementation, "build": info,
