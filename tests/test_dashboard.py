@@ -73,7 +73,8 @@ class DashboardTests(unittest.TestCase):
 
     def test_http_is_loopback_only_same_origin_and_has_no_execution_or_file_endpoint(self):
         with tempfile.TemporaryDirectory() as directory:
-            server = make_server(directory)
+            with patch('socket.getfqdn', side_effect=AssertionError('local startup must not resolve DNS')):
+                server = make_server(directory)
             thread = threading.Thread(target=server.serve_forever, daemon=True)
             thread.start()
             try:

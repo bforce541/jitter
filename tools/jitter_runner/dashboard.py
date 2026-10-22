@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+from socketserver import TCPServer
 import threading
 from urllib.parse import parse_qs, urlsplit
 import webbrowser
@@ -252,7 +253,15 @@ def make_server(root, port=0):
             except (OSError, ValueError, KeyError, TypeError, AttributeError, ExperimentError) as error:
                 self.send(400, {'error': str(error)})
 
-    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    class LoopbackServer(ThreadingHTTPServer):
+        def server_bind(self):
+            # The numeric local bind needs no reverse DNS. HTTPServer's default
+            # getfqdn() can stall startup on hosts with slow resolver policy.
+            TCPServer.server_bind(self)
+            self.server_name = '127.0.0.1'
+            self.server_port = self.server_address[1]
+
+    server = LoopbackServer(('127.0.0.1', port), Handler)
     server.daemon_threads = True
     server.library = library
     return server

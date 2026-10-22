@@ -17,9 +17,21 @@ def main():
     process = subprocess.Popen([args.cli, 'ui', args.bundle, '--port', '0', '--no-open'],
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     lines = queue.Queue()
-    threading.Thread(target=lambda: [lines.put(line) for line in process.stdout], daemon=True).start()
+    transcript = []
+    def read_output():
+        for line in process.stdout:
+            transcript.append(line)
+            lines.put(line)
+        lines.put(None)
+    reader = threading.Thread(target=read_output, daemon=True)
+    reader.start()
     try:
-        line = lines.get(timeout=15)
+        try:
+            line = lines.get(timeout=30)
+        except queue.Empty as error:
+            raise RuntimeError(f'Dashboard startup timed out; command={args.cli!r}, pid={process.pid}, output={transcript!r}') from error
+        if line is None:
+            raise RuntimeError(f'Dashboard exited before startup; return code={process.poll()}, output={transcript!r}')
         if not line.startswith('Jitter local dashboard: http://127.0.0.1:'):
             raise RuntimeError('Dashboard did not start: ' + line)
         url = line.split(': ', 1)[1].strip()
@@ -48,6 +60,7 @@ def main():
         except subprocess.TimeoutExpired:
             process.kill()
             process.wait()
+        reader.join(timeout=2)
         process.stdout.close()
 
 
