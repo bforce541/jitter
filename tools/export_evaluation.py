@@ -188,7 +188,7 @@ def report_text(catalog):
               "```sh", "python3 tools/jitter.py evaluate examples/evaluation.json --binary build/jitter --output results/new-evaluation",
               "python3 tools/jitter.py calibrate --trials 1000 --output results/new-calibration",
               "python3 tools/evaluate_diagnostics.py --output results/new-controls",
-              "python3 tools/jitter.py unpack evaluation-evidence.tar.gz --output results/restored-evaluation",
+              "python3 tools/jitter.py unpack jitter-evaluation-v2.tar.gz --output results/restored-evaluation",
               "python3 tools/jitter.py verify results/restored-evaluation",
               "python3 tools/jitter.py reproduce results/restored-evaluation --output results/new-replay", "```", "",
               "Reproduce a recommended configuration's exact single-process inputs by replaying its saved confirmation candidate sub-bundle. That functional replay alone is not a new statistical confirmation. Full investigation/evaluation replay collects new independent evidence and may choose differently.", "",

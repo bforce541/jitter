@@ -1,0 +1,78 @@
+{
+  "assets": [
+    {
+      "bytes": 35497,
+      "name": "dashboard-mobile.png",
+      "sha256": "fc40fc241644117b1ade993efba53e732d99ff8d2d4da6ab318282096fb01e48"
+    },
+    {
+      "bytes": 73945,
+      "name": "dashboard-overview.png",
+      "sha256": "a22fc212f78f8e228a770c1d195ac767910c8673e866af6bf61d5ab4cfa631fd"
+    },
+    {
+      "bytes": 12083728,
+      "name": "evaluation-catalog.json",
+      "sha256": "cebcd89eb023f548bf573f286490f31eb6ffba3fdd0901615cd93043dcc522fe"
+    },
+    {
+      "bytes": 2468,
+      "name": "jitter-calibration.tar.gz",
+      "sha256": "71c357c4dec7f63872ceb6ff9c05a904289df2802ba4da98359d0e2ffa7b0386"
+    },
+    {
+      "bytes": 8881361,
+      "name": "jitter-cold-build.tar.gz",
+      "sha256": "142efc61a2382e87389965f22157ebdfe3037b2613aaebde90165f2a84819934"
+    },
+    {
+      "bytes": 10483,
+      "name": "jitter-diagnostic-controls.tar.gz",
+      "sha256": "84e75523c03a982590285e16c250c974272aaf91b8d85f8275702968b6dbde44"
+    },
+    {
+      "bytes": 112096199,
+      "name": "jitter-evaluation-v1.tar.gz",
+      "sha256": "8e604c22e7f6a718c32b1a36c5d5128c6d57adcf13badbd26f1f1b6ca31c905b"
+    },
+    {
+      "bytes": 152319609,
+      "name": "jitter-evaluation-v2.tar.gz",
+      "sha256": "ea7d5e0c3e3151e17f21ce6bf92490415c8de58750978742383c44050a5987cf"
+    },
+    {
+      "bytes": 7811916,
+      "name": "jitter-overhead-json.tar.gz",
+      "sha256": "7c61753daf96fe196c4cd141fb6896adbb6a807ebac5cae1da97a91f89143b1a"
+    },
+    {
+      "bytes": 8289574,
+      "name": "jitter-overhead-shared-1.tar.gz",
+      "sha256": "3dd6aad0f8551aa099ebd1349e60a540bdc85ddd36e82c314b43b849b4df697e"
+    },
+    {
+      "bytes": 7949102,
+      "name": "jitter-overhead-shared-8.tar.gz",
+      "sha256": "df64d65083e1595ac0c3d5e1308c52e32e18b7294015ad5443cf55bbee34d949"
+    },
+    {
+      "bytes": 7888397,
+      "name": "jitter-overhead-sqlite.tar.gz",
+      "sha256": "7422dd21e5504620bd8fe6c946912c599c744edf18b3e83c2dcdabc99fb04575"
+    },
+    {
+      "bytes": 2401,
+      "name": "release-verification-cost-final.json",
+      "sha256": "bf6f10029d7228a83a17f65259cb42a83d818b23cf72e9ee608551cd5eef8d8a"
+    },
+    {
+      "bytes": 1598,
+      "name": "release-verification-cost.json",
+      "sha256": "96c0e6d646a337a206667c2cdc32f57204614229cf4c17811131426972d50bd6"
+    }
+  ],
+  "interpretation": "Portable raw evidence verifies without execution. Screenshots and timing-tool JSON retain their distinct scopes; see the evaluation report.",
+  "release": "v1.0.0",
+  "repository": "bforce541/jitter",
+  "schema_version": 1
+}
