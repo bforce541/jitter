@@ -14,19 +14,19 @@ Efficient C++ instrumentation, trace loss accounting, cross-thread dependencies,
 
 Acceptance: controlled scenarios produce relevant, testable hypotheses with documented overhead and trace limitations. See [Phase 2 usage and contracts](phase2.md).
 
-## Phase 3: Autonomous investigation
+## Phase 3: Autonomous investigation (implemented)
 
 Configuration search, hypothesis-informed experiment selection, repeated comparisons, uncertainty estimates, constraints, fresh confirmation runs, budgets, and stopping rules.
 
-Acceptance: complete autonomous configuration investigations accept, reject, or return inconclusive results based on evidence.
+Acceptance: complete autonomous configuration investigations accept, reject, or return inconclusive results based on evidence. See [controller and statistical contracts](phase3.md).
 
-## Phase 4: Variants and product completion
+## Phase 4: Variants and product completion (implemented)
 
 Explicit implementation alternatives, isolated candidate builds, bounded transformations with applicability and legality conditions, correctness validation, CLI, reports, and failure recovery.
 
-Acceptance: all promised public functionality and failure paths work, and recommendations or proposed patches have reproducible evidence.
+Acceptance: registered alternatives, isolation, correctness, CLI, reports and failure paths have end-to-end coverage. See [variant and product contracts](phase4.md).
 
-## Phase 5: Evaluation and release
+## Phase 5: Evaluation and release (release evaluation in progress)
 
 Independently maintained application integrations, credible tuning and diagnostic baselines, experiment-cost evaluation, analysis ablations, negative cases, reliability fixes, documentation, and a reproducible evaluation report.
 
@@ -42,4 +42,4 @@ Acceptance: a fresh user can install Jitter, investigate a supported application
 - Statistics, correctness validation, and constraints determine acceptable conclusions.
 - Reporting presents decisions and reproduction instructions.
 
-Concrete application selection, workload contracts, storage formats, and transformation scope will be decided during their respective phases.
+The concrete supported applications, result formats and transformation scope are defined in the linked phase and integration contracts. The evaluation report records the evidence and limits of the release.

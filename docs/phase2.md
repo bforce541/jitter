@@ -2,7 +2,7 @@
 
 Jitter now records supported execution events, validates their relationships, builds temporal dependency evidence, generates testable bottleneck hypotheses, and measures the effect of enabling observation. Application correctness and Phase 1 measurement contracts still apply.
 
-The current application remains `shared-index-v1`. This phase does not implement autonomous experiment selection, configuration recommendations, compiler transformations, or a generic C++ profiler. Those require later phases and supported integrations.
+This document specifies the Phase 2 `shared-index-v1` observation contract. The implemented controller and additional registered integrations are described in [Phase 3](phase3.md) and [Phase 4](phase4.md). Jitter remains bounded to supported integrations rather than a generic C++ profiler.
 
 ## Run, inspect, and reproduce
 
@@ -170,7 +170,7 @@ Signed deltas can be negative because host noise may exceed instrumentation effe
 
 ## Verification and module boundaries
 
-CTest runs C++ core checks and 38 Python tests, including real-engine observation, overflow, ordinary/paired reproduction, corrupted reports, and exact controlled dependencies. Known controls distinguish a mixed holder/queue scenario, isolated digest execution, single-worker queue pressure, and scheduler delay. They check an exact 80 ns ownership overlap and 82 ns unique queue-saturation interval; parallel capacity edges total 164 ns and are deliberately not reported as 164 ns of queue delay.
+The Phase 2 milestone passed C++ core checks and 38 Python tests. The expanded release suite also covers controller, external adapters, statistical calibration and archive restoration. Known controls distinguish a mixed holder/queue scenario, isolated execution, single-worker queue pressure and scheduler delay. They check an exact 80 ns ownership overlap and 82 ns unique queue-saturation interval; parallel capacity edges total 164 ns and are deliberately not reported as 164 ns of queue delay. Diagnostic schema 2 adds an explicit unattributed-wait hypothesis; archived schema-1 reports retain their original analysis semantics.
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
