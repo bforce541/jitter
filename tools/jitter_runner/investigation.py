@@ -229,7 +229,7 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
         before = time.monotonic()
         try:
             path, summary = run_experiment(experiment_for(spec, config, diagnostic), root / name,
-                                          binary=executable, source_context=context, deadline=deadline)
+                                          binary=executable, source_context=context, deadline=deadline, immutable_engine=True)
             row["status"] = "complete"
             for run in summary["runs"]:
                 state["cost"]["timed_application_cpu_seconds"] += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9

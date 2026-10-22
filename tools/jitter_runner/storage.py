@@ -8,8 +8,21 @@ from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
+import shutil
 
 from .spec import ExperimentError, load_json
+
+
+def link_immutable(source, destination):
+    """Share private immutable inputs, retaining ordinary self-contained files.
+
+    Only use for already frozen inputs inside one investigation, never for a
+    supplied executable or live checkout file that another build can replace.
+    """
+    try:
+        os.link(source, destination)
+    except OSError:
+        shutil.copy2(source, destination)
 
 
 def sha256(path):

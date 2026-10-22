@@ -9,6 +9,7 @@ import re
 import tarfile
 
 from .spec import ExperimentError, object_keys
+from .storage import link_immutable
 
 CHUNK = 262144
 MAX_BYTES = 16 * 1024**3
@@ -125,9 +126,14 @@ def unpack_result(source, output):
         if needed != set(members) - {"index.json"}:
             raise ExperimentError("portable archive has missing or unreferenced content")
         output.mkdir(parents=True, exist_ok=False)
+        restored = {}
         for name, record in files.items():
             path = output / name
             path.parent.mkdir(parents=True, exist_ok=True)
+            identity = (record["sha256"], record["size"], tuple(record["chunks"]), record["executable"])
+            if identity in restored:
+                link_immutable(restored[identity], path)
+                continue
             digest, size = hashlib.sha256(), 0
             with path.open("xb") as destination:
                 for identity in record["chunks"]:
@@ -141,5 +147,6 @@ def unpack_result(source, output):
             if size != record["size"] or digest.hexdigest() != record["sha256"]:
                 raise ExperimentError(f"portable archive file identity mismatch: {name}; evidence retained at {output}")
             path.chmod(0o755 if record["executable"] else 0o644)
+            restored[identity] = path
     verify_result(output)
     return output.resolve()

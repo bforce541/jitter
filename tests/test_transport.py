@@ -19,7 +19,7 @@ class TransportTests(unittest.TestCase):
             root = Path(directory)
             bundle, _ = run_calibration(root / "input", trials=2)
             content = b"shared bytes\n" * 40000
-            for name in ("first", "second"):
+            for name in ("first", "second", "third"):
                 (bundle / name).write_bytes(content)
             (bundle / "first").chmod(0o755)
             seal_bundle(bundle, "complete")
@@ -32,6 +32,7 @@ class TransportTests(unittest.TestCase):
             self.assertEqual((restored / "first").read_bytes(), content)
             self.assertTrue((restored / "first").stat().st_mode & 0o111)
             self.assertFalse((restored / "second").stat().st_mode & 0o111)
+            self.assertEqual((restored / "third").read_bytes(), content)
             self.assertEqual((restored / "manifest.json").read_bytes(), (bundle / "manifest.json").read_bytes())
 
     def test_existing_outputs_and_recursive_pack_are_preserved(self):

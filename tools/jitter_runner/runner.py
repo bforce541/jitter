@@ -13,7 +13,7 @@ import uuid
 from .adapters import get_adapter
 from .metrics import summarize_runs
 from .spec import ExperimentError, load_json, load_spec, validate_spec
-from .storage import git_output, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
+from .storage import git_output, link_immutable, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
 from .workload import encode_workload, generate
 from .process import run_command
 
@@ -83,7 +83,7 @@ def verify_bundle(path):
     return spec, summary, metadata
 
 
-def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None, source_context=None, deadline=None):
+def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None, source_context=None, deadline=None, immutable_engine=False):
     validate_spec(spec)
     adapter = get_adapter(spec["application"]["adapter"])
     original = None
@@ -120,7 +120,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
             root = Path(source_context["root"]) if source_context else ROOT
             hashes = source_context["source"]["files"] if source_context else snapshot_source(ROOT, path / "source.tar.gz")
             if source_context:
-                shutil.copy2(source_context["archive"], path / "source.tar.gz")
+                link_immutable(source_context["archive"], path / "source.tar.gz")
             metadata["source"] = source_context["source"] if source_context else {"revision": git_output(ROOT, ["rev-parse", "HEAD"]).decode().strip(),
                                   "dirty": bool(git_output(ROOT, ["status", "--porcelain"]).strip()),
                                   "files": hashes}
@@ -134,7 +134,10 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
                 metadata["binary_origin"] = "built from current checkout"
             if not source_context and hashes != source_hashes(ROOT):
                 raise ExperimentError("source changed during setup; rerun with a stable checkout")
-        shutil.copy2(source_binary, path / "engine" / "jitter")
+        if immutable_engine:
+            link_immutable(source_binary, path / "engine" / "jitter")
+        else:
+            shutil.copy2(source_binary, path / "engine" / "jitter")
         saved_binary = path / "engine" / "jitter"
         metadata["build"] = adapter.build_info(saved_binary, timeout=10 if deadline is None else max(.001, min(10, deadline - time.monotonic())))
         if spec["schema_version"] >= 2 and metadata["build"].get("trace_format") != 1:

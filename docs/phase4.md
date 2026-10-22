@@ -24,6 +24,8 @@ The default `any` engine can execute every registered implementation. A restrict
 
 No source modification is needed for rollback. An unsuccessful candidate simply fails to become a recommendation. Every admitted response is checked by an independent Python oracle; duplicate, extra, missing, errored or incorrect responses invalidate the experiment. Latency comparisons require all offered work to complete.
 
+Private immutable archives and executables can share ordinary file hardlinks within an investigation. Supplied binaries and live checkout files remain independent. This reduces repeated evidence storage; a copy fallback supports filesystems without hardlinks. Restored archives can likewise share identical private files while preserving executable modes. Raw evidence is immutable input to verification, not an editable workspace.
+
 ## Commands
 
 | Command | Purpose |
