@@ -28,6 +28,9 @@ def verify_result(root):
     if (root / "calibration.json").exists():
         from .calibration import verify_calibration
         return verify_calibration(root)
+    if (root / "diagnostic-evaluation.json").exists():
+        from .diagnostic_evaluation import verify_diagnostic_evaluation
+        return verify_diagnostic_evaluation(root)
     if (root / "overhead-spec.json").exists():
         from .overhead import verify_overhead
         return verify_overhead(root)

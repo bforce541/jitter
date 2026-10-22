@@ -54,4 +54,6 @@ The journal retains every attempted measurement, failed child, pair order, selec
 
 An interrupt preserves child logs and a terminal interrupted journal. `restart BUNDLE --output NEW` rebuilds from the captured source for a new independent investigation; if startup stopped before source capture it uses the current checkout, records that new provenance, and starts fresh. It does not continue a partly observed holdout. A failed build cannot modify the baseline source or cache. Failed final validation removes the generated recommendation and marks the bundle failed. Malformed or failed evidence remains available for diagnosis and cannot verify as a valid recommendation.
 
+CPU/setup cost totals cover completed, validated C++ measurement processes. They are independently recomputed from those raw resource/setup records during verification. Failed processes, compiler CPU, Python analysis and export CPU are not included in that application-only CPU total; elapsed investigation cost covers orchestration and build waiting separately.
+
 [Variants and CLI](phase4.md) · [Architecture](architecture.md) · [Evaluation](evaluation-report.md)

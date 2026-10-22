@@ -55,6 +55,11 @@ def source_files(root):
     files = []
     for name in sorted(set(filter(None, names))):
         path = root / name
+        # Release catalogs are derived evidence, not application/build input.
+        # Keep them in Git/release assets instead of recursively embedding a
+        # campaign's reports in every subsequent process source snapshot.
+        if Path(name).parts[:2] == ("docs", "evidence"):
+            continue
         # Capture the supported source tree, not arbitrary personal files.
         if name not in ("CMakeLists.txt", ".gitignore", "README.md", "pyproject.toml", "LICENSE") and Path(name).parts[0] not in ("src", "include", "tools", "tests", "examples", "docs", ".github", "third_party"):
             continue

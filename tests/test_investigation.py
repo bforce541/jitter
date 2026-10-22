@@ -11,7 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 from jitter_runner.investigation import (derive_decision, experiment_for, failure_kind,
                                         pair_order, run_investigation, select_finalist,
-                                        verify_investigation, strong_exploratory_gain)
+                                        verify_investigation, strong_exploratory_gain,
+                                        make_report, markdown_report)
 from jitter_runner.investigation_spec import validate_investigation
 from jitter_runner.runner import ROOT
 from jitter_runner.search import choose_candidate, configuration, normalize_space
@@ -220,6 +221,18 @@ class InvestigationIntegrationTests(unittest.TestCase):
         completed = [name for name, record in state["records"].items() if record["status"] == "complete"]
         self.assertEqual(len(completed), 8)
         self.assertTrue(all(not load_json(path / name / "spec.json")["instrumentation"]["enabled"] for name in completed))
+        for key in ("timed_application_cpu_seconds", "application_setup_seconds"):
+            modified = copy.deepcopy(state)
+            modified["cost"][key] += 1
+            modified_report = make_report(spec, modified)
+            write_json(path / "state.json", modified)
+            write_json(path / "report.json", modified_report)
+            (path / "report.md").write_text(markdown_report(modified_report))
+            seal_bundle(path, "complete")
+            with self.assertRaisesRegex(ExperimentError, "cost differs from validated raw measurements"):
+                verify_investigation(path)
+        write_json(path / "state.json", state)
+        (path / "report.md").write_text(markdown_report(report))
         changed = copy.deepcopy(report)
         changed["decision"] = "accepted_recommendation"
         write_json(path / "report.json", changed)

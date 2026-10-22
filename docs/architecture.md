@@ -25,9 +25,11 @@ Application adapters define behavior, allowed parameters, launch arguments and v
 
 `storage.py` supplies atomic JSON replacement, source inventories, regular-file archives, content hashes and semantic checks. Hashes detect changes; they are not a signature or a guarantee against a person intentionally fabricating an entirely new experiment. `transport.py` packages verified evidence using bounded content-addressed chunks and verifies restoration before reuse.
 
+Generated catalogs under `docs/evidence/` are retained in Git and release assets rather than copied into every later process source snapshot. They are derived experiment evidence, not build input. The explicit inventory still captures application, controller, tests, examples, build configuration, upstream code and other documentation. Archived inventories are verified as recorded, including older capture policies.
+
 `evaluation.py` freezes one source snapshot for a whole plan, interleaves strategy order under recorded seeds, retains all outcomes and records full wrapper time/storage. `calibration.py` generates explicitly synthetic statistical controls. `tools/evaluate_diagnostics.py` reuses test trace fixtures for transparent mechanism controls; it is evaluation tooling, not measured application behavior.
 
-The installation exposes `jitter_runner.cli:main`; `tools/jitter.py` remains a source-checkout entry point. Reports are terminal, JSON and Markdown. There is no web dashboard or external model dependency.
+The installation exposes `jitter_runner.cli:entrypoint`; `tools/jitter.py` uses the same signal-aware source entry point. Reports are terminal, JSON and Markdown. There is no web dashboard or external model dependency.
 
 ## Evidence and trust boundaries
 

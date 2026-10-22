@@ -542,18 +542,31 @@ def verify_investigation(path, archive_cache=None):
             raise ExperimentError("confirmation changed the frozen finalist or fixed sample size")
     if referenced != set(names) or execution != names:
         raise ExperimentError("measurement was omitted, reused, reordered, or detached from its trial")
+    application_cpu, application_setup = 0.0, 0.0
     for index, (name, record) in enumerate(state["records"].items(), 1):
         if not re.fullmatch(r"measurements/run-[0-9]{5}", name):
             raise ExperimentError("unsafe measurement path in journal")
         if record["status"] == "complete":
             if name not in checked:
                 checked[name] = verify_bundle(root / name, archive_cache=archive_cache)
-            saved, _, metadata = checked[name]
+            saved, summary, metadata = checked[name]
             if saved != experiment_for(spec, record["configuration"], record["diagnostic"]) or metadata["source"] != state["source"]:
                 raise ExperimentError("measurement changed fixed behavior, inputs or frozen source")
             build = state["builds"][record["configuration"]["implementation"]]
             if metadata["engine_sha256"] != build["engine_sha256"]:
                 raise ExperimentError("measurement did not use its isolated pinned executable")
+            for run in summary["runs"]:
+                application_cpu += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9
+                if "setup" not in run:
+                    application_setup = None
+                elif application_setup is not None:
+                    application_setup += run["setup"]["elapsed_ns"] / 1e9
+    if "timed_application_cpu_seconds" in cost and not math.isclose(cost["timed_application_cpu_seconds"], application_cpu, rel_tol=1e-12, abs_tol=1e-9):
+        raise ExperimentError("reported application CPU cost differs from validated raw measurements")
+    if "application_setup_seconds" in cost:
+        recorded_setup = cost["application_setup_seconds"]
+        if (recorded_setup is None) != (application_setup is None) or (recorded_setup is not None and not math.isclose(recorded_setup, application_setup, rel_tol=1e-12, abs_tol=1e-9)):
+            raise ExperimentError("reported application setup cost differs from validated raw measurements")
     if derive_decision(state) == "accepted_recommendation":
         confirmation = state["confirmation"]
         if len(confirmation["pairs"]) != spec["sampling"]["confirmation_pairs"] or any(not all(pair[side] for side in ("baseline", "candidate")) for pair in confirmation["pairs"]):

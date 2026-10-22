@@ -175,6 +175,9 @@ def main(argv=None):
             elif (args.bundle / "calibration.json").exists():
                 from .calibration import verify_calibration
                 summary = verify_calibration(args.bundle)
+            elif (args.bundle / "diagnostic-evaluation.json").exists():
+                from .diagnostic_evaluation import verify_diagnostic_evaluation
+                summary = verify_diagnostic_evaluation(args.bundle)
             elif (args.bundle / "overhead-spec.json").exists():
                 _, summary = verify_overhead(args.bundle)
             else:

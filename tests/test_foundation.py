@@ -210,6 +210,20 @@ class MeasurementTests(unittest.TestCase):
 
 
 class StorageTests(unittest.TestCase):
+    def test_source_inventory_retains_build_inputs_without_embedding_release_catalogs(self):
+        from jitter_runner.storage import snapshot_source
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git","init","-q",str(root)],check=True)
+            (root / "src").mkdir()
+            (root / "src/application.cpp").write_text("registered application source\n")
+            (root / "docs/evidence").mkdir(parents=True)
+            (root / "docs/evidence/catalog.json").write_text('{"derived":"campaign reports"}\n')
+            (root / "docs/method.md").write_text("measurement method\n")
+            inventory = snapshot_source(root, root / "saved.tar.gz")
+            self.assertEqual(set(inventory), {"src/application.cpp", "docs/method.md"})
+            verify_source_archive(root / "saved.tar.gz", inventory)
+
     def test_source_archive_is_checked_against_inventory(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "source.tar.gz"
