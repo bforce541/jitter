@@ -2,8 +2,10 @@
 """Generate the checked-in release report from verified, unfiltered evidence."""
 
 import argparse
+from collections import Counter
 import json
 from pathlib import Path
+import statistics
 
 from jitter_runner.evaluation import verify_evaluation
 from jitter_runner.calibration import verify_calibration
@@ -13,6 +15,7 @@ from jitter_runner.statistics import compare_pairs
 from jitter_runner.storage import sha256, verify_integrity, write_json
 from jitter_runner.search import normalize_space
 from jitter_runner.overhead import verify_overhead
+from jitter_runner.diagnostic_evaluation import verify_diagnostic_evaluation
 
 
 def compact_study(path):
@@ -107,7 +110,7 @@ def report_text(catalog):
     if catalog.get("baseline_evaluation"):
         previous = catalog["baseline_evaluation"]
         lines += ["", "## Preserved original policy and revised policy", "",
-                  "The original five-scenario cohort is retained in full. It motivated a declared strong-gain exploration stop and priorities for registered alternatives under serialization. The new cohort preserves those five workloads and adds a 30-point search-space ablation with the old and new policies under the same budgets. Fresh fixed confirmation is unchanged. These are repeated observations on one host, not a randomized causal estimate of policy effects.", "",
+                  "The original five-scenario cohort is retained in full. It motivated a declared strong-gain exploration stop and priorities for registered alternatives under serialization. The new cohort preserves those five workloads and adds a 30-point search-space ablation with the old and new policies under the same budgets. Fresh fixed confirmation is unchanged. Source-archive validation reuse also changed between cohorts, so their wall-time difference cannot be assigned entirely to policy. The two wide-space cases use the same validation implementation; their policy blocks are sequential. These are repeated observations on one host, not a randomized causal estimate of policy effects.", "",
                   "| Comparable five-scenario cohort | Strategy | Accepted / planned | Processes | Child seconds |",
                   "| --- | --- | ---: | ---: | ---: |"]
         old_names = {row["name"] for row in previous["plan"]["scenarios"]}
@@ -117,6 +120,15 @@ def report_text(catalog):
                 rows = [row for row in selected_groups if row["strategy"] == strategy]
                 lines.append(f"| {cohort} | {strategy} | {sum(row['confirmed_recommendations'] for row in rows)}/{sum(row['planned_studies'] for row in rows)} | {sum(row['runs'] for row in rows)} | {sum(row['wall_seconds'] for row in rows):.3f} |")
     lines += ["", "Engine preparations in this cohort use `--binary`; they are verified materializations, not compiler invocations. Full wrapper seconds include analysis and final verification. The ablation saves its diagnostic process and that cost remains counted. Logical child file bytes count repeated paths; private hardlinks and portable chunk archives reduce physical storage. Conditional effects among accepted studies are selected outcomes, not unbiased average strategy effects.", "",
+              "## Time to decision and recommendation", "",
+              "| Strategy | Median full wrapper seconds, all outcomes | Median seconds through accepted decision | Accepted decisions timed |",
+              "| --- | ---: | ---: | ---: |"]
+    for strategy in catalog["evaluation"]["plan"]["strategies"]:
+        rows = [row for row in summary["studies"] if row["strategy"] == strategy]
+        accepted_times = [row["cost"]["seconds"] for row in rows if row["decision"] == "accepted_recommendation"]
+        accepted_median = f"{statistics.median(accepted_times):.3f}" if accepted_times else "—"
+        lines.append(f"| {strategy} | {statistics.median(row['wall_seconds'] for row in rows):.3f} | {accepted_median} | {len(accepted_times)} |")
+    lines += ["", "Accepted-decision times include exploration, preparation and fresh confirmation through the controller decision. Wrapper time additionally includes final verification. Accepted-only times are conditional, so the all-outcome costs and counts must be considered alongside them. Precise time from investigation start to the first promising exploratory point was not separately journaled in these cohorts; individual trial durations are retained without relabeling them as that missing metric.", "",
               "## Fresh-confirmation examples and resource tradeoffs", "",
               "| Scenario / seed / strategy | Candidate | Median paired p99 improvement | One-sided lower bound | Median baseline → candidate p99 (ms) | Median CPU cores | Median peak RSS (bytes) |", "| --- | --- | ---: | ---: | ---: | ---: | ---: |"]
     for scenario in catalog["evaluation"]["plan"]["scenarios"]:
@@ -134,6 +146,14 @@ def report_text(catalog):
     lines += ["", "Examples use the smallest accepted guided seed per scenario for inspection, not the largest effect. Every other seed and nonaccepted result remains in the catalog. Saturation can make a large end-to-end latency reduction correspond to a much smaller change in service capacity; inspect throughput and CPU rather than interpreting the percentage as a compute-speed multiplier.", "",
               "## Negative, invalid and inconclusive evidence", "",
               "The table retains low-load/noisy cases and unsuccessful confirmation. Per-trial statuses distinguish invalid data, resource violations, regression, practical equivalence and uncertainty. C++/Python adversarial integration tests additionally exercise wrong outputs, warmup loss, dropped traces, failed builds/executors, impossible resources, timeout, interruption, corrupt/resealed reports and unsafe archives. Synthetic controls are separate from measured application outcomes.", "",
+              "| Measured stage | Outcome | Count |", "| --- | --- | ---: |"]
+    exploratory = Counter((trial.get("comparison") or {}).get("status", "unfinished") for study in studies.values() for trial in study["report"]["trials"])
+    confirmations = Counter((study["report"]["confirmation"].get("comparison") or {}).get("status", "unfinished") for study in studies.values() if study["report"]["confirmation"])
+    for stage, counts in (("Exploration",exploratory),("Fresh confirmation",confirmations)):
+        for status,count in sorted(counts.items()):
+            lines.append(f"| {stage} | {status} | {count} |")
+    retained_failures = Counter(trial["failure"]["kind"] for study in studies.values() for trial in study["report"]["trials"] if trial.get("failure"))
+    lines += ["", f"Measured journaled child/build failures: {sum(group['reported_child_failures'] for group in groups)}. Exploratory failure kinds: `{json.dumps(dict(retained_failures),sort_keys=True)}`. Zero observed correctness failures in a measured cohort is not proof of arbitrary transformation safety; every output still passes its registered independent oracle.", "",
               "## Calibration and diagnostic baselines", ""]
     for name, result in catalog["calibration"]["scenarios"].items():
         lines.append(f"- Synthetic {name}: {result['accepted']}/{result['trials']} accepted; Monte Carlo rate interval `{json.dumps(result['monte_carlo_rate_uncertainty'],sort_keys=True)}`.")
@@ -141,10 +161,14 @@ def report_text(catalog):
     lines += ["", f"Winner-selection control: fresh holdout accepted {selection['fresh_holdout']['accepted']}/{selection['fresh_holdout']['trials']}; deliberately unsafe reuse accepted {selection['unsafe_reused_exploration']['accepted']}/{selection['unsafe_reused_exploration']['trials']}. This is simulated selection bias, not a measured controller benchmark.", "",
               f"Hand-timed diagnostic controls: dependency analysis matched {catalog['diagnostic_controls']['matches']['dependency_match']}/6 known mechanisms; delay-only {catalog['diagnostic_controls']['matches']['delay_only_match']}/6; region-only {catalog['diagnostic_controls']['matches']['region_only_match']}/6. The controls include an unresolved owner and explicit trace-loss abstention. These are transparent weak baselines on six constructed fixtures, not a claim against production profilers.", "",
               "## Cold build, correctness and reproduction", ""]
-    if catalog.get("verification_cost"):
-        cost = catalog["verification_cost"]
+    if catalog.get("verification_cost_trials"):
         lines += ["The same immutable cold-study evidence was verified in three alternating cached/uncached pairs, after one warmup. Every path and raw response was still checked; only repeated identical source-archive decomposition was reused within each pass.", "",
-                  f"Observed median verification time: {cost['median_wall_seconds']['uncached']:.3f} s without reuse and {cost['median_wall_seconds']['cached']:.3f} s with reuse ({cost['observed_speedup_ratio']:.2f}× descriptive ratio). The resulting reports and manifest identity matched in every run. This is tooling cost on one host, with no significance or universal speedup claim.", ""]
+                  "| Verification-cost trial | Without reuse (s) | With reuse (s) | Descriptive ratio | Tool provenance |",
+                  "| --- | ---: | ---: | ---: | --- |"]
+        for index,cost in enumerate(catalog["verification_cost_trials"],1):
+            source_id = (cost.get("source") or {}).get("revision", "not separately recorded in the initial exploratory trial")
+            lines.append(f"| {index} | {cost['median_wall_seconds']['uncached']:.3f} | {cost['median_wall_seconds']['cached']:.3f} | {cost['observed_speedup_ratio']:.2f}× | {source_id} |")
+        lines += ["", "The resulting reports and manifest identity matched in every run. All recorded trials are retained, including the preliminary trial before tool-source provenance was added. These are tooling costs on one host, with no significance or universal speedup claim.", ""]
     if catalog.get("overhead"):
         lines += ["## Instrumentation overhead", "",
                   "Five alternating tracing-off/on pairs per listed configuration use identical inputs and executable bytes. Signed medians describe observations; they are not causal overhead estimates. If any pair loses trace events or changes coverage/delivery, aggregate deltas are withheld.", "",
@@ -179,27 +203,29 @@ def main():
     for name in ("bundle","calibration","diagnostics","cold-study","output"):
         parser.add_argument("--"+name,type=Path,required=True)
     parser.add_argument("--baseline-bundle",type=Path)
-    parser.add_argument("--verification-cost",type=Path)
+    parser.add_argument("--verification-cost",type=Path,action="append",default=[])
     parser.add_argument("--overhead",type=Path,action="append",default=[])
     args = parser.parse_args()
     plan, summary, state = verify_evaluation(args.bundle)
     calibration = verify_calibration(args.calibration)
-    verify_integrity(args.diagnostics, required=("diagnostic-evaluation.json",))
+    controls = verify_diagnostic_evaluation(args.diagnostics)
     verify_investigation(args.cold_study)
     studies = {row["path"]:compact_study(args.bundle / row["path"]) for row in summary["studies"] if row["status"] == "complete"}
     catalog = {"schema_version":1,"evidence_kind":"verified measured application reports, with separately labeled synthetic controls",
                "evaluation":{"manifest_sha256":sha256(args.bundle / "manifest.json"),"plan":plan,"summary":summary},
-               "studies":studies,"calibration":calibration,"diagnostic_controls":load_json(args.diagnostics / "diagnostic-evaluation.json"),
+               "studies":studies,"calibration":calibration,"diagnostic_controls":controls,
                "cold_study":compact_study(args.cold_study)}
     if args.baseline_bundle:
         old_plan, old_summary, _ = verify_evaluation(args.baseline_bundle)
         catalog["baseline_evaluation"] = {"manifest_sha256":sha256(args.baseline_bundle / "manifest.json"),
             "plan":old_plan,"summary":old_summary,
             "studies":{row["path"]:compact_study(args.baseline_bundle / row["path"]) for row in old_summary["studies"] if row["status"] == "complete"}}
-    if args.verification_cost:
-        catalog["verification_cost"] = load_json(args.verification_cost)
-        if catalog["verification_cost"]["manifest_sha256"] != sha256(args.cold_study / "manifest.json"):
+    catalog["verification_cost_trials"] = []
+    for path in args.verification_cost:
+        trial = load_json(path)
+        if trial["manifest_sha256"] != sha256(args.cold_study / "manifest.json"):
             raise ExperimentError("verification benchmark did not use the supplied cold-study evidence")
+        catalog["verification_cost_trials"].append(trial)
     catalog["overhead"] = []
     for path in args.overhead:
         overhead_spec, overhead_report = verify_overhead(path)

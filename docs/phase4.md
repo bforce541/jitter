@@ -22,6 +22,8 @@ An investigation freezes the supported source inventory and archive before its f
 
 The default `any` engine can execute every registered implementation. A restricted engine rejects runtime requests for a different implementation. A supplied executable is recorded as supplied; changing its filename cannot change its hash or compiled identity.
 
+Supported source snapshots are bounded to 10,000 files and 512 MiB of file content. Streaming validation checks member sizes before traversing payloads and also bounds decompressed tar headers/extensions. Source archives are regular files with a closed hash inventory; they cannot introduce links or paths outside the frozen tree.
+
 No source modification is needed for rollback. An unsuccessful candidate simply fails to become a recommendation. Every admitted response is checked by an independent Python oracle; duplicate, extra, missing, errored or incorrect responses invalidate the experiment. Latency comparisons require all offered work to complete.
 
 Private immutable archives and executables can share ordinary file hardlinks within an investigation. Supplied binaries and live checkout files remain independent. This reduces repeated evidence storage; a copy fallback supports filesystems without hardlinks. Restored archives can likewise share identical private files while preserving executable modes. Raw evidence is immutable input to verification, not an editable workspace.
@@ -52,6 +54,8 @@ Zero exit status means the requested workflow produced verified evidence, includ
 ## Bundle formats and compatibility
 
 Standalone schema versions 1 and 2 preserve earlier contracts; schema 3 adds explicit implementations, external adapters and p99.9. New engines also write `setup.csv`; schema-3 summaries include it when present. Older bundles without this additional preparation evidence remain readable and clearly lack that measurement.
+
+New metadata also records the actual Python driver revision, dirty state and module hashes. When those bytes already exist in the application source archive, the identity references that inventory. Replays using newer tooling preserve the different driver bytes separately under `driver-sources/`. Investigation reports bind all measurements to the same driver identity. Older bundles without this additional field retain their recorded provenance; the verifier does not invent a missing driver identity.
 
 An investigation adds `investigation-spec.json`, `state.json`, `sources/`, `engines/`, `measurements/`, `report.json`, `report.md`, and a hash manifest. `recommendation.json` exists only for a fully confirmed recommendation. Investigation journal/report schema 2 adds the goal, search coverage and remaining budget; journal/report schema 1 remains readable. Each measurement is a complete independently verifiable standalone bundle, including exact input bytes, engine, raw requests, resources, trace quality, source archive and logs. Failed children retain evidence but cannot verify as complete experiments.
 

@@ -37,4 +37,6 @@ The supported C/C++ engines and local build tools are trusted measurement integr
 
 Exact binary reproduction requires the recorded OS and architecture; current tools reject a cross-platform binary replay. A different host can validate the saved raw evidence without executing it, or rebuild the archived source for a new investigation. Those new timings are new evidence.
 
+`driver.py` captures Python driver bytes once at process import. Long evaluations retain that identity even if the checkout is subsequently edited. A replay preserves the application's original inputs and executable while independently identifying and preserving its current Python tooling; original application source is not relabeled as the new driver's source.
+
 Legacy standalone schemas and diagnostic schema 1 remain verified under their original contracts. New adapters, hypotheses or output fields require explicit format handling and compatibility checks, rather than silently reinterpreting old measurements.

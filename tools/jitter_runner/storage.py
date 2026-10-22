@@ -1,6 +1,7 @@
 """Immutable result bundles with explicit content integrity checks."""
 
 import hashlib
+import gzip
 import json
 import os
 import re
@@ -11,6 +12,24 @@ import tempfile
 import shutil
 
 from .spec import ExperimentError, load_json
+
+MAX_SOURCE_FILES = 10000
+MAX_SOURCE_BYTES = 512 * 1024**2
+MAX_SOURCE_ARCHIVE_BYTES = MAX_SOURCE_BYTES + 64 * 1024**2
+
+
+class _SourceReader:
+    """Bound total decompression, including tar extension/header payloads."""
+    def __init__(self, stream):
+        self.stream, self.count = stream, 0
+
+    def read(self, size):
+        limit = MAX_SOURCE_ARCHIVE_BYTES
+        if size < 0 or size > limit - self.count:
+            raise ExperimentError("source archive exceeds its decompression bound")
+        data = self.stream.read(size)
+        self.count += len(data)
+        return data
 
 
 def link_immutable(source, destination):
@@ -71,7 +90,10 @@ def source_files(root):
 
 
 def source_hashes(root):
-    return {name: sha256(root / name) for name in source_files(root)}
+    files = source_files(root)
+    if len(files) > MAX_SOURCE_FILES or sum((root / name).stat().st_size for name in files) > MAX_SOURCE_BYTES:
+        raise ExperimentError("source snapshot exceeds 10000 files or 512 MiB")
+    return {name: sha256(root / name) for name in files}
 
 
 def snapshot_source(root, destination):
@@ -118,8 +140,10 @@ def verify_integrity(root, required=("spec.json", "workload.csv", "metadata.json
 
 
 def verify_source_archive(path, expected_files, verified=None):
-    if not isinstance(expected_files, dict) or not expected_files:
+    if not isinstance(expected_files, dict) or not 1 <= len(expected_files) <= MAX_SOURCE_FILES:
         raise ExperimentError("invalid source inventory")
+    if Path(path).stat().st_size > MAX_SOURCE_ARCHIVE_BYTES:
+        raise ExperimentError("compressed source archive exceeds its size bound")
     if verified is False:
         verified = None
     identity = None
@@ -129,20 +153,26 @@ def verify_source_archive(path, expected_files, verified=None):
         identity = (sha256(path), hashlib.sha256(json.dumps(expected_files, sort_keys=True).encode()).hexdigest())
         if identity in verified:
             return
-    with tarfile.open(path, "r:gz") as archive:
-        members = archive.getmembers()
-        names = [member.name for member in members]
-        if len(names) != len(set(names)) or set(names) != set(expected_files):
-            raise ExperimentError("source archive inventory differs from recorded source")
-        for member in members:
+    names, total = set(), 0
+    # Stream headers and reject oversized members BEFORE traversing payloads.
+    with gzip.open(path, "rb") as stream, tarfile.open(fileobj=_SourceReader(stream), mode="r|") as archive:
+        for member in archive:
             name = Path(member.name)
             if not member.isfile() or name.is_absolute() or ".." in name.parts:
                 raise ExperimentError("unsafe source archive entry")
+            if member.name not in expected_files or member.name in names:
+                raise ExperimentError("source archive inventory differs from recorded source")
+            names.add(member.name)
+            total += member.size
+            if member.size < 0 or total > MAX_SOURCE_BYTES:
+                raise ExperimentError("source archive exceeds the 512 MiB expanded size bound")
             with archive.extractfile(member) as stream:
                 digest = hashlib.sha256()
                 for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                     digest.update(chunk)
             if digest.hexdigest() != expected_files[member.name]:
                 raise ExperimentError(f"source archive content differs from recorded source: {member.name}")
+    if names != set(expected_files):
+        raise ExperimentError("source archive inventory differs from recorded source")
     if verified is not None:
         verified.add(identity)

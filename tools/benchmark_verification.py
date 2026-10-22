@@ -2,6 +2,7 @@
 """Measure full validation cost on identical evidence; never run an application."""
 
 import argparse
+from datetime import datetime, timezone
 import json
 import statistics
 import time
@@ -9,6 +10,8 @@ from pathlib import Path
 
 from jitter_runner.investigation import verify_investigation
 from jitter_runner.storage import sha256, write_json
+from jitter_runner.storage import git_output
+from jitter_runner.runner import ROOT, host_info
 
 
 def main():
@@ -19,6 +22,11 @@ def main():
     if args.output.exists():
         raise FileExistsError(args.output)
     identity = sha256(args.bundle / "manifest.json")
+    provenance = {"revision":git_output(ROOT,["rev-parse","HEAD"]).decode().strip(),
+                  "dirty":bool(git_output(ROOT,["status","--porcelain"]).strip()),
+                  "files":{name:sha256(ROOT / name) for name in (
+                      "tools/benchmark_verification.py","tools/jitter_runner/investigation.py",
+                      "tools/jitter_runner/runner.py","tools/jitter_runner/storage.py")}}
     expected = verify_investigation(args.bundle)[1]
     samples = []
     for pair in range(3):
@@ -31,6 +39,7 @@ def main():
                 raise RuntimeError("verification result or evidence changed during the cost comparison")
     summaries = {mode:statistics.median(row["seconds"] for row in samples if row["mode"]==mode) for mode in ("cached","uncached")}
     write_json(args.output, {"schema_version":1,"evidence_kind":"wall/CPU validation cost, not application timing",
+        "created_at_utc":datetime.now(timezone.utc).isoformat(),"host":host_info(),"source":provenance,
         "manifest_sha256":identity,"samples":samples,"median_wall_seconds":summaries,
         "observed_speedup_ratio":summaries["uncached"]/summaries["cached"],
         "result_equal_in_every_run":True,

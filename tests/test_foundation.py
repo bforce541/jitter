@@ -210,6 +210,30 @@ class MeasurementTests(unittest.TestCase):
 
 
 class StorageTests(unittest.TestCase):
+    def test_oversized_source_header_is_rejected_before_payload_expansion(self):
+        import gzip
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "source.tar.gz"
+            entry = tarfile.TarInfo("src/oversized.cpp")
+            entry.size = 1024**4
+            with gzip.open(path,"wb") as archive:
+                archive.write(entry.tobuf())
+            with self.assertRaisesRegex(ExperimentError,"expanded size bound"):
+                verify_source_archive(path,{entry.name:"0"*64})
+
+    def test_tar_extension_payloads_obey_the_decompression_bound(self):
+        import gzip
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "source.tar.gz"
+            entry = tarfile.TarInfo("PaxHeader")
+            entry.type, entry.size = tarfile.XHDTYPE, 1024**4
+            with gzip.open(path,"wb") as archive:
+                archive.write(entry.tobuf() + b"0"*30000)
+            with patch("jitter_runner.storage.MAX_SOURCE_ARCHIVE_BYTES",16384):
+                with self.assertRaisesRegex(ExperimentError,"decompression bound"):
+                    verify_source_archive(path,{"src/example.cpp":"0"*64})
+
     def test_source_inventory_retains_build_inputs_without_embedding_release_catalogs(self):
         from jitter_runner.storage import snapshot_source
         with tempfile.TemporaryDirectory() as directory:

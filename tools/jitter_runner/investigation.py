@@ -16,6 +16,7 @@ from .spec import ExperimentError, load_json, validate_spec
 from .statistics import compare_pairs
 from .storage import seal_bundle, sha256, verify_integrity, verify_source_archive, write_json
 from .variants import build_variant, freeze_source
+from .driver import IDENTITY as DRIVER_IDENTITY
 
 CONTROLLER_VERSION = "adaptive-paired-v1"
 CONTROLLER_VERSION_2 = "adaptive-paired-v2"
@@ -147,6 +148,8 @@ def make_report(spec, state):
         report["remaining_budget"]["candidates"] = spec["budget"]["max_candidates"] - len(state["trials"])
         report["restart_from"] = state.get("restart_from")
         report["search_stop_reason"] = state.get("search_stop_reason")
+    if "driver" in state:
+        report["driver"] = state["driver"]
     return report
 
 
@@ -173,6 +176,12 @@ def markdown_report(report):
                   f"One-sided lower bound: `{evidence['uncertainty']['lower_bound']}` at confidence `{evidence['uncertainty']['confidence']}`.", "",
                   f"Tail support: `{stable(evidence['tail_support'])}`."]
         lines += ["", *[f"- {reason}" for reason in evidence["reasons"]]]
+    if "driver" in report:
+        source = report.get("source") or {}
+        lines += ["", "## Environment and provenance", "",
+                  f"Application source: `{source.get('revision', 'unavailable')}`; dirty: `{source.get('dirty', 'unavailable')}`.", "",
+                  f"Python driver: `{report['driver']['revision']}`; dirty: `{report['driver']['dirty']}`. Module hashes and preserved driver storage are in the structured evidence.", "",
+                  f"Recorded host: `{stable(report['host'])}`."]
     lines += ["", "## Cost", "", f"`{stable(report['cost'])}`", "", "## Limits", "", *[f"- {item}" for item in report["limitations"]], "",
               "## Reproduction", "", "From the repository root, replace BUNDLE with this directory:", "",
               "```sh", "python3 tools/jitter.py verify BUNDLE", "python3 tools/jitter.py reproduce BUNDLE --output results/replay", "```", "",
@@ -184,6 +193,8 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
     validate_investigation(spec)
     if reproduce_from and restart_from:
         raise ExperimentError("exact replay and a fresh restart are separate operations")
+    if reproduce_from and binary is not None:
+        raise ExperimentError("exact replay must use saved executables, not an override binary")
     recovery = Path(restart_from).resolve() if restart_from else None
     if recovery:
         recovery_spec, _, recovery_state = verify_investigation(recovery)
@@ -204,6 +215,7 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
     deadline = start + spec["budget"]["wall_seconds"]
     write_json(root / "investigation-spec.json", spec)
     state = {"schema_version": 2, "controller_version": controller_version(spec), "status": "running",
+             "driver": copy.deepcopy(DRIVER_IDENTITY),
              "created_at_utc": datetime.now(timezone.utc).isoformat(), "host": host_info(),
              "reproduce_from": str(original) if original else None, "source": None, "hypotheses": [],
              "restart_from": str(recovery) if recovery else None,
@@ -555,6 +567,8 @@ def verify_investigation(path, archive_cache=None):
             build = state["builds"][record["configuration"]["implementation"]]
             if metadata["engine_sha256"] != build["engine_sha256"]:
                 raise ExperimentError("measurement did not use its isolated pinned executable")
+            if "driver" in state and metadata.get("driver", {}).get("identity") != state["driver"]:
+                raise ExperimentError("measurement driver differs from its investigation")
             for run in summary["runs"]:
                 application_cpu += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9
                 if "setup" not in run:

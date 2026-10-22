@@ -16,6 +16,7 @@ from .spec import ExperimentError, load_json, load_spec, validate_spec
 from .storage import git_output, link_immutable, seal_bundle, sha256, snapshot_source, source_hashes, verify_integrity, verify_source_archive, write_json
 from .workload import encode_workload, generate
 from .process import run_command
+from .driver import save_driver, verify_driver
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -89,6 +90,8 @@ def verify_bundle(path, archive_cache=None):
     if spec["application"]["adapter"] not in metadata["build"].get("contracts", [metadata["build"].get("contract")]):
         raise ExperimentError("recorded build contract mismatch")
     verify_source_archive(path / "source.tar.gz", metadata["source"].get("files"), verified=archive_cache)
+    if "driver" in metadata:
+        verify_driver(path, metadata["driver"], metadata["source"]["files"])
     if metadata.get("engine_sha256") != sha256(path / "engine" / "jitter"):
         raise ExperimentError("recorded executable identity mismatch")
     if manifest["status"] != summary["status"]:
@@ -152,6 +155,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
         else:
             shutil.copy2(source_binary, path / "engine" / "jitter")
         saved_binary = path / "engine" / "jitter"
+        metadata["driver"] = save_driver(path, metadata["source"]["files"])
         metadata["build"] = adapter.build_info(saved_binary, timeout=10 if deadline is None else max(.001, min(10, deadline - time.monotonic())))
         if spec["schema_version"] >= 2 and metadata["build"].get("trace_format") != 1:
             raise ExperimentError("schema version 2 requires a trace-format-1 engine")
