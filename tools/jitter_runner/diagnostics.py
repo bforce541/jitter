@@ -5,7 +5,7 @@ from .dependencies import build_dependencies
 from .trace_reader import read_trace
 
 
-def hypotheses(spec, baseline, evidence):
+def hypotheses(spec, baseline, evidence, analysis_version=1):
     tail = evidence["tail_requests"]
     total = sum(stage["latency_ns"] for stage in tail)
     components = {key: sum(stage[key] for stage in tail) for key in
@@ -25,6 +25,17 @@ def hypotheses(spec, baseline, evidence):
             {"kind": "configuration_comparison", "parameter": "application.workers", "values": sorted({max(1, current // 2), current}),
              "prediction": "Reducing concurrent contenders may reduce lock waiting; compare end-to-end latency and required throughput under identical inputs."},
             "Less lock waiting can shift delay into the queue. Observed hold time can include preemption; no configuration is recommended yet.")
+        if analysis_version >= 2:
+            result[-1]["support_ns"] = owners
+            result[-1]["tail_component_fraction"] = owners / total if total else 0
+    unowned = sum(stage["unattributed_lock_wait_ns"] for stage in tail)
+    if analysis_version >= 2 and total and unowned / total >= .1:
+        add("unattributed_lock_wait", "A sampled mutex wait has substantial time without an observed owner overlap.",
+            "lock_wait_ns", {"unattributed_lock_wait_ns": unowned, "observed_owner_overlap_ns": owners},
+            {"kind": "instrumentation_extension", "prediction": "Repeat unchanged inputs and extend supported scheduling evidence before assigning this wait to contention."},
+            "This may include unobserved handoff, scheduler delay, or ownership boundaries; it is not proof of lock contention.")
+        result[-1]["support_ns"] = unowned
+        result[-1]["tail_component_fraction"] = unowned / total
     measurement = baseline["phases"]["measurement"]
     if fraction("queue_ns") >= .1 or measurement["rejected"]:
         max_workers = min(256, 268435456 // (spec["instrumentation"]["events_per_thread"] * 32) - 1)
@@ -71,14 +82,17 @@ def hypotheses(spec, baseline, evidence):
     return sorted(result, key=lambda item: (-item["support_ns"], item["id"]))
 
 
-def diagnose(spec, run_dir, baseline, selected_request=None):
+def diagnose(spec, run_dir, baseline, selected_request=None, analysis_version=2):
+    if type(analysis_version) is not int or analysis_version not in (1, 2):
+        from .spec import ExperimentError
+        raise ExperimentError("unsupported diagnostic analysis version")
     trace = read_trace(spec, run_dir, baseline)
     quality = trace["quality"]
     if not quality["enabled"]:
-        return {"schema_version": 1, "status": "disabled", "trace_quality": quality, "hypotheses": [],
+        return {"schema_version": analysis_version, "status": "disabled", "trace_quality": quality, "hypotheses": [],
                 "limitations": ["Tracing is disabled. Baseline timing and correctness remain available."]}
     evidence = build_dependencies(trace, spec["application"]["workers"], selected_request)
-    report = {"schema_version": 1, "status": "analyzed" if quality["complete"] else "insufficient_trace",
+    report = {"schema_version": analysis_version, "status": "analyzed" if quality["complete"] else "insufficient_trace",
               "trace_quality": quality, **evidence, "hypotheses": [],
               "limitations": ["Lock ownership spans are sampled after acquisition and before release; overlaps are lower bounds.",
                               "Region and worker spans include preemption and instrumentation; they are not CPU-time attribution.",
@@ -87,7 +101,7 @@ def diagnose(spec, run_dir, baseline, selected_request=None):
     if not quality["complete"]:
         report["limitations"].append("Events were dropped; dependency edges and bottleneck hypotheses are withheld. Increase buffer capacity within the memory budget and rerun.")
     else:
-        report["hypotheses"] = hypotheses(spec, baseline, evidence)
+        report["hypotheses"] = hypotheses(spec, baseline, evidence, analysis_version)
     if evidence["graph"]["edges_truncated"]:
         report["limitations"].append("The selected graph exceeded its edge budget. It is explicitly truncated and cannot represent every dependency.")
     return report

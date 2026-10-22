@@ -42,7 +42,7 @@ def _add(archive, name, content):
 
 
 def pack_result(root, output):
-    root, output = Path(root).resolve(), Path(output).absolute()
+    root, output = Path(root).resolve(), Path(output).resolve()
     if output.is_relative_to(root):
         raise ExperimentError("portable archive must be outside its input bundle")
     verify_result(root)

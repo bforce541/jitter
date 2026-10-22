@@ -112,6 +112,7 @@ def main(argv=None):
             from .evaluation import run_evaluation
             path, report = run_evaluation(load_json(args.plan), args.output, binary=args.binary)
             print(f"Evaluation: {path}; {len(report.get('studies', []))} retained studies")
+            return 1 if report["totals"]["failed_studies"] or report["totals"]["interrupted_studies"] else 0
         elif args.command == "calibrate":
             from .calibration import run_calibration
             path, _ = run_calibration(args.output, seed=args.seed, trials=args.trials)
@@ -152,7 +153,8 @@ def main(argv=None):
                 report = load_json(run_dir / "diagnostics.json")
                 report = {key: report[key] for key in ("status", "trace_quality", "hypotheses", "limitations")}
             else:
-                report = diagnose(spec, run_dir, analyze_run(spec, generate(spec), run_dir), args.request)
+                report = diagnose(spec, run_dir, analyze_run(spec, generate(spec), run_dir), args.request,
+                                  analysis_version=load_json(run_dir / "diagnostics.json")["schema_version"])
                 report = {key: report[key] for key in ("status", "trace_quality", "tail_requests", "graph", "blocking_holders", "limitations")}
             print(json.dumps(report, indent=2, sort_keys=True, allow_nan=False))
         else:

@@ -40,6 +40,10 @@ class TransportTests(unittest.TestCase):
             bundle, _ = run_calibration(root / "input", trials=1)
             with self.assertRaises(ExperimentError):
                 pack_result(bundle, bundle / "recursive.tar.gz")
+            nested = root / "existing-parent"
+            nested.mkdir()
+            with self.assertRaises(ExperimentError):
+                pack_result(bundle, nested / ".." / "input" / "recursive.tar.gz")
             output = root / "keep"
             output.write_bytes(b"keep")
             with self.assertRaises(FileExistsError):

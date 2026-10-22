@@ -44,3 +44,30 @@ jobs:
         run: python3 tools/jitter.py overhead examples/contention.json --output results/ci-overhead
       - name: Verify paired study
         run: python3 tools/jitter.py verify results/ci-overhead
+      - name: Install source CLI
+        run: python3 -m pip install --no-deps -e .
+      - name: Exercise autonomous CLI and portable evidence
+        run: python3 tools/ci_smoke.py --binary build/jitter --output results/ci-release
+      - name: Calibrate statistics and diagnostic controls
+        run: |
+          jitter calibrate --trials 64 --output results/ci-calibration
+          jitter verify results/ci-calibration
+          python3 tools/evaluate_diagnostics.py --output results/ci-diagnostic-controls
+
+  sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Configure address and undefined behavior instrumentation
+        run: >-
+          cmake -S . -B build-sanitized -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer'
+          -DCMAKE_CXX_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer'
+          -DCMAKE_EXE_LINKER_FLAGS='-fsanitize=address,undefined'
+      - name: Build
+        run: cmake --build build-sanitized --parallel 2
+      - name: Test instrumented C and C++ integration
+        run: ctest --test-dir build-sanitized --output-on-failure

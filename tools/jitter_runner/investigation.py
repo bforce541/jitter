@@ -155,6 +155,9 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
         original_spec, _, original_state = verify_investigation(original)
         if original_spec != spec:
             raise ExperimentError("investigation replay changed its specification")
+        current_host = host_info()
+        if any(original_state["host"][key] != current_host[key] for key in ("system", "machine")):
+            raise ExperimentError("saved investigation executables require the original OS and architecture; rebuild the archived source on this host for new measurements")
     root = new_output(output)
     start = time.monotonic()
     deadline = start + spec["budget"]["wall_seconds"]
@@ -230,7 +233,10 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
             row["status"] = "complete"
             for run in summary["runs"]:
                 state["cost"]["timed_application_cpu_seconds"] += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9
-                state["cost"]["application_setup_seconds"] += run.get("setup", {}).get("elapsed_ns", 0) / 1e9
+                if "setup" not in run:
+                    state["cost"]["application_setup_seconds"] = None
+                elif state["cost"]["application_setup_seconds"] is not None:
+                    state["cost"]["application_setup_seconds"] += run["setup"]["elapsed_ns"] / 1e9
             measured[name] = (experiment_for(spec, config, diagnostic), summary, load_json(path / "metadata.json"))
             return name, summary
         except (Exception, KeyboardInterrupt) as error:
@@ -404,6 +410,8 @@ def verify_investigation(path):
         if record["diagnostic"] and (name != state["diagnostic"] or record["configuration"] != configuration(spec["experiment"])):
             raise ExperimentError("diagnostic did not measure the baseline")
     for key, value in cost.items():
+        if key == "application_setup_seconds" and value is None:
+            continue
         if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
             raise ExperimentError("invalid cost measurement")
     failures = sum(record["status"] == "failed" for record in state["records"].values()) + sum(build["status"] == "failed" for build in state["builds"].values())

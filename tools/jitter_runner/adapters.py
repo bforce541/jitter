@@ -69,11 +69,12 @@ class SharedIndexAdapter:
     def validate(self, spec, workload, output, persist=False):
         baseline = analyze_run(spec, workload, output)
         if spec["schema_version"] >= 2:
-            report = diagnose(spec, output, baseline)
+            saved = None if persist else load_json(Path(output) / "diagnostics.json")
+            report = diagnose(spec, output, baseline, analysis_version=2 if persist else saved["schema_version"])
             baseline["observation"] = report["trace_quality"]
             if persist:
                 write_json(Path(output) / "diagnostics.json", report)
-            elif report != load_json(Path(output) / "diagnostics.json"):
+            elif report != saved:
                 raise ExperimentError("saved diagnostics differ from raw trace evidence")
         return baseline
 
