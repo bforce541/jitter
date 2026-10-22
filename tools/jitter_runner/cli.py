@@ -50,6 +50,12 @@ def main(argv=None):
     calibrate.add_argument("--output", type=Path, required=True)
     calibrate.add_argument("--seed", type=int, default=42)
     calibrate.add_argument("--trials", type=int, default=1000)
+    pack = subcommands.add_parser("pack", help="verify and deduplicate a portable evidence archive")
+    pack.add_argument("bundle", type=Path)
+    pack.add_argument("--output", type=Path, required=True)
+    unpack = subcommands.add_parser("unpack", help="restore and verify portable evidence without executing it")
+    unpack.add_argument("archive", type=Path)
+    unpack.add_argument("--output", type=Path, required=True)
     run = subcommands.add_parser("run", help="build and measure an experiment specification")
     run.add_argument("spec", type=Path)
     run.add_argument("--output", type=Path, help="new result directory; existing paths are never overwritten")
@@ -72,10 +78,16 @@ def main(argv=None):
         command.add_argument("bundle", type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == "doctor":
-            tools = {name: shutil.which(name) for name in ("cmake", "git", "c++")}
+        if args.command in ("pack", "unpack"):
+            from .transport import pack_result, unpack_result
+            result = pack_result(args.bundle, args.output) if args.command == "pack" else unpack_result(args.archive, args.output)
+            print(f"Verified portable evidence: {result}")
+        elif args.command == "doctor":
+            tools = {name: shutil.which(name) for name in ("cmake", "git", "cc", "c++")}
+            source_ready = (Path(__file__).resolve().parents[2] / "CMakeLists.txt").is_file()
             result = {"system": platform.system(), "python": platform.python_version(), "source_root": str(Path(__file__).resolve().parents[2]), "tools": tools,
-                      "ready": platform.system() in ("Linux", "Darwin") and all(tools.values()) and sys.version_info >= (3,9)}
+                      "source_checkout": source_ready,
+                      "ready": source_ready and platform.system() in ("Linux", "Darwin") and all(tools.values()) and sys.version_info >= (3,9)}
             print(json.dumps(result, indent=2) if args.json else "\n".join([f"Jitter environment: {'ready' if result['ready'] else 'missing requirements'}", *[f"{name}: {path or 'not found; install this tool and retry'}" for name,path in tools.items()]]))
             return 0 if result["ready"] else 1
         elif args.command == "variants":
