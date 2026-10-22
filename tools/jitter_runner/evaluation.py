@@ -245,11 +245,17 @@ def run_evaluation(plan, output=None, binary=None, reproduce_from=None):
     return root, report
 
 
-def _read_children(root, plan, state):
+def _read_children(root, plan, state, archive_cache=None):
+    if archive_cache is None:
+        archive_cache = set()
     object_keys(state, ("schema_version", "evaluation_version", "status", "created_at_utc", "reproduce_from", "records") +
                 (("source",) if "source" in state else ()), "evaluation state")
     if "source" in state:
-        verify_source_archive(root / "sources/source.tar.gz", state["source"]["files"])
+        verify_source_archive(root / "sources/source.tar.gz", state["source"]["files"], verified=archive_cache)
+        for name, expected in state["source"]["files"].items():
+            from .storage import sha256
+            if sha256(root / "sources/tree" / name) != expected:
+                raise ExperimentError("evaluation frozen source tree differs from its archive")
     integer(state["schema_version"], 1, 1, "evaluation state.schema_version")
     if (state["evaluation_version"] != VERSION
             or state["status"] not in ("complete", "interrupted") or type(state["created_at_utc"]) is not str):
@@ -288,7 +294,7 @@ def _read_children(root, plan, state):
             if validate_investigation(load_json(path / "investigation-spec.json")) != expected_spec:
                 raise ExperimentError("retained child changed its expected investigation specification")
         if status == "complete":
-            spec, report, child_state = verify_investigation(path)
+            spec, report, child_state = verify_investigation(path, archive_cache=archive_cache)
             if "source" in state and child_state.get("source") != state["source"]:
                 raise ExperimentError("evaluation child changed its frozen source snapshot")
             if spec != expected_spec:
@@ -312,12 +318,12 @@ def _read_children(root, plan, state):
     return children, sizes
 
 
-def verify_evaluation(path):
+def verify_evaluation(path, archive_cache=None):
     root = Path(path).resolve()
     verify_integrity(root, required=("evaluation-plan.json", "evaluation-state.json", "evaluation-report.json", "evaluation-report.md"))
     plan = validate_evaluation(load_json(root / "evaluation-plan.json"))
     state = load_json(root / "evaluation-state.json")
-    children, sizes = _read_children(root, plan, state)
+    children, sizes = _read_children(root, plan, state, archive_cache=archive_cache)
     report = make_evaluation_report(plan, state, children, sizes)
     if (report != load_json(root / "evaluation-report.json")
             or markdown_evaluation(report) != (root / "evaluation-report.md").read_text(encoding="utf-8")):

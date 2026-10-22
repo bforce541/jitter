@@ -18,6 +18,20 @@ from .storage import seal_bundle, sha256, verify_integrity, verify_source_archiv
 from .variants import build_variant, freeze_source
 
 CONTROLLER_VERSION = "adaptive-paired-v1"
+CONTROLLER_VERSION_2 = "adaptive-paired-v2"
+
+
+def controller_version(spec):
+    return CONTROLLER_VERSION_2 if spec["schema_version"] >= 2 else CONTROLLER_VERSION
+
+
+def strong_exploratory_gain(spec, trial):
+    stopping = spec.get("stopping", {})
+    comparison = trial.get("comparison") or {}
+    effects = comparison.get("effect", {}).get("paired_fraction", [])
+    return (stopping.get("enabled") is True and not trial.get("failure")
+            and comparison.get("status") == "promising" and len(effects) >= spec["sampling"]["exploration_pairs"]
+            and all(effect > stopping["strong_gain_fraction"] for effect in effects))
 
 
 class BudgetExhausted(Exception):
@@ -61,7 +75,7 @@ def select_finalist(trials):
     return max(promising, key=lambda trial: (trial["comparison"]["effect"]["median_fraction"], trial["id"])) if promising else None
 
 
-def _pairs_from_records(root, trial, records, cache=None):
+def _pairs_from_records(root, trial, records, cache=None, archive_cache=None):
     result = []
     for pair in trial["pairs"]:
         if any(name is None or records[name]["status"] != "complete" for name in (pair["baseline"], pair["candidate"])):
@@ -71,18 +85,19 @@ def _pairs_from_records(root, trial, records, cache=None):
         for side in ("baseline", "candidate"):
             name = pair[side]
             if cache is not None and name not in cache:
-                cache[name] = verify_bundle(root / name)
-            _, summary, metadata = cache[name] if cache is not None else verify_bundle(root / name)
+                cache[name] = verify_bundle(root / name, archive_cache=archive_cache)
+            _, summary, metadata = cache[name] if cache is not None else verify_bundle(root / name, archive_cache=archive_cache)
             row[side] = summary["runs"][0]
             row[side + "_host"] = metadata["host"]
         result.append(row)
     return result
 
 
-def _comparison(root, spec, trial, records, confirmation=False, cache=None):
+def _comparison(root, spec, trial, records, confirmation=False, cache=None, archive_cache=None):
     if not trial["pairs"]:
         return None
-    return compare_pairs(_pairs_from_records(root, trial, records, cache), spec["comparison"], confirmation=confirmation)
+    version = (trial.get("comparison") or {}).get("schema_version", 2)
+    return compare_pairs(_pairs_from_records(root, trial, records, cache, archive_cache), spec["comparison"], confirmation=confirmation, version=version)
 
 
 def derive_decision(state):
@@ -108,7 +123,7 @@ def derive_decision(state):
 def make_report(spec, state):
     decision = derive_decision(state)
     accepted = decision == "accepted_recommendation"
-    return {"schema_version": 1, "controller_version": CONTROLLER_VERSION, "decision": decision,
+    report = {"schema_version": state.get("schema_version", 1), "controller_version": state["controller_version"], "decision": decision,
             "stop_reason": state["stop_reason"], "baseline": configuration(spec["experiment"]),
             "recommendation": state["confirmation"]["configuration"] if accepted else None,
             "best_exploratory_candidate": state["finalist"], "trials": state["trials"],
@@ -119,6 +134,20 @@ def make_report(spec, state):
                             "Tracing is a separate diagnostic process; final performance comparisons disable it.",
                             "Recorded host equality does not establish independent effects, quiet hardware, or absence of thermal drift.",
                             "No result generalizes beyond this workload, host, implementation contract, and observed resource envelope."]}
+    if state.get("schema_version", 1) >= 2:
+        space = normalize_space(spec["experiment"], spec["search"])
+        best = select_finalist(state["trials"])
+        report["best_exploratory_candidate"] = best["configuration"] if best else None
+        report["goal"] = {"metric": spec["comparison"]["metric"], "comparison_policy": spec["comparison"],
+                          "absolute_constraints": spec["experiment"]["objective"]}
+        report["search_coverage"] = {"supported_candidates": len(space) - 1, "attempted_candidates": len(state["trials"]),
+                                     "untried_candidates": len(space) - 1 - len(state["trials"]), "global_optimum_established": False}
+        report["remaining_budget"] = {key: max(0, spec["budget"][limit] - state["cost"][key]) for key, limit in
+                                      (("runs", "max_runs"), ("builds", "max_builds"), ("failures", "max_failures"), ("seconds", "wall_seconds"))}
+        report["remaining_budget"]["candidates"] = spec["budget"]["max_candidates"] - len(state["trials"])
+        report["restart_from"] = state.get("restart_from")
+        report["search_stop_reason"] = state.get("search_stop_reason")
+    return report
 
 
 def markdown_report(report):
@@ -133,6 +162,9 @@ def markdown_report(report):
         center = comparison["effect"]["median_fraction"] if comparison else None
         effect = f"{100*center:.2f}%" if center is not None else "unavailable"
         lines.append(f"| {trial['id']} | `{stable(trial['configuration'])}` | {comparison['status'] if comparison else stable(trial.get('failure', 'unfinished'))} | {effect} |")
+    if "search_coverage" in report:
+        lines += ["", "## Goal and coverage", "", f"Goal: `{stable(report['goal'])}`", "",
+                  f"Search coverage: `{stable(report['search_coverage'])}`", "", f"Remaining budget: `{stable(report['remaining_budget'])}`"]
     confirmation = report["confirmation"]
     if confirmation and confirmation.get("comparison"):
         evidence = confirmation["comparison"]
@@ -148,8 +180,17 @@ def markdown_report(report):
     return "\n".join(lines)
 
 
-def run_investigation(spec, output=None, binary=None, reproduce_from=None, source_context=None):
+def run_investigation(spec, output=None, binary=None, reproduce_from=None, source_context=None, restart_from=None):
     validate_investigation(spec)
+    if reproduce_from and restart_from:
+        raise ExperimentError("exact replay and a fresh restart are separate operations")
+    recovery = Path(restart_from).resolve() if restart_from else None
+    if recovery:
+        recovery_spec, _, recovery_state = verify_investigation(recovery)
+        if recovery_spec != spec:
+            raise ExperimentError("restart changed the saved investigation specification")
+        if recovery_state["source"]:
+            source_context = {"archive": recovery / "sources/source.tar.gz", "source": recovery_state["source"]}
     original = Path(reproduce_from).resolve() if reproduce_from else None
     if original:
         original_spec, _, original_state = verify_investigation(original)
@@ -162,9 +203,11 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
     start = time.monotonic()
     deadline = start + spec["budget"]["wall_seconds"]
     write_json(root / "investigation-spec.json", spec)
-    state = {"schema_version": 1, "controller_version": CONTROLLER_VERSION, "status": "running",
+    state = {"schema_version": 2, "controller_version": controller_version(spec), "status": "running",
              "created_at_utc": datetime.now(timezone.utc).isoformat(), "host": host_info(),
              "reproduce_from": str(original) if original else None, "source": None, "hypotheses": [],
+             "restart_from": str(recovery) if recovery else None,
+             "search_stop_reason": None,
              "diagnostic": None, "records": {}, "builds": {}, "trials": [], "finalist": None,
              "confirmation": None, "stop_reason": None,
              "cost": {"runs": 0, "builds": 0, "failures": 0, "seconds": 0, "build_seconds": 0,
@@ -174,6 +217,7 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
     (root / "engines").mkdir()
     context = None
     measured = {}
+    source_checks = set()
 
     def persist():
         state["cost"]["seconds"] = time.monotonic() - start
@@ -213,6 +257,8 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
                 state["cost"]["build_seconds"] += time.monotonic() - before_build
                 state["cost"]["failures"] += 1
                 persist()
+                if not isinstance(error, KeyboardInterrupt) and remaining() <= 0:
+                    raise BudgetExhausted() from error
                 raise
         if state["builds"][name]["status"] != "complete":
             raise ExperimentError("previous candidate build failed; logs are retained")
@@ -225,11 +271,13 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
         name = f"measurements/run-{state['cost']['runs']:05d}"
         row = {"status": "running", "stage": stage, "configuration": config, "diagnostic": diagnostic}
         state["records"][name] = row
+        if diagnostic:
+            state["diagnostic"] = name
         persist()
         before = time.monotonic()
         try:
             path, summary = run_experiment(experiment_for(spec, config, diagnostic), root / name,
-                                          binary=executable, source_context=context, deadline=deadline, immutable_engine=True)
+                                          binary=executable, source_context=context, deadline=deadline, immutable_engine=True, archive_cache=source_checks)
             row["status"] = "complete"
             for run in summary["runs"]:
                 state["cost"]["timed_application_cpu_seconds"] += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9
@@ -242,6 +290,8 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
         except (Exception, KeyboardInterrupt) as error:
             row.update(status="failed", failure=failure_kind(error), error=str(error))
             state["cost"]["failures"] += 1
+            if not isinstance(error, KeyboardInterrupt) and remaining() <= 0:
+                raise BudgetExhausted() from error
             raise
         finally:
             row["seconds"] = time.monotonic() - before
@@ -261,6 +311,8 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
                 try:
                     pair[side], _ = measure(config, stage)
                 except BudgetExhausted:
+                    if state["cost"]["runs"] > previous_runs:
+                        pair[side] = f"measurements/run-{state['cost']['runs']:05d}"
                     raise
                 except (Exception, KeyboardInterrupt):
                     if state["cost"]["runs"] > previous_runs:
@@ -293,7 +345,7 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
         space = normalize_space(spec["experiment"], spec["search"])
         for _ in range(spec["budget"]["max_candidates"]):
             guard()
-            candidate, reason = choose_candidate(space, baseline, _history(state["trials"]), state["hypotheses"], spec["search"]["strategy"], spec["search"]["seed"])
+            candidate, reason = choose_candidate(space, baseline, _history(state["trials"]), state["hypotheses"], spec["search"]["strategy"], spec["search"]["seed"], model_version=spec["schema_version"])
             if candidate is None:
                 break
             # Reserve a whole confirmatory holdout, rather than spending the last
@@ -311,6 +363,8 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
                 engine(candidate)
                 collect(trial, spec["sampling"]["exploration_pairs"], "exploration")
                 while len(trial["pairs"]) < spec["sampling"]["max_exploration_pairs"]:
+                    if strong_exploratory_gain(spec, trial):
+                        break
                     comparison = trial["comparison"]
                     center = comparison["effect"]["median_fraction"]
                     if comparison["status"] not in ("promising", "exploratory") or center is None or center <= spec["comparison"]["min_effect"] / 2:
@@ -328,6 +382,10 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
             finally:
                 trial["seconds"] = time.monotonic() - before
                 persist()
+            if strong_exploratory_gain(spec, trial):
+                state["search_stop_reason"] = "strong_exploratory_gain"
+                persist()
+                break
         finalist = select_finalist(state["trials"])
         if finalist:
             state["finalist"] = finalist["configuration"]
@@ -380,15 +438,19 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None, sourc
     return root, report
 
 
-def verify_investigation(path):
+def verify_investigation(path, archive_cache=None):
     root = Path(path).resolve()
+    if archive_cache is None:
+        archive_cache = set()
     verify_integrity(root, required=("investigation-spec.json", "state.json", "report.json", "report.md"))
     spec = validate_investigation(load_json(root / "investigation-spec.json"))
     state = load_json(root / "state.json")
-    if state.get("controller_version") != CONTROLLER_VERSION or state.get("status") not in ("complete", "interrupted"):
+    if type(state.get("schema_version")) is not int or state["schema_version"] not in (1, 2):
+        raise ExperimentError("unsupported investigation journal schema")
+    if state.get("controller_version") != controller_version(spec) or state.get("status") not in ("complete", "interrupted"):
         raise ExperimentError("incompatible or unfinished controller journal")
     if state["source"]:
-        verify_source_archive(root / "sources/source.tar.gz", state["source"]["files"])
+        verify_source_archive(root / "sources/source.tar.gz", state["source"]["files"], verified=archive_cache)
         for name, checksum in state["source"]["files"].items():
             if sha256(root / "sources/tree" / name) != checksum:
                 raise ExperimentError("frozen source tree differs from its archive")
@@ -438,10 +500,14 @@ def verify_investigation(path):
     elif state["hypotheses"]:
         raise ExperimentError("hypotheses lack diagnostic evidence")
     for trial in state["trials"]:
-        expected, reason = choose_candidate(space, baseline, _history(history), state["hypotheses"], spec["search"]["strategy"], spec["search"]["seed"])
+        if history and strong_exploratory_gain(spec, history[-1]):
+            raise ExperimentError("investigation continued exploration after its strong-gain stopping rule")
+        expected, reason = choose_candidate(space, baseline, _history(history), state["hypotheses"], spec["search"]["strategy"], spec["search"]["seed"], model_version=spec["schema_version"])
         if expected != trial["configuration"] or trial["id"] != candidate_id(expected) or trial["selection"] != reason:
             raise ExperimentError("controller selection differs from prior evidence")
         history.append(trial)
+    if state.get("search_stop_reason") is not None and (state["search_stop_reason"] != "strong_exploratory_gain" or not state["trials"] or not strong_exploratory_gain(spec, state["trials"][-1])):
+        raise ExperimentError("search stop reason lacks the required exploratory evidence")
     finalist = select_finalist(state["trials"])
     if state["finalist"] is not None and (not finalist or state["finalist"] != finalist["configuration"]):
         raise ExperimentError("finalist was not selected from the exploratory evidence")
@@ -449,6 +515,8 @@ def verify_investigation(path):
     trials = state["trials"] + ([state["confirmation"]] if state["confirmation"] else [])
     for trial in trials:
         confirm = trial is state["confirmation"]
+        if state["schema_version"] >= 2 and trial.get("comparison") and trial["comparison"].get("schema_version") != 2:
+            raise ExperimentError("new investigation journals require full-coverage comparison schema 2")
         if len(trial["pairs"]) > (spec["sampling"]["confirmation_pairs"] if confirm else spec["sampling"]["max_exploration_pairs"]):
             raise ExperimentError("trial exceeded its fixed sample bound")
         for pair in trial["pairs"]:
@@ -466,7 +534,7 @@ def verify_investigation(path):
                 expected_config = baseline if side == "baseline" else trial["configuration"]
                 if state["records"][name]["configuration"] != expected_config or state["records"][name]["stage"] != ("confirmation" if confirm else "exploration"):
                     raise ExperimentError("paired trial configuration or stage mismatch")
-        if trial.get("comparison") != _comparison(root, spec, trial, state["records"], confirmation=confirm, cache=checked):
+        if trial.get("comparison") != _comparison(root, spec, trial, state["records"], confirmation=confirm, cache=checked, archive_cache=archive_cache):
             # Failed attempts may have no completed pair and no comparison.
             if trial.get("comparison") is not None or any(all(pair[side] for side in ("baseline", "candidate")) for pair in trial["pairs"]):
                 raise ExperimentError("comparison differs from validated raw paired evidence")
@@ -479,7 +547,7 @@ def verify_investigation(path):
             raise ExperimentError("unsafe measurement path in journal")
         if record["status"] == "complete":
             if name not in checked:
-                checked[name] = verify_bundle(root / name)
+                checked[name] = verify_bundle(root / name, archive_cache=archive_cache)
             saved, _, metadata = checked[name]
             if saved != experiment_for(spec, record["configuration"], record["diagnostic"]) or metadata["source"] != state["source"]:
                 raise ExperimentError("measurement changed fixed behavior, inputs or frozen source")

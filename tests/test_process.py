@@ -57,6 +57,16 @@ class ProcessTests(unittest.TestCase):
         self.assert_stopped(descendant)
 
     @unittest.skipUnless(os.name == "posix", "process groups require POSIX")
+    def test_timeout_stops_term_ignoring_descendant_without_output_pipe(self):
+        child = "import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); print('ready',flush=True); time.sleep(60)"
+        script = ("import subprocess,sys,time; "
+                  f"child=subprocess.Popen([sys.executable,'-c',{child!r}],stdout=subprocess.PIPE); "
+                  "child.stdout.readline(); print(child.pid,flush=True); time.sleep(60)")
+        with self.assertRaises(subprocess.TimeoutExpired) as raised:
+            run_command([sys.executable,"-c",script],timeout=.5,capture_output=True,text=True)
+        self.assert_stopped(int(raised.exception.output.strip()))
+
+    @unittest.skipUnless(os.name == "posix", "process groups require POSIX")
     def test_interrupt_stops_launched_process(self):
         real_popen = subprocess.Popen
         launched = []

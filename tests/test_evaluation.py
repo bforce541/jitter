@@ -52,7 +52,7 @@ def fake_run(spec, output=None, binary=None, reproduce_from=None, source_context
     return directory, report
 
 
-def fake_verify(path):
+def fake_verify(path, archive_cache=None):
     directory = Path(path)
     return load_json(directory / "investigation-spec.json"), load_json(directory / "report.json"), {"source": load_json(directory / "test-source.json")}
 
@@ -62,10 +62,20 @@ class EvaluationTests(unittest.TestCase):
         config = validate_evaluation(load_json(ROOT / "examples/evaluation.json"))
         self.assertEqual(config["strategies"], ["guided", "random", "grid", "local", "unguided"])
         self.assertTrue({"shared-contention", "json-small", "json-large", "sqlite-index", "shared-saturated"}.issubset({row["name"] for row in config["scenarios"]}))
-        self.assertEqual(len(execution_order(config)), 75)
+        self.assertEqual(len(execution_order(config)), 105)
         for scenario in config["scenarios"]:
             exp = scenario["investigation"]["experiment"]
             self.assertEqual(exp["workload"]["rate_per_second"] * exp["workload"]["measurement_ms"] // 1000, 2000)
+
+    def test_wide_policy_ablation_preserves_inputs_spaces_and_budgets(self):
+        scenarios = {row["name"]: row["investigation"] for row in load_json(ROOT / "examples/evaluation.json")["scenarios"]}
+        before, after = copy.deepcopy(scenarios["wide-v1"]), copy.deepcopy(scenarios["wide-v2"])
+        self.assertEqual(before.pop("schema_version"), 1)
+        self.assertEqual(after.pop("schema_version"), 2)
+        self.assertEqual(after.pop("stopping"), {"enabled": True, "strong_gain_fraction": .25})
+        self.assertEqual(before, after)
+        legacy = validate_evaluation(load_json(ROOT / "examples/evaluation-v1.json"))
+        self.assertEqual(len(execution_order(legacy)), 75)
 
     def test_child_changes_only_search_controls_and_unguided_diagnostic(self):
         config = load_json(ROOT / "examples/evaluation.json")

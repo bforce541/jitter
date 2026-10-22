@@ -10,7 +10,7 @@ requires-python = ">=3.9"
 dependencies = []
 
 [project.scripts]
-jitter = "jitter_runner.cli:main"
+jitter = "jitter_runner.cli:entrypoint"
 
 [tool.setuptools]
 package-dir = {"" = "tools"}

@@ -365,6 +365,15 @@ class ObservationIntegrationTests(unittest.TestCase):
         with self.assertRaises(ExperimentError):
             verify_overhead(path)
 
+    def test_registered_schema_three_overhead_is_supported(self):
+        spec = self.spec()
+        spec["schema_version"] = 3
+        spec["application"]["implementation"] = "narrow"
+        spec["repetitions"] = 1
+        path, report = run_overhead(spec, self.path / "registered-overhead", binary=self.binary)
+        self.assertEqual(len(report["pairs"]), 1)
+        self.assertEqual(verify_overhead(path)[0]["schema_version"], 3)
+
 
 if __name__ == "__main__":
     unittest.main()

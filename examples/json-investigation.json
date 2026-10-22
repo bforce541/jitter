@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "experiment": {
     "schema_version": 3,
     "application": {
@@ -76,5 +76,9 @@
     "max_failures": 2,
     "wall_seconds": 300
   },
-  "diagnostic": true
+  "diagnostic": true,
+  "stopping": {
+    "enabled": true,
+    "strong_gain_fraction": 0.25
+  }
 }

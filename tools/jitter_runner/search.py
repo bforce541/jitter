@@ -118,7 +118,7 @@ def _seed_key(seed, config, step=0):
     return hashlib.sha256(f"{seed}:{step}:{_canonical(config)}".encode("utf-8")).hexdigest()
 
 
-def _support(hypotheses):
+def _support(hypotheses, model_version=1):
     result = {}
     for hypothesis in hypotheses:
         if isinstance(hypothesis, str):
@@ -132,6 +132,8 @@ def _support(hypotheses):
             raise ExperimentError("hypothesis support must be a finite fraction in [0, 1]")
         if name in ("shared_lock_contention", "queue_pressure"):
             result[name] = max(result.get(name, 0), weight)
+        if model_version >= 2 and name == "digest_execution":
+            result[name] = max(result.get(name, 0), weight)
         if name == "sql_execution" and isinstance(hypothesis, dict):
             suggestion = hypothesis.get("suggested_experiment", {})
             if suggestion.get("parameter") == "application.implementation" and "indexed" in suggestion.get("values", []):
@@ -139,7 +141,7 @@ def _support(hypotheses):
     return result
 
 
-def choose_candidate(space, baseline, history, hypotheses, strategy, seed):
+def choose_candidate(space, baseline, history, hypotheses, strategy, seed, model_version=1):
     """Choose one untried point; positive effects mean fractional improvement.
 
     Every history entry, including failed or interrupted entries, consumes its
@@ -147,6 +149,7 @@ def choose_candidate(space, baseline, history, hypotheses, strategy, seed):
     """
     if strategy not in STRATEGIES:
         raise ExperimentError("unsupported search strategy")
+    integer(model_version, 1, 2, "search model version")
     integer(seed, 0, (1 << 63) - 1, "search.seed")
     if not isinstance(space, list) or not 1 <= len(space) <= MAX_CONFIGURATIONS:
         raise ExperimentError("search space must contain 1 to 4096 configurations")
@@ -202,7 +205,7 @@ def choose_candidate(space, baseline, history, hypotheses, strategy, seed):
             reason.update(mode="local_exhausted", basis="All adjacent rank neighbors of the promising incumbent have been tried.")
             return None, reason
         remaining = neighbors
-    support = _support(hypotheses) if strategy == "guided" else {}
+    support = _support(hypotheses, model_version) if strategy == "guided" else {}
     learned = {}
     # Compare observations that differ in exactly one parameter. Adjacent
     # observations within a context prevent quadratic work as the study grows.
@@ -234,6 +237,15 @@ def choose_candidate(space, baseline, history, hypotheses, strategy, seed):
             value += 2 * support["variant:" + config["implementation"]]
             directional.append("observed SQL execution supports testing the registered index alternative")
         contention, queue = support.get("shared_lock_contention", 0), support.get("queue_pressure", 0)
+        if model_version >= 2:
+            alternatives = {"coarse":"narrow", "scan":"indexed"}
+            if queue and alternatives.get(incumbent["implementation"]) == config["implementation"]:
+                value += 3 * queue
+                directional.append("queue propagation through the registered serialized resource supports testing its bounded alternative before adding contenders")
+            if (support.get("digest_execution",0) and incumbent["implementation"] in ("map","ordered")
+                    and config["implementation"] != incumbent["implementation"]):
+                value += 2 * support["digest_execution"]
+                directional.append("observed JSON execution supports testing the registered representation alternative")
         if contention:
             if config["implementation"] == "narrow" and incumbent["implementation"] == "coarse":
                 value += 2 * contention

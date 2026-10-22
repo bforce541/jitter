@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 from jitter_runner.investigation import (derive_decision, experiment_for, failure_kind,
                                         pair_order, run_investigation, select_finalist,
-                                        verify_investigation)
+                                        verify_investigation, strong_exploratory_gain)
 from jitter_runner.investigation_spec import validate_investigation
 from jitter_runner.runner import ROOT
 from jitter_runner.search import choose_candidate, configuration, normalize_space
@@ -53,6 +53,33 @@ def observed_trial(config, effect, status="promising"):
 
 
 class InvestigationContractTests(unittest.TestCase):
+    def test_strong_gain_stops_exploration_without_authorizing_recommendation(self):
+        spec = investigation_spec()
+        spec.update(schema_version=2, stopping={"enabled": True, "strong_gain_fraction": .25})
+        validate_investigation(spec)
+        trial = observed_trial({"workers": 1}, .4)
+        trial["comparison"]["effect"]["paired_fraction"] = [.4, .41]
+        self.assertTrue(strong_exploratory_gain(spec, trial))
+        self.assertEqual(derive_decision(decision_state(trials=[trial])), "inconclusive")
+        for status in ("inconclusive", "constraint_violation", "invalid", "regression"):
+            changed = copy.deepcopy(trial)
+            changed["comparison"]["status"] = status
+            self.assertFalse(strong_exploratory_gain(spec, changed))
+        for effects in ([.4], [.4, .25], [.4, -.1]):
+            changed = copy.deepcopy(trial)
+            changed["comparison"]["effect"]["paired_fraction"] = effects
+            self.assertFalse(strong_exploratory_gain(spec, changed))
+        trial["failure"] = {"kind": "correctness_failure"}
+        self.assertFalse(strong_exploratory_gain(spec, trial))
+        trial.pop("failure")
+        spec["stopping"]["enabled"] = False
+        self.assertFalse(strong_exploratory_gain(spec, trial))
+        for stopping in ({"enabled": 1, "strong_gain_fraction": .25},
+                         {"enabled": True, "strong_gain_fraction": .01},
+                         {"enabled": True, "strong_gain_fraction": float("nan")}):
+            with self.assertRaises(ExperimentError):
+                validate_investigation({**spec, "stopping": stopping})
+
     def test_valid_fixture_and_closed_contract(self):
         spec = investigation_spec()
         self.assertIs(validate_investigation(spec), spec)
@@ -169,12 +196,19 @@ class InvestigationIntegrationTests(unittest.TestCase):
         return run_investigation(spec or investigation_spec(), self.path / name, binary=binary or self.binary)
 
     def test_short_investigation_is_inconclusive_and_report_tampering_fails(self):
-        path, report = self.execute()
+        spec = investigation_spec()
+        spec.update(schema_version=2, stopping={"enabled": True, "strong_gain_fraction": .25})
+        path, report = self.execute(spec)
         self.assertEqual(report["decision"], "inconclusive")
         self.assertIsNone(report["recommendation"])
         self.assertIsNone(report["confirmation"])
         self.assertFalse((path / "recommendation.json").exists())
         self.assertEqual(len(report["trials"]), 2)
+        self.assertEqual(report["schema_version"], 2)
+        self.assertEqual(report["controller_version"], "adaptive-paired-v2")
+        self.assertIsNone(report["search_stop_reason"])
+        self.assertEqual(report["search_coverage"]["untried_candidates"], 0)
+        self.assertFalse(report["search_coverage"]["global_optimum_established"])
         self.assertEqual(report["cost"]["runs"], 8)
         for trial in report["trials"]:
             self.assertEqual(len(trial["pairs"]), 2)
@@ -226,6 +260,20 @@ class InvestigationIntegrationTests(unittest.TestCase):
         self.assertIn("deliberate application failure", (child / "run-001/stderr.log").read_text())
         self.assertEqual(load_json(child / "manifest.json")["status"], "failed")
         self.assertTrue((path / "report.md").is_file())
+
+    def test_restart_recovers_failed_executor_with_fresh_measurements(self):
+        broken = self.path / "broken-restart-engine"
+        broken.write_text("#!/bin/sh\nif [ \"$1\" = \"--build-info\" ]; then exec " + shlex.quote(str(self.binary)) + " --build-info; fi\nexit 9\n")
+        broken.chmod(0o755)
+        spec = investigation_spec()
+        spec["diagnostic"] = True
+        original, report = self.execute(spec, name="restart-original", binary=broken)
+        self.assertEqual(report["decision"], "invalid_investigation")
+        restarted, fresh = run_investigation(spec, self.path / "restarted", binary=self.binary, restart_from=original)
+        self.assertEqual(fresh["decision"], "inconclusive")
+        self.assertEqual(fresh["restart_from"], str(original))
+        self.assertEqual(verify_investigation(restarted)[2]["cost"]["failures"], 0)
+        self.assertEqual(verify_investigation(original)[2]["cost"]["failures"], 1)
 
 
 if __name__ == "__main__":

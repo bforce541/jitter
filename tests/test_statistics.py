@@ -35,6 +35,17 @@ def pair(improvement=.2, completed=2000):
 
 
 class PairedStatisticsTests(unittest.TestCase):
+    def test_warmup_loss_cannot_confirm_a_measurement_only_win(self):
+        data = [pair(.8) for _ in range(8)]
+        data[0]["candidate"]["phases"]["warmup"] = {"offered":10,"completed":9,"rejected":1,"errors":0}
+        current = compare_pairs(data, policy(), confirmation=True)
+        self.assertEqual(current["schema_version"], 2)
+        self.assertEqual(current["status"], "invalid")
+        self.assertTrue(any("warmup" in reason for reason in current["reasons"]))
+        legacy = compare_pairs(data, policy(), confirmation=True, version=1)
+        self.assertEqual(legacy["schema_version"], 1)
+        self.assertTrue(legacy["accepted"])
+
     def test_exact_one_sided_order_statistic_calculation(self):
         bounds = median_bounds(list(range(8)), .95)
         self.assertEqual(bounds["order_statistic_rank"], 2)

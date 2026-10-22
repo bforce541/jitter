@@ -104,7 +104,7 @@ def _sign_probability(values, margin):
     return sum(math.comb(count, j) for j in range(wins, count + 1)) / (1 << count)
 
 
-def compare_pairs(pairs, policy, confirmation=False):
+def compare_pairs(pairs, policy, confirmation=False, version=2):
     """Compare verified run summaries; acceptance also requires caller protocol.
 
     The caller must freeze one finalist and the number of fresh confirmation
@@ -113,6 +113,8 @@ def compare_pairs(pairs, policy, confirmation=False):
     This function cannot establish freshness from aggregate run summaries.
     """
     validate_policy(policy)
+    if type(version) is not int or version not in (1, 2):
+        raise ExperimentError("unsupported paired comparison schema")
     if type(confirmation) is not bool:
         raise ExperimentError("confirmation must be boolean")
     if not isinstance(pairs, list) or len(pairs) > 1000:
@@ -134,6 +136,13 @@ def compare_pairs(pairs, policy, confirmation=False):
             before, after = left["phases"]["measurement"], right["phases"]["measurement"]
             if any(run.get("correctness") != "passed" for run in (left, right)):
                 raise ValueError("correctness did not pass")
+            if version >= 2:
+                for run in (left, right):
+                    warmup = run["phases"].get("warmup")
+                    if warmup is not None and (not isinstance(warmup, dict) or
+                            any(type(warmup.get(key)) is not int or warmup[key] < 0 for key in ("offered", "completed", "rejected", "errors")) or
+                            warmup["rejected"] or warmup["errors"] or warmup["offered"] != warmup["completed"]):
+                        raise ValueError("warmup must also have complete, rejection-free request coverage")
             for phase in (before, after):
                 if not isinstance(phase, dict) or not isinstance(phase.get("latency_ns"), dict):
                     raise ValueError("measurement and latency summary must be objects")
@@ -255,7 +264,7 @@ def compare_pairs(pairs, policy, confirmation=False):
             metrics[name]["tail_support"] = {"required_completed_per_run": threshold,
                 "sufficient": bool(measurements) and len(values[0]) == len(measurements) == len(values[1])
                 and all(min(before["completed"], after["completed"]) >= threshold for before, after in measurements)}
-    return {"schema_version": 1, "status": status, "accepted": status == "accepted",
+    return {"schema_version": version, "status": status, "accepted": status == "accepted",
             "confirmation": confirmation, "pairs_requested": len(pairs), "pairs_valid": len(measurements),
             "pairs": evidence, "metrics": metrics,
             "effect": {"metric": metric, "positive_means": "candidate improvement",

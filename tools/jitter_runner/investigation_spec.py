@@ -5,8 +5,11 @@ from .search import normalize_space
 
 
 def validate_investigation(spec):
-    object_keys(spec, ("schema_version", "experiment", "search", "sampling", "comparison", "budget", "diagnostic"), "investigation")
-    integer(spec["schema_version"], 1, 1, "investigation.schema_version")
+    if not isinstance(spec, dict):
+        raise ExperimentError("investigation must be an object")
+    integer(spec.get("schema_version"), 1, 2, "investigation.schema_version")
+    object_keys(spec, ("schema_version", "experiment", "search", "sampling", "comparison", "budget", "diagnostic") +
+                (("stopping",) if spec["schema_version"] == 2 else ()), "investigation")
     experiment = validate_spec(spec["experiment"])
     if experiment["schema_version"] != 3 or experiment["repetitions"] != 1:
         raise ExperimentError("investigation requires a schema-version-3 experiment with repetitions=1")
@@ -29,6 +32,12 @@ def validate_investigation(spec):
     real(policy["max_throughput_loss"], 0, .5, "comparison.max_throughput_loss")
     integer(policy["min_tail_observations"], 20, 1000, "comparison.min_tail_observations")
     real(policy["max_baseline_spread"], 1, 100, "comparison.max_baseline_spread")
+    if spec["schema_version"] == 2:
+        stopping = spec["stopping"]
+        object_keys(stopping, ("enabled", "strong_gain_fraction"), "stopping")
+        if type(stopping["enabled"]) is not bool:
+            raise ExperimentError("stopping.enabled must be boolean")
+        real(stopping["strong_gain_fraction"], policy["min_effect"], .99, "stopping.strong_gain_fraction")
     budget = spec["budget"]
     object_keys(budget, ("max_candidates", "max_runs", "max_builds", "max_failures", "wall_seconds"), "budget")
     for key, high in (("max_candidates", 4096), ("max_runs", 100000), ("max_builds", 16), ("max_failures", 1000)):

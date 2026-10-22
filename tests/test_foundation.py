@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 from jitter_runner.metrics import REQUEST_FIELDS, RESOURCE_FIELDS, analyze_run, distribution
 from jitter_runner.runner import ROOT, run_experiment, verify_bundle
-from jitter_runner.spec import ExperimentError, load_spec, validate_spec
+from jitter_runner.spec import ExperimentError, load_json, load_spec, validate_spec
 from jitter_runner.storage import seal_bundle, verify_integrity, verify_source_archive, write_json
 from jitter_runner.workload import MASK, MULTIPLIER, encode_workload, expected_value, generate, mix64, GOLDEN
 
@@ -219,18 +219,26 @@ class StorageTests(unittest.TestCase):
             with tarfile.open(path, "w:gz") as archive:
                 archive.addfile(entry, io.BytesIO(contents))
             expected = {entry.name: hashlib.sha256(contents).hexdigest()}
-            verify_source_archive(path, expected)
+            validated = set()
+            verify_source_archive(path, expected, verified=validated)
+            verify_source_archive(path, expected, verified=validated)
             with self.assertRaises(ExperimentError):
-                verify_source_archive(path, {entry.name: "0" * 64})
+                verify_source_archive(path, {entry.name: "0" * 64}, verified=validated)
             with self.assertRaises(ExperimentError):
                 verify_source_archive(path, {"different.cpp": expected[entry.name]})
+            corrupted = b"changed snapshot\n"
+            entry.size = len(corrupted)
+            with tarfile.open(path, "w:gz") as archive:
+                archive.addfile(entry, io.BytesIO(corrupted))
+            with self.assertRaises(ExperimentError):
+                verify_source_archive(path, expected, verified=validated)
             entry = tarfile.TarInfo("src/link")
             entry.type = tarfile.SYMTYPE
             entry.linkname = "/tmp/elsewhere"
             with tarfile.open(path, "w:gz") as archive:
                 archive.addfile(entry)
             with self.assertRaises(ExperimentError):
-                verify_source_archive(path, {entry.name: hashlib.sha256(b"").hexdigest()})
+                verify_source_archive(path, {entry.name: hashlib.sha256(b"").hexdigest()}, verified=validated)
 
     def test_invalid_manifest_and_unsafe_paths_fail(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -245,6 +253,17 @@ class StorageTests(unittest.TestCase):
 
 @unittest.skipUnless(os.environ.get("JITTER_TEST_BINARY"), "set JITTER_TEST_BINARY to run C++ integration tests")
 class IntegrationTests(unittest.TestCase):
+    def test_execution_arguments_cannot_be_changed_by_resealing(self):
+        original, _ = self.execute()
+        execution_path = original / "run-001/execution.json"
+        execution = load_json(execution_path)
+        position = execution["command"].index("--workers") + 1
+        execution["command"][position] = str(int(execution["command"][position]) + 1)
+        write_json(execution_path, execution)
+        seal_bundle(original, "complete")
+        with self.assertRaisesRegex(ExperimentError, "execution differs"):
+            verify_bundle(original)
+
     def setUp(self):
         self.binary = Path(os.environ["JITTER_TEST_BINARY"]).resolve()
         self.temporary = tempfile.TemporaryDirectory()

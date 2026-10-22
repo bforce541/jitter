@@ -10,6 +10,24 @@ def _stop(process):
     # direct child lets those children outlive a timed-out experiment.
     try:
         if os.name == "posix":
+            os.killpg(process.pid, signal.SIGTERM)
+        else:
+            process.terminate()
+    except ProcessLookupError:
+        pass
+    try:
+        # Our CLI handles TERM by cleaning up its own application/build group.
+        # A short grace period also covers nested invocations; unresponsive
+        # programs are still forcibly stopped below.
+        process.communicate(timeout=1)
+        if os.name != "posix":
+            return
+        # The direct child can exit while a descendant ignores TERM and has
+        # already closed its pipes. Reap any remaining members of our group.
+    except subprocess.TimeoutExpired:
+        pass
+    try:
+        if os.name == "posix":
             os.killpg(process.pid, signal.SIGKILL)
         else:
             process.kill()

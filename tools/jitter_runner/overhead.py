@@ -70,8 +70,8 @@ def verify_overhead(path):
     path = Path(path).resolve()
     verify_integrity(path, required=("overhead-spec.json", "execution.json", "comparison.json"))
     spec = load_spec(path / "overhead-spec.json")
-    if spec["schema_version"] != 2:
-        raise ExperimentError("overhead requires a schema-version-2 specification")
+    if spec["schema_version"] < 2:
+        raise ExperimentError("overhead requires a trace-capable schema-version-2 or 3 specification")
     execution = load_json(path / "execution.json")
     if not isinstance(execution, dict) or execution.get("order") != plan(spec):
         raise ExperimentError("overhead execution order differs from its alternating plan")
@@ -95,8 +95,8 @@ def verify_overhead(path):
 
 def run_overhead(spec, output=None, binary=None, build_dir=None, reproduce_from=None):
     validate_spec(spec)
-    if spec["schema_version"] != 2:
-        raise ExperimentError("overhead requires schema version 2 with an instrumentation configuration")
+    if spec["schema_version"] < 2:
+        raise ExperimentError("overhead requires schema version 2 or 3 with an instrumentation configuration")
     validate_spec(child_spec(spec, "on"))
     original = Path(reproduce_from).resolve() if reproduce_from else None
     if original:

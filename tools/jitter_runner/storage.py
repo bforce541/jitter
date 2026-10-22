@@ -112,9 +112,18 @@ def verify_integrity(root, required=("spec.json", "workload.csv", "metadata.json
     return manifest
 
 
-def verify_source_archive(path, expected_files):
+def verify_source_archive(path, expected_files, verified=None):
     if not isinstance(expected_files, dict) or not expected_files:
         raise ExperimentError("invalid source inventory")
+    if verified is False:
+        verified = None
+    identity = None
+    if verified is not None:
+        # Hash the bytes at EVERY path. Only decompression/inventory work may
+        # be reused for an identical cryptographic content+inventory identity.
+        identity = (sha256(path), hashlib.sha256(json.dumps(expected_files, sort_keys=True).encode()).hexdigest())
+        if identity in verified:
+            return
     with tarfile.open(path, "r:gz") as archive:
         members = archive.getmembers()
         names = [member.name for member in members]
@@ -130,3 +139,5 @@ def verify_source_archive(path, expected_files):
                     digest.update(chunk)
             if digest.hexdigest() != expected_files[member.name]:
                 raise ExperimentError(f"source archive content differs from recorded source: {member.name}")
+    if verified is not None:
+        verified.add(identity)

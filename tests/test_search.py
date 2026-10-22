@@ -119,6 +119,19 @@ class SearchSpaceTests(unittest.TestCase):
 
 
 class SearchDecisionTests(unittest.TestCase):
+    def test_queue_guidance_tests_registered_serialization_alternative_in_v2(self):
+        baseline = configuration(experiment())
+        space = normalize_space(experiment(), search())
+        hypothesis = [{"id": "queue_pressure", "tail_component_fraction": .8}]
+        legacy, _ = choose_candidate(space, baseline, [], hypothesis, "guided", 17, model_version=1)
+        current, reason = choose_candidate(space, baseline, [], hypothesis, "guided", 17, model_version=2)
+        self.assertEqual(legacy, {**baseline, "workers": 16})
+        self.assertEqual(current, {**baseline, "implementation": "narrow"})
+        self.assertIn("registered serialized resource", reason["basis"])
+        for strategy in ("grid", "random", "local"):
+            self.assertEqual(choose_candidate(space, baseline, [], hypothesis, strategy, 17, model_version=1),
+                             choose_candidate(space, baseline, [], hypothesis, strategy, 17, model_version=2))
+
     def setUp(self):
         self.baseline = configuration(experiment())
         self.space = normalize_space(experiment(), search())

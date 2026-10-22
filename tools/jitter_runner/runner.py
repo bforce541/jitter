@@ -26,8 +26,12 @@ def host_info():
     if hasattr(os, "sched_getaffinity"):
         info["available_cpu_ids"] = sorted(os.sched_getaffinity(0))
     if platform.system() == "Darwin":
-        result = subprocess.run(["sysctl", "-n", "machdep.cpu.brand_string"], capture_output=True, text=True, timeout=5)
-        info["cpu_model"] = result.stdout.strip() if result.returncode == 0 else "unavailable"
+        try:
+            result = subprocess.run(["sysctl", "-n", "machdep.cpu.brand_string"], capture_output=True, text=True, timeout=5)
+            info["cpu_model"] = result.stdout.strip() if result.returncode == 0 else "unavailable"
+        except (OSError, subprocess.SubprocessError) as error:
+            info["cpu_model"] = "unavailable"
+            info["cpu_model_probe_error"] = type(error).__name__
     elif platform.system() == "Linux":
         try:
             for line in Path("/proc/cpuinfo").read_text().splitlines():
@@ -48,7 +52,7 @@ def new_output(path):
     return path.resolve()
 
 
-def verify_bundle(path):
+def verify_bundle(path, archive_cache=None):
     path = Path(path).resolve()
     manifest = verify_integrity(path)
     spec = load_spec(path / "spec.json")
@@ -59,6 +63,15 @@ def verify_bundle(path):
     runs = []
     for index in range(spec["repetitions"]):
         run_dir = path / f"run-{index + 1:03d}"
+        execution = load_json(run_dir / "execution.json")
+        command = execution.get("command") if isinstance(execution, dict) else None
+        if (not isinstance(command, list) or not command or any(type(item) is not str for item in command)
+                or not Path(command[0]).is_absolute() or Path(command[0]).parts[-2:] != ("engine", "jitter")):
+            raise ExperimentError("invalid recorded application command")
+        recorded_root = Path(command[0]).parent.parent
+        expected = adapter.command(Path(command[0]), spec, recorded_root / "workload.csv", recorded_root / run_dir.name)
+        if execution != {"command": expected, "timeout_seconds": spec["timeout_seconds"]} or type(execution.get("timeout_seconds")) not in (int, float):
+            raise ExperimentError("recorded application execution differs from its specification")
         run = adapter.validate(spec, workload, run_dir)
         if run != load_json(run_dir / "summary.json"):
             raise ExperimentError(f"saved summary differs from raw evidence: {run_dir.name}")
@@ -75,7 +88,7 @@ def verify_bundle(path):
         raise ExperimentError("recorded source archive identity mismatch")
     if spec["application"]["adapter"] not in metadata["build"].get("contracts", [metadata["build"].get("contract")]):
         raise ExperimentError("recorded build contract mismatch")
-    verify_source_archive(path / "source.tar.gz", metadata["source"].get("files"))
+    verify_source_archive(path / "source.tar.gz", metadata["source"].get("files"), verified=archive_cache)
     if metadata.get("engine_sha256") != sha256(path / "engine" / "jitter"):
         raise ExperimentError("recorded executable identity mismatch")
     if manifest["status"] != summary["status"]:
@@ -83,7 +96,7 @@ def verify_bundle(path):
     return spec, summary, metadata
 
 
-def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None, source_context=None, deadline=None, immutable_engine=False):
+def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_from=None, source_context=None, deadline=None, immutable_engine=False, archive_cache=None):
     validate_spec(spec)
     adapter = get_adapter(spec["application"]["adapter"])
     original = None
@@ -173,7 +186,7 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
         summary = summarize_runs(spec, runs)
         write_json(path / "summary.json", summary)
         seal_bundle(path, summary["status"])
-        verify_bundle(path)
+        verify_bundle(path, archive_cache=archive_cache)
         return path, summary
     except (Exception, KeyboardInterrupt) as error:
         # Failed runs retain their inputs and logs, and cannot verify as valid evidence.
@@ -184,5 +197,6 @@ def run_experiment(spec, output=None, binary=None, build_dir=None, reproduce_fro
         write_json(path / "summary.json", summary)
         seal_bundle(path, "failed")
         if isinstance(error, KeyboardInterrupt):
+            error.jitter_evidence_path = str(path)
             raise
         raise ExperimentError(f"experiment failed: {error}; evidence retained at {path}") from error

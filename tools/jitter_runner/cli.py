@@ -9,6 +9,7 @@ import tarfile
 import shutil
 import subprocess
 import platform
+import signal
 
 from .investigation import run_investigation, verify_investigation, markdown_report
 from .investigation_spec import load_investigation
@@ -96,7 +97,7 @@ def main(argv=None):
             spec = load_investigation(args.spec)
             if args.dry_run:
                 from .search import normalize_space
-                print(json.dumps({"space": normalize_space(spec["experiment"], spec["search"]), "budget": spec["budget"], "sampling": spec["sampling"], "comparison": spec["comparison"]}, indent=2, sort_keys=True))
+                print(json.dumps({"space": normalize_space(spec["experiment"], spec["search"]), "budget": spec["budget"], "sampling": spec["sampling"], "comparison": spec["comparison"], "stopping": spec.get("stopping", {"enabled": False})}, indent=2, sort_keys=True))
             else:
                 path, report = run_investigation(spec, args.output, binary=args.binary)
                 print(f"Investigation: {report['decision']} ({report['stop_reason']}); evidence: {path}; report: {path / 'report.md'}")
@@ -106,8 +107,9 @@ def main(argv=None):
             if args.command == "report":
                 print(json.dumps(report, indent=2, sort_keys=True) if args.json else markdown_report(report))
             else:
-                path, report = run_investigation(spec, args.output, reproduce_from=args.bundle)
+                path, report = run_investigation(spec, args.output, restart_from=args.bundle)
                 print(f"Restarted investigation: {report['decision']}; evidence: {path}")
+                return 1 if report["decision"] in ("invalid_investigation", "interrupted") else 0
         elif args.command == "evaluate":
             from .evaluation import run_evaluation
             path, report = run_evaluation(load_json(args.plan), args.output, binary=args.binary)
@@ -131,10 +133,16 @@ def main(argv=None):
             if (args.bundle / "evaluation-plan.json").exists():
                 from .evaluation import run_evaluation, verify_evaluation
                 spec, _, _ = verify_evaluation(args.bundle)
-                path, _ = run_evaluation(spec, args.output, reproduce_from=args.bundle)
+                path, result = run_evaluation(spec, args.output, reproduce_from=args.bundle)
+                if result["totals"]["failed_studies"] or result["totals"]["interrupted_studies"] or result["totals"]["not_run_studies"]:
+                    print(f"Reproduction did not complete every study; evidence retained at {path}", file=sys.stderr)
+                    return 1
             elif (args.bundle / "investigation-spec.json").exists():
                 spec, _, _ = verify_investigation(args.bundle)
-                path, _ = run_investigation(spec, args.output, reproduce_from=args.bundle)
+                path, result = run_investigation(spec, args.output, reproduce_from=args.bundle)
+                if result["decision"] in ("invalid_investigation", "interrupted"):
+                    print(f"Reproduction: {result['decision']}; evidence retained at {path}", file=sys.stderr)
+                    return 1
             elif (args.bundle / "overhead-spec.json").exists():
                 spec, _ = verify_overhead(args.bundle)
                 path, _ = run_overhead(spec, args.output, reproduce_from=args.bundle)
@@ -145,7 +153,7 @@ def main(argv=None):
         elif args.command == "diagnose":
             spec, _, _ = verify_bundle(args.bundle)
             if spec["schema_version"] < 2 or not spec["instrumentation"]["enabled"]:
-                raise ExperimentError("diagnosis requires an enabled schema-version-2 trace")
+                raise ExperimentError("diagnosis requires tracing enabled in experiment schema 2 or 3")
             if not 1 <= args.run <= spec["repetitions"]:
                 raise ExperimentError("selected run is outside the bundle")
             run_dir = args.bundle / f"run-{args.run:03d}"
@@ -179,7 +187,25 @@ def main(argv=None):
     except (ExperimentError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError, tarfile.TarError) as error:
         print(f"jitter: {error}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt as error:
+        location = getattr(error, "jitter_evidence_path", None)
+        print("jitter: interrupted" + (f"; evidence retained at {location}" if location else "; any partial evidence is retained"), file=sys.stderr)
+        return 130
+
+
+def entrypoint():
+    previous = signal.getsignal(signal.SIGTERM)
+    def interrupted(signum, frame):
+        raise KeyboardInterrupt("SIGTERM")
+    signal.signal(signal.SIGTERM, interrupted)
+    try:
+        return main()
+    except KeyboardInterrupt:
+        print("jitter: interrupted; any partial evidence is retained", file=sys.stderr)
+        return 130
+    finally:
+        signal.signal(signal.SIGTERM, previous)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(entrypoint())

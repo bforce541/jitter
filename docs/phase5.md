@@ -9,7 +9,7 @@ python3 tools/jitter.py calibrate --trials 1000 --output results/calibration
 python3 tools/evaluate_diagnostics.py --output results/diagnostic-controls
 ```
 
-The plan preserves the original low-load cases and adds a saturated shared-index workload and a real SQLite index comparison. Guided, random, grid, local and hypothesis-disabled strategies receive identical declared scenario budgets and confirmation policies. Three search/order seeds expose some repeated-outcome variation; they do not establish generality across workloads or hardware. Guided search is not presumed superior.
+The plan preserves the original low-load cases, a saturated shared-index workload and a real SQLite index comparison. It also compares policy versions on a wider 30-point shared-index space. Guided, random, grid, local and hypothesis-disabled strategies receive identical declared scenario budgets and confirmation policies. Seven scenarios, five strategies and three seeds produce 105 investigations; `examples/evaluation-v1.json` retains the original 75-study plan. Three search/order seeds expose some repeated-outcome variation; they do not establish generality across workloads or hardware. Guided search is not presumed superior.
 
 Every study retains correct, invalid, infeasible, failed and inconclusive outcomes. Only accepted fresh confirmation counts as a recommendation. Per-group raw decisions, experiment count, engine preparation count, elapsed time, retained storage and conditional confirmation effects remain available. Engine records produced using `--binary` are executable materializations, not compiler invocations; their cold-build cost must be assessed separately using the default isolated-build path.
 
