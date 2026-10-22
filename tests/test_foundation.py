@@ -229,7 +229,7 @@ class StorageTests(unittest.TestCase):
             entry = tarfile.TarInfo("PaxHeader")
             entry.type, entry.size = tarfile.XHDTYPE, 1024**4
             with gzip.open(path,"wb") as archive:
-                archive.write(entry.tobuf() + b"0"*30000)
+                archive.write(entry.tobuf(format=tarfile.GNU_FORMAT) + b"0"*30000)
             with patch("jitter_runner.storage.MAX_SOURCE_ARCHIVE_BYTES",16384):
                 with self.assertRaisesRegex(ExperimentError,"decompression bound"):
                     verify_source_archive(path,{"src/example.cpp":"0"*64})
