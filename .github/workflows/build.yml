@@ -54,6 +54,8 @@ jobs:
         run: python3 -m pip install --no-deps -e .
       - name: Exercise autonomous CLI and portable evidence
         run: python3 tools/ci_smoke.py --binary build/jitter --output results/ci-release
+      - name: Exercise installed local dashboard
+        run: python3 tools/dashboard_smoke.py results/ci-release/study
       - name: Calibrate statistics and diagnostic controls
         run: |
           jitter calibrate --trials 64 --output results/ci-calibration

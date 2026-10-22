@@ -29,7 +29,7 @@ Generated catalogs under `docs/evidence/` are retained in Git and release assets
 
 `evaluation.py` freezes one source snapshot for a whole plan, interleaves strategy order under recorded seeds, retains all outcomes and records full wrapper time/storage. `calibration.py` generates explicitly synthetic statistical controls. `tools/evaluate_diagnostics.py` reuses test trace fixtures for transparent mechanism controls; it is evaluation tooling, not measured application behavior.
 
-The installation exposes `jitter_runner.cli:entrypoint`; `tools/jitter.py` uses the same signal-aware source entry point. Reports are terminal, JSON and Markdown. There is no web dashboard or external model dependency.
+The installation exposes `jitter_runner.cli:entrypoint`; `tools/jitter.py` uses the same signal-aware source entry point. Reports are terminal, JSON and Markdown. `jitter ui` adds a read-only, loopback-only artifact viewer using Python’s standard HTTP server and packaged HTML/CSS/JavaScript. It never executes benchmark code, uses the same evidence validators, and requires no external service or model. See [dashboard access and evidence boundaries](dashboard.md).
 
 ## Evidence and trust boundaries
 

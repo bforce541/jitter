@@ -39,7 +39,14 @@ class DashboardTests(unittest.TestCase):
             detail = library.detail(identity)
             self.assertEqual(detail['records'][0]['status'], 'failed')
             self.assertEqual(detail['report'], {})
+            write(root/'live/state.json', {'status':'running', 'builds':{'narrow':{'status':'failed'}}, 'records':{}})
+            (root/'live/engines/narrow/logs').mkdir(parents=True)
+            (root/'live/engines/narrow/logs/build.stderr.log').write_text('compile failure')
+            self.assertEqual(library.detail(identity)['build_logs']['narrow']['build.stderr.log']['text'], 'compile failure')
+            snapshot = library.detail(identity)['snapshot']
             write(root/'live/report.json', {'decision':'invalid_investigation'})
+            with self.assertRaisesRegex(ExperimentError, 'changed'):
+                library.verify(identity, snapshot)
             self.assertEqual(library.detail(identity)['report']['decision'], 'invalid_investigation')
             with self.assertRaises(ExperimentError):
                 library.measurement(identity, '../../personal')
@@ -59,6 +66,8 @@ class DashboardTests(unittest.TestCase):
             (root/'bundle/investigation-spec.json').unlink()
             (root/'bundle/investigation-spec.json').write_text('{"bad":NaN}')
             self.assertFalse(library.discover()['entries'])
+            (root/'bundle/investigation-spec.json').write_text('[]')
+            self.assertIn('JSON object', library.discover()['warnings'][0])
             with patch('jitter_runner.dashboard.MAX_JSON', 2):
                 self.assertFalse(library.discover()['entries'])
 
@@ -75,7 +84,7 @@ class DashboardTests(unittest.TestCase):
                 self.assertIn("default-src 'self'", response.getheader('Content-Security-Policy'))
                 self.assertIn(b'app.js', response.read())
                 for path, headers, code in [('/api/library', {}, 200), ('/api/library', {'Host':'attacker.test'},403),
-                        ('/api/library', {'Origin':'https://attacker.test'},403), ('/api/detail?id=unknown',{},400),
+                        ('/api/library', {'Origin':'https://attacker.test'},403), ('/api/library', {'Sec-Fetch-Site':'cross-site'},403), ('/api/detail?id=unknown',{},400),
                         ('/../../pyproject.toml',{},404), ('/api/run',{},404), ('/api/measurement?id=unknown&run=../x',{},400)]:
                     connection.request('GET',path,headers=headers)
                     response = connection.getresponse()

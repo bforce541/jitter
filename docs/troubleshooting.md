@@ -25,3 +25,7 @@
 **Different conclusions on repeat:** inspect all run-level effects, baseline spread, scheduling tolerance, constraints and confirmation bounds. The initial evaluation is from one uncontrolled machine. Fresh processes and recorded metadata cannot control thermal state, frequency, background load or all dependence between experiments.
 
 **Shared CI runner produces no win:** this is acceptable. CI tests functionality and evidence handling, not performance superiority. Laboratory-grade performance gates are deliberately absent.
+
+**macOS installed CLI reports `ModuleNotFoundError` despite successful editable installation:** Python skips `.pth` files carrying the macOS hidden flag. In the release validation environment, files inside a dot-prefixed `.venv` acquired that flag; removing it temporarily worked, but it returned later. The actor setting it was not established. A visible `jitter-env` virtual environment passed the complete installed CLI flow. Recreate a visible environment using the README, or use `python3 tools/jitter.py ...` from the checkout. This is an environment diagnosis, not evidence of a native engine failure.
+
+**Dashboard port is occupied:** use `jitter ui results --port 0` and open the printed loopback URL. The viewer intentionally does not bind to external interfaces. Select a result or press Refresh after collecting new evidence. A missing trace or failed evidence verification is shown explicitly; it is not converted to a successful result. See [dashboard guide](dashboard.md).

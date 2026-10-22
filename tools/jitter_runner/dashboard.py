@@ -25,7 +25,10 @@ def read_json(path, default=None):
     if path.stat().st_size > MAX_JSON:
         raise ExperimentError('Artifact exceeds dashboard JSON size limit')
     with path.open(encoding='utf-8') as stream:
-        return json.load(stream, parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Non-finite JSON value'))) 
+        value = json.load(stream, parse_constant=lambda token: (_ for _ in ()).throw(ValueError('Non-finite JSON value')))
+    if not isinstance(value, dict):
+        raise ExperimentError('Expected a JSON object artifact')
+    return value
 
 
 def confined(root, relative):
@@ -88,7 +91,7 @@ class Library:
                                 'runs': report.get('cost', {}).get('runs'),
                                 'created': state.get('created_at_utc'), 'sealed': (base / 'manifest.json').is_file()})
                 paths[identity] = (base, kind)
-            except (OSError, ValueError, TypeError, ExperimentError) as error:
+            except (OSError, ValueError, TypeError, AttributeError, ExperimentError) as error:
                 warnings.append(f'{relative}: {error}')
         with self.lock:
             self.paths = paths
@@ -108,7 +111,10 @@ class Library:
         names = {'investigation': ('investigation-spec.json', 'report.json', 'state.json'),
                  'overhead': ('overhead-spec.json', 'comparison.json', 'execution.json'),
                  'measurement': ('spec.json', 'summary.json', 'metadata.json')}[kind]
+        before = self.snapshot(path, names)
         spec, report, state = [read_json(confined(path, name), {}) for name in names]
+        if before != self.snapshot(path, names):
+            raise ExperimentError('Result changed while reading; refresh to retry')
         records = []
         for name, row in state.get('records', {}).items():
             records.append({'path': name, **row})
@@ -116,12 +122,34 @@ class Library:
             records = [{'path': '.', 'status': report.get('status', 'incomplete'), 'stage': 'measurement'}]
         if kind == 'overhead':
             records = [{'path': row['bundle'], 'stage': 'tracing ' + row['mode'], 'status':'stored'} for row in state.get('order', [])]
-        return {'id': identity, 'kind': kind, 'path': str(path), 'spec': spec, 'report': report,
-                'state': state, 'records': records,
+        build_logs = {}
+        for implementation in state.get('builds', {}):
+            logs = confined(path, Path('engines') / implementation / 'logs')
+            build_logs[implementation] = {}
+            if logs.is_dir():
+                for file in sorted(logs.glob('*.log'))[:10]:
+                    confined(path, file.relative_to(path))
+                    with file.open('rb') as stream:
+                        content = stream.read(MAX_TEXT + 1)
+                    build_logs[implementation][file.name] = {'text': content[:MAX_TEXT].decode('utf-8', errors='replace'), 'truncated': len(content) > MAX_TEXT}
+        return {'id': identity, 'kind': kind, 'path': str(path), 'spec': spec, 'report': report, 'build_logs': build_logs,
+                'state': state, 'records': records, 'snapshot': before,
                 'reproduce': 'jitter reproduce ' + shlex.quote(str(path)) + ' --output ' + shlex.quote(str(path.with_name(path.name + '-replay'))),
                 'verify': 'jitter verify ' + shlex.quote(str(path))}
 
-    def measurement(self, identity, name):
+    @staticmethod
+    def snapshot(path, names):
+        digest = hashlib.sha256()
+        for name in names:
+            file = confined(path, name)
+            if file.is_file():
+                if file.stat().st_size > MAX_JSON:
+                    raise ExperimentError('Artifact exceeds dashboard JSON size limit')
+                digest.update(name.encode())
+                digest.update(file.read_bytes())
+        return digest.hexdigest()
+
+    def measurement(self, identity, name, repetition=1):
         detail = self.detail(identity)
         if name not in {row['path'] for row in detail['records']}:
             raise ExperimentError('Measurement is not registered in this result')
@@ -129,7 +157,11 @@ class Library:
         data = {key: read_json(confined(base, filename), {}) for key, filename in
                 [('spec','spec.json'), ('summary','summary.json'), ('environment','metadata.json')]}
         data['runs'] = []
-        for directory in sorted(base.glob('run-*'))[:100]:
+        directories = sorted(item for item in base.glob('run-*') if item.is_dir())[:100]
+        data['available_runs'] = [item.name for item in directories]
+        if not 1 <= repetition <= max(1, len(directories)):
+            raise ExperimentError('Repetition is outside the stored measurement')
+        for directory in directories[repetition-1:repetition]:
             if not directory.is_dir():
                 continue
             confined(base, directory.relative_to(base))
@@ -146,8 +178,10 @@ class Library:
             data['runs'].append(run)
         return data
 
-    def verify(self, identity):
+    def verify(self, identity, snapshot=None):
         path, kind = self.lookup(identity)
+        if snapshot is not None and self.detail(identity)['snapshot'] != snapshot:
+            raise ExperimentError('Displayed result has changed; refresh before verifying')
         if not self.verify_lock.acquire(blocking=False):
             raise ExperimentError('Verification already running. Try again after it finishes.')
         try:
@@ -166,6 +200,8 @@ class Library:
             else:
                 from .runner import verify_bundle
                 verify_bundle(path)
+            if snapshot is not None and self.detail(identity)['snapshot'] != snapshot:
+                raise ExperimentError('Displayed result changed during verification; refresh and retry')
             return {'status': 'verified', 'scope': 'Raw evidence and semantic checks passed at this instant. Files may change afterward; reverify before relying on a decision.'}
         finally:
             self.verify_lock.release()
@@ -191,9 +227,12 @@ def make_server(root, port=0):
 
         def do_GET(self):
             host = f'127.0.0.1:{self.server.server_port}'
-            if self.headers.get('Host') != host or self.headers.get('Origin', 'http://' + host) != 'http://' + host:
-                return self.send(403, {'error': 'Only the local dashboard origin may access artifacts'})
             parsed = urlsplit(self.path)
+            foreign_api = (parsed.path.startswith('/api/') and
+                           (self.headers.get('Origin', 'http://' + host) != 'http://' + host or
+                            self.headers.get('Sec-Fetch-Site') == 'cross-site'))
+            if self.headers.get('Host') != host or foreign_api:
+                return self.send(403, {'error': 'Only the local dashboard origin may access artifacts'})
             query = parse_qs(parsed.query)
             try:
                 if parsed.path in ('/', '/app.js', '/style.css'):
@@ -206,11 +245,11 @@ def make_server(root, port=0):
                 if parsed.path == '/api/detail':
                     return self.send(200, library.detail(identity))
                 if parsed.path == '/api/measurement':
-                    return self.send(200, library.measurement(identity, query.get('run', [''])[0]))
+                    return self.send(200, library.measurement(identity, query.get('run', [''])[0], int(query.get('repetition', ['1'])[0])))
                 if parsed.path == '/api/verify':
-                    return self.send(200, library.verify(identity))
+                    return self.send(200, library.verify(identity, query.get('snapshot', [None])[0]))
                 self.send(404, {'error':'Unknown dashboard endpoint'})
-            except (OSError, ValueError, KeyError, TypeError, ExperimentError) as error:
+            except (OSError, ValueError, KeyError, TypeError, AttributeError, ExperimentError) as error:
                 self.send(400, {'error': str(error)})
 
     server = ThreadingHTTPServer(('127.0.0.1', port), Handler)

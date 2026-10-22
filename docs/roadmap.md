@@ -26,7 +26,7 @@ Explicit implementation alternatives, isolated candidate builds, bounded transfo
 
 Acceptance: registered alternatives, isolation, correctness, CLI, reports and failure paths have end-to-end coverage. See [variant and product contracts](phase4.md).
 
-## Phase 5: Evaluation and release (release evaluation in progress)
+## Phase 5: Evaluation and release (implemented)
 
 Independently maintained application integrations, credible tuning and diagnostic baselines, experiment-cost evaluation, analysis ablations, negative cases, reliability fixes, documentation, and a reproducible evaluation report.
 
@@ -41,5 +41,6 @@ Acceptance: a fresh user can install Jitter, investigate a supported application
 - Search and the controller choose experiments.
 - Statistics, correctness validation, and constraints determine acceptable conclusions.
 - Reporting presents decisions and reproduction instructions.
+- The local dashboard reads existing artifacts and invokes evidence verification; the CLI owns execution and reproduction.
 
 The concrete supported applications, result formats and transformation scope are defined in the linked phase and integration contracts. The evaluation report records the evidence and limits of the release.

@@ -20,3 +20,5 @@ The diagnostic controls contain six handcrafted trace mechanisms: observed holde
 Functional CI installs the source CLI, runs the test suite and complete investigation/replay/archive flow on Linux and macOS. A Linux job instruments C and C++ with address and undefined-behavior sanitizers. Local thread-sanitizer coverage is recorded separately. No CI timing win is required.
 
 A portable evidence archive can be restored and independently verified before any saved executable is run. Reproduction reuses original binary bytes only on a compatible OS/architecture. Fresh hosts can rebuild from frozen sources and collect new evidence. Release claims remain bounded to these explicit integrations, workloads and observations; an independently maintained production service and broader hardware evaluation remain unestablished.
+
+The completed [local dashboard](dashboard.md) inspects these artifacts after the controller/evaluation foundation. It does not replace the CLI or introduce an external backend. [Release validation](release-validation.md) records installation, platform tests, browser checks and portable evidence checks.

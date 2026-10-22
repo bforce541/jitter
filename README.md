@@ -11,8 +11,8 @@ Requires Linux or macOS, Python 3.9+, Git, CMake 3.20+, a C compiler and a C++20
 ```sh
 git clone https://github.com/bforce541/jitter.git
 cd jitter
-python3 -m venv .venv
-. .venv/bin/activate
+python3 -m venv jitter-env
+. jitter-env/bin/activate
 python3 -m pip install --no-deps -e .
 jitter doctor
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -48,6 +48,14 @@ jitter unpack results/evidence.tar.gz --output results/restored
 ```
 
 All output paths must be new. Generated local results are excluded from Git. Portable archives preserve raw inputs, responses, traces, source, executables and manifests while deduplicating repeated content.
+
+## Local visual inspection
+
+```sh
+jitter ui results
+```
+
+Opens a polished, read-only localhost dashboard for real investigations, search decisions, fresh confirmation, dependency paths, metrics, uncertainty, budgets, process logs and instrumentation overhead. It works offline after installation and has no accounts, API keys or per-use API cost. The CLI remains primary. [Dashboard guide](docs/dashboard.md).
 
 ## Evaluate
 
