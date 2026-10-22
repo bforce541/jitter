@@ -77,9 +77,16 @@ def main(argv=None):
     for name in ("verify", "summarize"):
         command = subcommands.add_parser(name, help="check artifact integrity and validate raw evidence" if name == "verify" else "validate and print saved measurements")
         command.add_argument("bundle", type=Path)
+    ui = subcommands.add_parser("ui", help="open the offline, read-only local investigation dashboard")
+    ui.add_argument("root", type=Path, nargs="?", default=Path("results"))
+    ui.add_argument("--port", type=int, default=8765, help="loopback port; 0 chooses a free port")
+    ui.add_argument("--no-open", action="store_true", help="print the local URL without opening a browser")
     args = parser.parse_args(argv)
     try:
-        if args.command in ("pack", "unpack"):
+        if args.command == "ui":
+            from .dashboard import serve
+            serve(args.root, args.port, not args.no_open)
+        elif args.command in ("pack", "unpack"):
             from .transport import pack_result, unpack_result
             result = pack_result(args.bundle, args.output) if args.command == "pack" else unpack_result(args.archive, args.output)
             print(f"Verified portable evidence: {result}")

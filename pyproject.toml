@@ -15,3 +15,6 @@ jitter = "jitter_runner.cli:entrypoint"
 [tool.setuptools]
 package-dir = {"" = "tools"}
 packages = ["jitter_runner"]
+
+[tool.setuptools.package-data]
+jitter_runner = ["ui_assets/*.html", "ui_assets/*.css", "ui_assets/*.js"]
