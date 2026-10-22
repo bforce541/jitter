@@ -33,6 +33,8 @@ class TransportTests(unittest.TestCase):
             self.assertTrue((restored / "first").stat().st_mode & 0o111)
             self.assertFalse((restored / "second").stat().st_mode & 0o111)
             self.assertEqual((restored / "third").read_bytes(), content)
+            self.assertEqual((restored / "third").stat().st_ino, (restored / "second").stat().st_ino)
+            self.assertNotEqual((restored / "first").stat().st_ino, (restored / "second").stat().st_ino)
             self.assertEqual((restored / "manifest.json").read_bytes(), (bundle / "manifest.json").read_bytes())
 
     def test_existing_outputs_and_recursive_pack_are_preserved(self):

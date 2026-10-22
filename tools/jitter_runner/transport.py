@@ -130,9 +130,9 @@ def unpack_result(source, output):
         for name, record in files.items():
             path = output / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            identity = (record["sha256"], record["size"], tuple(record["chunks"]), record["executable"])
-            if identity in restored:
-                link_immutable(restored[identity], path)
+            file_identity = (record["sha256"], record["size"], tuple(record["chunks"]), record["executable"])
+            if file_identity in restored:
+                link_immutable(restored[file_identity], path)
                 continue
             digest, size = hashlib.sha256(), 0
             with path.open("xb") as destination:
@@ -147,6 +147,6 @@ def unpack_result(source, output):
             if size != record["size"] or digest.hexdigest() != record["sha256"]:
                 raise ExperimentError(f"portable archive file identity mismatch: {name}; evidence retained at {output}")
             path.chmod(0o755 if record["executable"] else 0o644)
-            restored[identity] = path
+            restored[file_identity] = path
     verify_result(output)
     return output.resolve()
