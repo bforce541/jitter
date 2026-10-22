@@ -46,6 +46,11 @@ def encode_workload(rows):
 
 def expected_value(app, key, heavy):
     """Exponentiate an affine map; intentionally different from the C++ loop."""
+    if app["adapter"] == "sqlite-aggregate-v1":
+        count = app["heavy_rows"] if heavy else app["light_rows"]
+        base = app["dataset_seed"] + GOLDEN * (key + 1)
+        # No SQLite engine or SQL is used by this independent response oracle.
+        return sum((index + 1) * (mix64(base + GOLDEN * (index + 1)) % 1000000) for index in range(count))
     if app["adapter"] == "json-projection-v1":
         # Construct and parse with a different implementation from the C++ DOM.
         import json

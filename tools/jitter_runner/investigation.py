@@ -61,7 +61,7 @@ def select_finalist(trials):
     return max(promising, key=lambda trial: (trial["comparison"]["effect"]["median_fraction"], trial["id"])) if promising else None
 
 
-def _pairs_from_records(root, trial, records):
+def _pairs_from_records(root, trial, records, cache=None):
     result = []
     for pair in trial["pairs"]:
         if any(name is None or records[name]["status"] != "complete" for name in (pair["baseline"], pair["candidate"])):
@@ -69,17 +69,20 @@ def _pairs_from_records(root, trial, records):
             continue
         row = {}
         for side in ("baseline", "candidate"):
-            _, summary, metadata = verify_bundle(root / pair[side])
+            name = pair[side]
+            if cache is not None and name not in cache:
+                cache[name] = verify_bundle(root / name)
+            _, summary, metadata = cache[name] if cache is not None else verify_bundle(root / name)
             row[side] = summary["runs"][0]
             row[side + "_host"] = metadata["host"]
         result.append(row)
     return result
 
 
-def _comparison(root, spec, trial, records, confirmation=False):
+def _comparison(root, spec, trial, records, confirmation=False, cache=None):
     if not trial["pairs"]:
         return None
-    return compare_pairs(_pairs_from_records(root, trial, records), spec["comparison"], confirmation=confirmation)
+    return compare_pairs(_pairs_from_records(root, trial, records, cache), spec["comparison"], confirmation=confirmation)
 
 
 def derive_decision(state):
@@ -145,7 +148,7 @@ def markdown_report(report):
     return "\n".join(lines)
 
 
-def run_investigation(spec, output=None, binary=None, reproduce_from=None):
+def run_investigation(spec, output=None, binary=None, reproduce_from=None, source_context=None):
     validate_investigation(spec)
     original = Path(reproduce_from).resolve() if reproduce_from else None
     if original:
@@ -161,11 +164,13 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
              "reproduce_from": str(original) if original else None, "source": None, "hypotheses": [],
              "diagnostic": None, "records": {}, "builds": {}, "trials": [], "finalist": None,
              "confirmation": None, "stop_reason": None,
-             "cost": {"runs": 0, "builds": 0, "failures": 0, "seconds": 0, "build_seconds": 0}}
+             "cost": {"runs": 0, "builds": 0, "failures": 0, "seconds": 0, "build_seconds": 0,
+                      "timed_application_cpu_seconds": 0, "application_setup_seconds": 0}}
     write_json(root / "manifest.json", {"schema_version": 1, "status": "running", "artifacts": {}})
     (root / "measurements").mkdir()
     (root / "engines").mkdir()
     context = None
+    measured = {}
 
     def persist():
         state["cost"]["seconds"] = time.monotonic() - start
@@ -223,6 +228,10 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
             path, summary = run_experiment(experiment_for(spec, config, diagnostic), root / name,
                                           binary=executable, source_context=context, deadline=deadline)
             row["status"] = "complete"
+            for run in summary["runs"]:
+                state["cost"]["timed_application_cpu_seconds"] += sum(phase["cpu_user_ns"] + phase["cpu_system_ns"] for phase in run["phases"].values()) / 1e9
+                state["cost"]["application_setup_seconds"] += run.get("setup", {}).get("elapsed_ns", 0) / 1e9
+            measured[name] = (experiment_for(spec, config, diagnostic), summary, load_json(path / "metadata.json"))
             return name, summary
         except (Exception, KeyboardInterrupt) as error:
             row.update(status="failed", failure=failure_kind(error), error=str(error))
@@ -253,11 +262,11 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
                     if side == "baseline":
                         state["stop_reason"] = "baseline_failure"
                     raise
-            trial["comparison"] = _comparison(root, spec, trial, state["records"], confirmation=stage == "confirmation")
+            trial["comparison"] = _comparison(root, spec, trial, state["records"], confirmation=stage == "confirmation", cache=measured)
             persist()
 
     try:
-        previous = {"archive": original / "sources/source.tar.gz", "source": original_state["source"]} if original else None
+        previous = {"archive": original / "sources/source.tar.gz", "source": original_state["source"]} if original else source_context
         context = freeze_source(ROOT, root / "sources", previous)
         state["source"] = context["source"]
         persist()
@@ -338,9 +347,9 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
         state["stop_reason"] = state["stop_reason"] or "internal_failure"
     state["status"] = "complete" if state["stop_reason"] != "interrupted" else "interrupted"
     for trial in state["trials"]:
-        trial["comparison"] = _comparison(root, spec, trial, state["records"])
+        trial["comparison"] = _comparison(root, spec, trial, state["records"], cache=measured)
     if state["confirmation"]:
-        state["confirmation"]["comparison"] = _comparison(root, spec, state["confirmation"], state["records"], confirmation=True)
+        state["confirmation"]["comparison"] = _comparison(root, spec, state["confirmation"], state["records"], confirmation=True, cache=measured)
     persist()
     report = make_report(spec, state)
     write_json(root / "report.json", report)
@@ -348,7 +357,20 @@ def run_investigation(spec, output=None, binary=None, reproduce_from=None):
     if report["recommendation"]:
         write_json(root / "recommendation.json", experiment_for(spec, report["recommendation"]))
     seal_bundle(root, "complete")
-    verify_investigation(root)
+    try:
+        verify_investigation(root)
+    except (Exception, KeyboardInterrupt) as error:
+        state["stop_reason"] = "internal_failure"
+        state["error"] = {"kind": "verification_failure", "message": str(error)}
+        write_json(root / "state.json", state)
+        failed_report = make_report(spec, state)
+        write_json(root / "report.json", failed_report)
+        (root / "report.md").write_text(markdown_report(failed_report), encoding="utf-8")
+        (root / "recommendation.json").unlink(missing_ok=True)
+        seal_bundle(root, "failed")
+        if isinstance(error, KeyboardInterrupt):
+            raise
+        raise ExperimentError(f"final evidence validation failed: {error}; all evidence retained at {root}") from error
     return root, report
 
 
@@ -390,7 +412,7 @@ def verify_investigation(path):
     if cost["runs"] != len(state["records"]) or cost["builds"] != len(state["builds"]) or not 0 <= cost["runs"] <= budget["max_runs"] or not 0 <= cost["builds"] <= budget["max_builds"]:
         raise ExperimentError("investigation budget accounting differs from journal")
     for name, build in state["builds"].items():
-        if name not in ("coarse", "narrow", "map", "ordered"):
+        if name not in ("coarse", "narrow", "map", "ordered", "scan", "indexed"):
             raise ExperimentError("unsafe implementation build path")
         saved = load_json(root / "engines" / name / "build.json")
         if build["status"] == "complete" and (build != saved or build["engine_sha256"] != sha256(root / "engines" / name / "jitter") or build["source_files"] != state["source"]["files"]):
@@ -415,6 +437,7 @@ def verify_investigation(path):
     finalist = select_finalist(state["trials"])
     if state["finalist"] is not None and (not finalist or state["finalist"] != finalist["configuration"]):
         raise ExperimentError("finalist was not selected from the exploratory evidence")
+    checked = {}  # One fresh validation per child during THIS verification pass.
     trials = state["trials"] + ([state["confirmation"]] if state["confirmation"] else [])
     for trial in trials:
         confirm = trial is state["confirmation"]
@@ -435,7 +458,7 @@ def verify_investigation(path):
                 expected_config = baseline if side == "baseline" else trial["configuration"]
                 if state["records"][name]["configuration"] != expected_config or state["records"][name]["stage"] != ("confirmation" if confirm else "exploration"):
                     raise ExperimentError("paired trial configuration or stage mismatch")
-        if trial.get("comparison") != _comparison(root, spec, trial, state["records"], confirmation=confirm):
+        if trial.get("comparison") != _comparison(root, spec, trial, state["records"], confirmation=confirm, cache=checked):
             # Failed attempts may have no completed pair and no comparison.
             if trial.get("comparison") is not None or any(all(pair[side] for side in ("baseline", "candidate")) for pair in trial["pairs"]):
                 raise ExperimentError("comparison differs from validated raw paired evidence")
@@ -447,7 +470,9 @@ def verify_investigation(path):
         if not re.fullmatch(r"measurements/run-[0-9]{5}", name):
             raise ExperimentError("unsafe measurement path in journal")
         if record["status"] == "complete":
-            saved, _, metadata = verify_bundle(root / name)
+            if name not in checked:
+                checked[name] = verify_bundle(root / name)
+            saved, _, metadata = checked[name]
             if saved != experiment_for(spec, record["configuration"], record["diagnostic"]) or metadata["source"] != state["source"]:
                 raise ExperimentError("measurement changed fixed behavior, inputs or frozen source")
             build = state["builds"][record["configuration"]["implementation"]]

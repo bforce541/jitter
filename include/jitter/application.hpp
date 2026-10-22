@@ -9,6 +9,7 @@
 #include <vector>
 
 namespace jitter {
+class SqliteDataset;
 
 struct ApplicationConfig {
     std::uint32_t workers{4};
@@ -21,6 +22,8 @@ struct ApplicationConfig {
     std::string implementation{"coarse"};
     std::uint32_t light_fields{8};
     std::uint32_t heavy_fields{256};
+    std::uint32_t light_rows{8};
+    std::uint32_t heavy_rows{256};
 };
 
 // SplitMix64's finalizer: specified integer operations, independent of std::hash.
@@ -41,6 +44,7 @@ private:
     std::mutex mutex_;
     struct JsonDocuments;
     std::unique_ptr<JsonDocuments> json_;
+    std::unique_ptr<SqliteDataset> sqlite_;
 };
 
 } // namespace jitter

@@ -173,6 +173,38 @@ void check_tracing() {
     check(threw, "trace memory bounds");
 }
 
+void check_sqlite() {
+    for (const auto& implementation : {"scan", "indexed"}) {
+        jitter::ApplicationConfig config;
+        config.adapter = "sqlite-aggregate-v1";
+        config.implementation = implementation;
+        config.key_count = 8;
+        config.light_rows = 8;
+        config.heavy_rows = 256;
+        jitter::SharedIndex db(config);
+        check(db.lookup(1, false) == UINT64_C(13580604), "SQLite light aggregate independent golden");
+        check(db.lookup(0, true) == UINT64_C(16310960696), "SQLite heavy aggregate independent golden");
+        std::vector<std::thread> readers;
+        std::atomic<bool> correct{true};
+        for (int i=0; i<4; ++i) readers.emplace_back([&] {
+            for (int request=0; request<16; ++request) {
+                if (db.lookup(0, true) != UINT64_C(16310960696)) correct = false;
+            }
+        });
+        for (auto& reader : readers) reader.join();
+        check(correct, "SQLite connection and statement have serialized request ownership");
+        config.light_rows = 0;
+        bool threw = false;
+        try { jitter::SharedIndex invalid(config); } catch (const std::invalid_argument&) { threw = true; }
+        check(threw, "SQLite rejects zero-row request contracts");
+        config.light_rows = 4096;
+        config.key_count = 65536;
+        threw = false;
+        try { jitter::SharedIndex too_large(config); } catch (const std::invalid_argument&) { threw = true; }
+        check(threw, "SQLite rejects oversized preparation before allocation");
+    }
+}
+
 void check_parser() {
     const auto path = std::filesystem::temp_directory_path() /
         ("jitter-core-" + std::to_string(getpid()) + ".csv");
@@ -210,6 +242,7 @@ int main() {
         check_accounting();
         check_parser();
         check_tracing();
+        check_sqlite();
         return 0;
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';

@@ -58,6 +58,16 @@ def hypotheses(spec, baseline, evidence):
             {"unclassified_service_ns": components["other_service_ns"]},
             {"kind": "instrumentation_extension", "prediction": "Add a supported execution region or scheduling measurement around the residual interval, then measure its overhead."},
             "Residual time is not assigned to a guessed resource or function.")
+    if spec["application"]["adapter"] == "sqlite-aggregate-v1":
+        for item in result:
+            if item["id"] == "digest_execution":
+                item["id"] = "sql_execution"
+                item["mechanism"] = "The selected SQLite aggregate execution region contributes to slow requests."
+                item["suggested_experiment"] = {"kind": "implementation_comparison", "parameter": "application.implementation",
+                    "values": ["indexed"], "prediction": "Test the registered index on the same immutable rows and SQL; confirm latency, throughput, index memory, and preparation cost."}
+                item["caveat"] = "Query wall time includes scheduling and observation. An index is a hypothesis to test, and its construction and memory costs remain visible."
+            elif item["id"] == "shared_lock_contention":
+                item["mechanism"] = "Slow requests overlap another request's observed ownership of the SQLite connection mutex."
     return sorted(result, key=lambda item: (-item["support_ns"], item["id"]))
 
 

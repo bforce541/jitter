@@ -86,7 +86,7 @@ def read_trace(spec, run_dir, baseline):
                        "reserved_bytes", "clock", "retention", "buffers"), "trace metadata")
     tracing = spec["instrumentation"]
     stages = WORKER_STAGES
-    if spec["application"].get("implementation", "coarse") != "coarse":
+    if spec["application"].get("implementation", "coarse") in ("narrow", "map", "ordered"):
         stages = ("queue_exit", "request_start", "lock_wait", "lock_acquire", "lock_release", "region_begin", "region_end", "request_complete")
     threads = spec["application"]["workers"] + 1
     require(type(info["enabled"]) is bool and info["enabled"] == tracing["enabled"], "mode differs from specification")

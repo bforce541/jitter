@@ -36,6 +36,11 @@ def validate_investigation(spec):
     real(budget["wall_seconds"], .01, 86400, "budget.wall_seconds")
     if type(spec["diagnostic"]) is not bool:
         raise ExperimentError("diagnostic must be boolean")
+    if spec["diagnostic"]:
+        import copy
+        diagnostic = copy.deepcopy(experiment)
+        diagnostic["instrumentation"]["enabled"] = True
+        validate_spec(diagnostic)
     return spec
 
 

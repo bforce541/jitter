@@ -136,8 +136,17 @@ def analyze_run(spec, workload, run_dir):
         warnings.append("Load generator fell behind its configured scheduling tolerance.")
     if "warmup" in summaries and summaries["warmup"]["rejected"]:
         warnings.append("Warmup rejected requests; inspect whether the intended application state was reached.")
-    return {"schema_version": 1, "correctness": "passed", "constraints": checks,
-            "feasible": all(checks.values()), "phases": summaries, "warnings": warnings}
+    result = {"schema_version": 1, "correctness": "passed", "constraints": checks,
+              "feasible": all(checks.values()), "phases": summaries, "warnings": warnings}
+    if spec["schema_version"] >= 3 and (Path(run_dir) / "setup.csv").exists():
+        rows = read_csv(Path(run_dir) / "setup.csv", RESOURCE_FIELDS)
+        if len(rows) != 1 or rows[0]["phase"] != "setup":
+            raise ExperimentError("invalid setup measurement inventory")
+        setup = {key: numeric(rows[0][key]) for key in RESOURCE_FIELDS if key != "phase"}
+        if setup["arrival_window_ns"] != 0 or setup["elapsed_ns"] <= 0 or setup["peak_rss_bytes"] <= 0:
+            raise ExperimentError("invalid application preparation measurements")
+        result["setup"] = setup
+    return result
 
 
 def summarize_runs(spec, runs):

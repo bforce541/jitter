@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
             {"--queue-capacity", true}, {"--key-count", true}, {"--dataset-seed", true},
             {"--light-rounds", true}, {"--heavy-rounds", true},
             {"--adapter", true}, {"--implementation", true}, {"--light-fields", true}, {"--heavy-fields", true},
+            {"--light-rows", true}, {"--heavy-rows", true},
             {"--warmup-ns", true}, {"--measurement-ns", true}, {"--trace", true}, {"--trace-capacity", true}};
         for (int i = 1; i < argc; i += 2) {
             const std::string name(argv[i]);
@@ -93,6 +94,12 @@ int main(int argc, char** argv) {
             }
             config.light_fields = static_cast<std::uint32_t>(parse(options.at("--light-fields"), 1, 4096));
             config.heavy_fields = static_cast<std::uint32_t>(parse(options.at("--heavy-fields"), 1, 4096));
+        } else if (config.adapter == "sqlite-aggregate-v1") {
+            if (!options.contains("--light-rows") || !options.contains("--heavy-rows")) {
+                throw std::invalid_argument("sqlite-aggregate-v1 requires both row-count options");
+            }
+            config.light_rows = static_cast<std::uint32_t>(parse(options.at("--light-rows"), 1, 4096));
+            config.heavy_rows = static_cast<std::uint32_t>(parse(options.at("--heavy-rows"), 1, 4096));
         } else {
             throw std::invalid_argument("unsupported application adapter");
         }

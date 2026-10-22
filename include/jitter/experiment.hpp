@@ -39,6 +39,7 @@ struct RunOutput {
     std::vector<RequestResult> requests;
     std::vector<PhaseResources> phases;
     TraceOutput trace;
+    PhaseResources setup;
 };
 
 std::vector<Request> read_workload(const std::filesystem::path& path,

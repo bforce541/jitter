@@ -11,6 +11,10 @@ from .spec import ExperimentError
 from .storage import git_output, sha256, snapshot_source, verify_source_archive, write_json
 
 REGISTRY = {
+    "scan": {"adapter": "sqlite-aggregate-v1", "description": "Execute exact read-only aggregates using the upstream SQLite table scan.",
+             "legality": "Generated immutable integer table only; automatic indexes disabled; no user SQL or schema observations."},
+    "indexed": {"adapter": "sqlite-aggregate-v1", "description": "Create a (bucket,seq) index before arrivals and execute the same aggregate query.",
+                "legality": "Only physical lookup organization changes; exact integer outputs and all request identities are checked; index memory remains constrained."},
     "coarse": {"adapter": "shared-index-v1", "description": "Serialize immutable lookup and digest under the shared mutex.",
                "legality": "Reference affine uint64 response contract; dataset is initialized before workers and never mutated."},
     "narrow": {"adapter": "shared-index-v1", "description": "Copy immutable input under the mutex; compute the same digest after release.",

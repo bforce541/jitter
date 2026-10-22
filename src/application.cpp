@@ -1,4 +1,5 @@
 #include "jitter/application.hpp"
+#include "jitter/sqlite_dataset.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -85,6 +86,13 @@ SharedIndex::SharedIndex(const ApplicationConfig& config) : config_(config) {
     if (std::string(JITTER_COMPILED_VARIANT) != "any" && config.implementation != JITTER_COMPILED_VARIANT) {
         throw std::invalid_argument("implementation differs from compiled variant");
     }
+    if (config.adapter == "sqlite-aggregate-v1") {
+        if (config.implementation != "scan" && config.implementation != "indexed") {
+            throw std::invalid_argument("SQLite requires scan or indexed implementation");
+        }
+        sqlite_ = std::make_unique<SqliteDataset>(config);
+        return;
+    }
     if (config.adapter == "json-projection-v1") {
         if (config.implementation != "map" && config.implementation != "ordered") {
             throw std::invalid_argument("json-projection-v1 requires map or ordered implementation");
@@ -119,6 +127,11 @@ SharedIndex::~SharedIndex() = default;
 std::uint64_t SharedIndex::lookup(std::uint32_t key, bool heavy, TraceContext context) {
     if (key >= config_.key_count) {
         throw std::out_of_range("lookup key is outside the dataset");
+    }
+    if (sqlite_) {
+        TracedLock lock(mutex_, context, index_lock);
+        TracedRegion region(context, digest_region);
+        return sqlite_->aggregate(key, heavy ? config_.heavy_rows : config_.light_rows);
     }
     if (json_) {
         const std::string* document{};

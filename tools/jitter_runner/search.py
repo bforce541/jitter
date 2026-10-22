@@ -17,7 +17,7 @@ KEYS = ("workers", "queue_capacity", "implementation")
 STRATEGIES = ("guided", "random", "grid", "local")
 MAX_CONFIGURATIONS = 4096
 IMPLEMENTATIONS = {"shared-index-v1": ("coarse", "narrow"),
-                   "json-projection-v1": ("map", "ordered")}
+                   "json-projection-v1": ("map", "ordered"), "sqlite-aggregate-v1": ("scan", "indexed")}
 FAILED_STATUSES = {"failed", "infeasible", "invalid", "rejected", "error",
                    "interrupted", "timeout", "incomparable", "constraint_violation",
                    "inconclusive"}
@@ -132,6 +132,10 @@ def _support(hypotheses):
             raise ExperimentError("hypothesis support must be a finite fraction in [0, 1]")
         if name in ("shared_lock_contention", "queue_pressure"):
             result[name] = max(result.get(name, 0), weight)
+        if name == "sql_execution" and isinstance(hypothesis, dict):
+            suggestion = hypothesis.get("suggested_experiment", {})
+            if suggestion.get("parameter") == "application.implementation" and "indexed" in suggestion.get("values", []):
+                result["variant:indexed"] = max(result.get("variant:indexed", 0), weight)
     return result
 
 
@@ -226,6 +230,9 @@ def choose_candidate(space, baseline, history, hypotheses, strategy, seed):
         span = distance(config, incumbent)
         value = (3.0 if span == 1 else 0.0) - span
         directional = []
+        if config["implementation"] != incumbent["implementation"] and support.get("variant:" + config["implementation"], 0):
+            value += 2 * support["variant:" + config["implementation"]]
+            directional.append("observed SQL execution supports testing the registered index alternative")
         contention, queue = support.get("shared_lock_contention", 0), support.get("queue_pressure", 0)
         if contention:
             if config["implementation"] == "narrow" and incumbent["implementation"] == "coarse":

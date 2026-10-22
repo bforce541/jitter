@@ -34,20 +34,23 @@ def validate_spec(spec):
     if not isinstance(app, dict):
         raise ExperimentError("application must be an object")
     json_app = app.get("adapter") == "json-projection-v1"
-    if app.get("adapter") not in ("shared-index-v1", "json-projection-v1") or (json_app and spec["schema_version"] < 3):
-        raise ExperimentError("unsupported adapter or schema; JSON projection requires schema version 3")
-    behavior = ("light_fields", "heavy_fields") if json_app else ("light_rounds", "heavy_rounds")
+    sqlite_app = app.get("adapter") == "sqlite-aggregate-v1"
+    if app.get("adapter") not in ("shared-index-v1", "json-projection-v1", "sqlite-aggregate-v1") or ((json_app or sqlite_app) and spec["schema_version"] < 3):
+        raise ExperimentError("unsupported adapter or schema; external integrations require schema version 3")
+    behavior = ("light_fields", "heavy_fields") if json_app else (("light_rows", "heavy_rows") if sqlite_app else ("light_rounds", "heavy_rounds"))
     object_keys(app, ("adapter", "workers", "queue_capacity", "key_count", "dataset_seed", *behavior) +
                 (("implementation",) if spec["schema_version"] == 3 else ()), "application")
     for key, low, high in (("workers", 1, 256), ("queue_capacity", 1, 1000000), ("key_count", 1, 65536),
                            ("dataset_seed", 0, (1 << 64) - 1)):
         integer(app[key], low, high, f"application.{key}")
     for key in behavior:
-        integer(app[key], 1, 4096 if json_app else 10000000, f"application.{key}")
+        integer(app[key], 1, 4096 if json_app or sqlite_app else 10000000, f"application.{key}")
+    if sqlite_app and app["key_count"] * max(app["light_rows"], app["heavy_rows"]) > 1000000:
+        raise ExperimentError("SQLite dataset exceeds one million prepared rows")
     if json_app and app["key_count"] * (32 * (app["light_fields"] + app["heavy_fields"]) + 128) > 268435456:
         raise ExperimentError("JSON corpus exceeds its conservative 256 MiB storage bound")
     if spec["schema_version"] == 3:
-        choices = ("map", "ordered") if json_app else ("coarse", "narrow")
+        choices = ("map", "ordered") if json_app else (("scan", "indexed") if sqlite_app else ("coarse", "narrow"))
         if app["implementation"] not in choices:
             raise ExperimentError(f"implementation must be one of {choices}")
     if spec["schema_version"] >= 2:

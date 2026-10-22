@@ -24,6 +24,7 @@ def plan():
     result = load_json(ROOT / "examples/evaluation.json")
     result["scenarios"] = result["scenarios"][:1]
     result["strategies"] = ["guided", "random"]
+    result["seeds"] = [1]
     return result
 
 
@@ -40,27 +41,28 @@ def child_report(effect=.2, accepted=False):
             "cost": {"runs": 24, "builds": 2, "failures": 0, "seconds": .1, "build_seconds": .01}}
 
 
-def fake_run(spec, output=None, binary=None, reproduce_from=None):
+def fake_run(spec, output=None, binary=None, reproduce_from=None, source_context=None):
     """Fixture format intentionally cannot pass the real child verifier."""
     directory = Path(output)
     directory.mkdir(parents=True)
     write_json(directory / "investigation-spec.json", spec)
     report = child_report(accepted=spec["search"]["strategy"] == "guided")
     write_json(directory / "report.json", report)
+    write_json(directory / "test-source.json", source_context["source"] if source_context else {})
     return directory, report
 
 
 def fake_verify(path):
     directory = Path(path)
-    return load_json(directory / "investigation-spec.json"), load_json(directory / "report.json"), {}
+    return load_json(directory / "investigation-spec.json"), load_json(directory / "report.json"), {"source": load_json(directory / "test-source.json")}
 
 
 class EvaluationTests(unittest.TestCase):
     def test_checked_in_plan_has_real_adapter_scenarios_and_all_baselines(self):
         config = validate_evaluation(load_json(ROOT / "examples/evaluation.json"))
         self.assertEqual(config["strategies"], ["guided", "random", "grid", "local", "unguided"])
-        self.assertEqual({row["name"] for row in config["scenarios"]}, {"shared-contention", "json-small", "json-large"})
-        self.assertEqual(len(execution_order(config)), 15)
+        self.assertTrue({"shared-contention", "json-small", "json-large", "sqlite-index", "shared-saturated"}.issubset({row["name"] for row in config["scenarios"]}))
+        self.assertEqual(len(execution_order(config)), 75)
         for scenario in config["scenarios"]:
             exp = scenario["investigation"]["experiment"]
             self.assertEqual(exp["workload"]["rate_per_second"] * exp["workload"]["measurement_ms"] // 1000, 2000)
@@ -164,14 +166,14 @@ class EvaluationTests(unittest.TestCase):
 
     @patch("jitter_runner.evaluation.verify_investigation", side_effect=fake_verify)
     def test_wrapper_failure_remains_in_denominator_and_retains_partial_files(self, verify):
-        def failing(spec, output=None, binary=None):
+        def failing(spec, output=None, binary=None, source_context=None):
             if spec["search"]["strategy"] == "random":
                 directory = Path(output)
                 directory.mkdir(parents=True)
                 write_json(directory / "investigation-spec.json", spec)
                 (directory / "failure.log").write_text("fixture engine failed")
                 raise RuntimeError("fixture engine failed")
-            return fake_run(spec, output, binary)
+            return fake_run(spec, output, binary, source_context=source_context)
         with tempfile.TemporaryDirectory() as temporary, patch("jitter_runner.evaluation.run_investigation", side_effect=failing):
             root, report = run_evaluation(plan(), Path(temporary) / "evaluation")
             self.assertEqual(report["totals"]["planned_studies"], 2)
@@ -216,10 +218,10 @@ class EvaluationTests(unittest.TestCase):
 
     @patch("jitter_runner.evaluation.verify_investigation", side_effect=fake_verify)
     def test_replay_retains_failed_original_children_without_rebuilding(self, verify):
-        def failing(spec, output=None, binary=None, reproduce_from=None):
+        def failing(spec, output=None, binary=None, reproduce_from=None, source_context=None):
             if spec["search"]["strategy"] == "random":
                 raise RuntimeError("fixture missing binary")
-            return fake_run(spec, output, binary, reproduce_from)
+            return fake_run(spec, output, binary, reproduce_from, source_context)
         with tempfile.TemporaryDirectory() as temporary, patch("jitter_runner.evaluation.run_investigation", side_effect=failing) as run:
             root, _ = run_evaluation(plan(), Path(temporary) / "original")
             run.reset_mock()

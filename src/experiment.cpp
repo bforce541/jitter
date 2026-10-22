@@ -220,12 +220,17 @@ std::vector<Request> read_workload(const std::filesystem::path& path,
 RunOutput run_application(const ApplicationConfig& config,
                           const std::vector<Request>& requests,
                           std::int64_t warmup_ns, std::int64_t measurement_ns, TraceConfig tracing) {
+    const auto setup_start = Clock::now();
+    const auto setup_before = usage();
     RunOutput output;
     output.requests.reserve(requests.size());
     for (const auto& request : requests) output.requests.push_back({request});
     TraceSession trace(tracing, config.workers + 1);
     {
     WorkerPool pool(config, trace);
+    const auto setup_after = usage();
+    output.setup = {"setup", 0, since(setup_start), nanos(setup_after.ru_utime) - nanos(setup_before.ru_utime),
+                    nanos(setup_after.ru_stime) - nanos(setup_before.ru_stime), rss(setup_after)};
     for (const bool measured : {false, true}) {
         const auto duration = measured ? measurement_ns : warmup_ns;
         if (duration == 0) continue;
@@ -273,6 +278,13 @@ void write_output(const std::filesystem::path& path, const RunOutput& output) {
     requests.flush();
     resources.flush();
     if (!requests || !resources) throw std::runtime_error("cannot write experiment output");
+    std::ofstream setup(path / "setup.csv");
+    setup << "phase,arrival_window_ns,elapsed_ns,cpu_user_ns,cpu_system_ns,peak_rss_bytes\n";
+    const auto& preparation = output.setup;
+    setup << preparation.phase << ",0," << preparation.elapsed_ns << ',' << preparation.cpu_user_ns << ','
+          << preparation.cpu_system_ns << ',' << preparation.peak_rss_bytes << '\n';
+    setup.flush();
+    if (!setup) throw std::runtime_error("cannot write application setup measurements");
     write_trace(path, output.trace);
 }
 

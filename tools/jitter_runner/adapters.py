@@ -27,6 +27,7 @@ class SharedIndexAdapter:
             if result.returncode:
                 raise ExperimentError(f"{name} failed; see {logs}")
         selected = {"CMAKE_BUILD_TYPE", "CMAKE_CXX_COMPILER", "CMAKE_CXX_FLAGS", "CMAKE_CXX_FLAGS_RELEASE",
+                    "CMAKE_C_COMPILER", "CMAKE_C_FLAGS", "CMAKE_C_FLAGS_RELEASE", "JITTER_VARIANT",
                     "CMAKE_EXE_LINKER_FLAGS", "CMAKE_EXE_LINKER_FLAGS_RELEASE", "CMAKE_GENERATOR",
                     "CMAKE_MAKE_PROGRAM", "CMAKE_OSX_ARCHITECTURES", "CMAKE_OSX_DEPLOYMENT_TARGET",
                     "CMAKE_OSX_SYSROOT", "CMAKE_TOOLCHAIN_FILE", "CMAKE_CXX_COMPILER_TARGET"}
@@ -53,7 +54,7 @@ class SharedIndexAdapter:
     def command(self, binary, spec, workload, output):
         app = spec["application"]
         command = [str(binary), "--workload", str(workload), "--output", str(output)]
-        behavior = ("light_fields", "heavy_fields") if self.name == "json-projection-v1" else ("light_rounds", "heavy_rounds")
+        behavior = ("light_fields", "heavy_fields") if self.name == "json-projection-v1" else (("light_rows", "heavy_rows") if self.name == "sqlite-aggregate-v1" else ("light_rounds", "heavy_rounds"))
         for name in ("workers", "queue_capacity", "key_count", "dataset_seed", *behavior):
             command.extend(["--" + name.replace("_", "-"), str(app[name])])
         if spec["schema_version"] >= 3:
@@ -81,7 +82,11 @@ class JsonProjectionAdapter(SharedIndexAdapter):
     name = "json-projection-v1"
 
 
-ADAPTERS = {adapter.name: adapter for adapter in (SharedIndexAdapter(), JsonProjectionAdapter())}
+class SqliteAggregateAdapter(SharedIndexAdapter):
+    name = "sqlite-aggregate-v1"
+
+
+ADAPTERS = {adapter.name: adapter for adapter in (SharedIndexAdapter(), JsonProjectionAdapter(), SqliteAggregateAdapter())}
 
 
 def get_adapter(name):

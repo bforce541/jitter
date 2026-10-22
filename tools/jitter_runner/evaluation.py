@@ -17,9 +17,10 @@ import time
 
 from .investigation import run_investigation, verify_investigation
 from .investigation_spec import validate_investigation
-from .runner import new_output
+from .runner import ROOT, new_output
 from .spec import ExperimentError, integer, load_json, object_keys
-from .storage import seal_bundle, verify_integrity, write_json
+from .storage import seal_bundle, verify_integrity, verify_source_archive, write_json
+from .variants import freeze_source
 
 
 STRATEGIES = ("guided", "random", "grid", "local", "unguided")
@@ -198,9 +199,13 @@ def run_evaluation(plan, output=None, binary=None, reproduce_from=None):
         original_records = {row["path"]: row for row in original_state["records"]}
     root = new_output(output)
     write_json(root / "evaluation-plan.json", plan)
+    previous_source = ({"archive": original / "sources/source.tar.gz", "source": original_state["source"]}
+                       if original and original_state.get("source") else None)
+    frozen = freeze_source(ROOT, root / "sources", previous_source)
     state = {"schema_version": 1, "evaluation_version": VERSION, "status": "running",
              "created_at_utc": datetime.now(timezone.utc).isoformat(),
              "reproduce_from": str(original) if original else None,
+             "source": frozen["source"],
              "records": [{**row, "status": "not_run", "wall_seconds": 0.0} for row in execution_order(plan)]}
     write_json(root / "evaluation-state.json", state)
     write_json(root / "manifest.json", {"schema_version": 1, "status": "running", "artifacts": {}})
@@ -212,7 +217,7 @@ def run_evaluation(plan, output=None, binary=None, reproduce_from=None):
         write_json(root / "evaluation-state.json", state)
         print(f"Evaluating {record['scenario']} seed {record['seed']}: {record['strategy']}", flush=True)
         try:
-            kwargs = {"output": root / record["path"], "binary": binary}
+            kwargs = {"output": root / record["path"], "binary": binary, "source_context": frozen}
             if original:
                 if original_records[record["path"]]["status"] != "complete":
                     raise ExperimentError("original child has no verified saved executables; exact replay cannot silently rebuild it")
@@ -241,7 +246,10 @@ def run_evaluation(plan, output=None, binary=None, reproduce_from=None):
 
 
 def _read_children(root, plan, state):
-    object_keys(state, ("schema_version", "evaluation_version", "status", "created_at_utc", "reproduce_from", "records"), "evaluation state")
+    object_keys(state, ("schema_version", "evaluation_version", "status", "created_at_utc", "reproduce_from", "records") +
+                (("source",) if "source" in state else ()), "evaluation state")
+    if "source" in state:
+        verify_source_archive(root / "sources/source.tar.gz", state["source"]["files"])
     integer(state["schema_version"], 1, 1, "evaluation state.schema_version")
     if (state["evaluation_version"] != VERSION
             or state["status"] not in ("complete", "interrupted") or type(state["created_at_utc"]) is not str):
@@ -280,7 +288,9 @@ def _read_children(root, plan, state):
             if validate_investigation(load_json(path / "investigation-spec.json")) != expected_spec:
                 raise ExperimentError("retained child changed its expected investigation specification")
         if status == "complete":
-            spec, report, _ = verify_investigation(path)
+            spec, report, child_state = verify_investigation(path)
+            if "source" in state and child_state.get("source") != state["source"]:
+                raise ExperimentError("evaluation child changed its frozen source snapshot")
             if spec != expected_spec:
                 raise ExperimentError("evaluation child changed its fixed workload, budget, policy or search controls")
             children[identity["path"]] = report
