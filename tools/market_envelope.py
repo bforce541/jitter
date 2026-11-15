@@ -16,6 +16,8 @@ def limit(value):
 
 
 def make_envelope(study, p99_ns, p999_ns=None, late_fraction=None, cpu_cores=None):
+    if study.get("diagnostic_sweep"):
+        raise ValueError("traced timings are diagnostic evidence and cannot establish a load envelope")
     axis = study.get("comparison", {}).get("axis", "book")
     if axis not in ("book", "queue"):
         raise ValueError("unrecognized study comparison axis")

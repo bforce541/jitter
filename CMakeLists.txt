@@ -105,5 +105,7 @@ if(BUILD_TESTING)
     target_link_libraries(jitter_spsc_tests PRIVATE jitter_market_core Threads::Threads)
     add_test(NAME market_spsc_fifo COMMAND jitter_spsc_tests)
     add_test(NAME market_spsc_feed COMMAND jitter_market --mode feed --book dense --queue spsc --events 4096 --warmup 1024 --burst 32 --rate 100000)
-    set_tests_properties(market_spsc_fifo market_spsc_feed PROPERTIES TIMEOUT 30)
+    add_test(NAME market_tail_diagnostic COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_SOURCE_DIR}/tests/market_tail_smoke.py" $<TARGET_FILE:jitter_market>)
+    set_tests_properties(market_spsc_fifo market_spsc_feed market_tail_diagnostic PROPERTIES TIMEOUT 30)
 endif()

@@ -4,6 +4,8 @@
 #include <charconv>
 #include <chrono>
 #include <condition_variable>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
@@ -21,6 +23,7 @@ struct Options {
     std::uint64_t seed{17}, count{100000}, warmup{20000}, rate{100000}, burst{1}, capacity{4096};
     bool feed{}, dense{}, spsc{};
     std::uint64_t profile_ms{};
+    std::string_view trace;
 };
 std::uint64_t integer(std::string_view value) {
     std::uint64_t out;
@@ -43,6 +46,7 @@ Options parse(int argc, char** argv) {
         else if (k == "--burst") o.burst = integer(v);
         else if (k == "--capacity") o.capacity = integer(v);
         else if (k == "--profile-ms") o.profile_ms = integer(v);
+        else if (k == "--trace" && !v.empty()) o.trace = v;
         else throw std::runtime_error("unknown option or value: " + std::string(k));
     }
     if (o.count < 1 || o.count > 2000000 || o.warmup > 200000 || o.rate < 1000 || o.rate > 10000000 ||
@@ -51,6 +55,8 @@ Options parse(int argc, char** argv) {
         throw std::runtime_error("out-of-range option or feed event counts not divisible by burst");
     if (o.spsc && (!o.feed || !std::has_single_bit(o.capacity)))
         throw std::runtime_error("SPSC requires feed mode and a power-of-two capacity");
+    if (!o.trace.empty() && (!o.feed || std::filesystem::exists(o.trace)))
+        throw std::runtime_error("trace requires feed mode and a new output path");
     return o;
 }
 
@@ -60,6 +66,8 @@ struct Timing {
 };
 struct Result {
     std::vector<Timing> samples;
+    std::vector<std::int64_t> dequeued;
+    std::int64_t first_sleep_started{}, first_sleep_returned{};
     Entries final;
     std::size_t peak_depth{}, dropped{};
     std::size_t warmup_dropped{};
@@ -155,7 +163,7 @@ std::int64_t process_cpu_ns() {
     return time_ns(usage.ru_utime) + time_ns(usage.ru_stime);
 }
 
-template<class Book, class Queue>
+template<class Book, class Queue, bool Trace = false>
 Result feed(const Replay& replay, const Options& o) {
     Feed<Book> handler;
     if (!handler.snapshot(0, replay.initial)) throw std::runtime_error("invalid initial snapshot");
@@ -163,6 +171,7 @@ Result feed(const Replay& replay, const Options& o) {
     // Each input has a preallocated slot. An empty sequence identifies an input
     // that was never queued; the consumer owns writes to admitted slots.
     out.samples.resize(o.count);
+    if constexpr (Trace) out.dequeued.resize(o.count);
     auto phase = [&](std::size_t offset, std::size_t count, bool measured) {
         if (!count) return;
         Queue queue(o.capacity);
@@ -173,6 +182,8 @@ Result feed(const Replay& replay, const Options& o) {
         std::thread worker([&] {
             Item item{};
             while (queue.pop(item)) {
+                if constexpr (Trace)
+                    if (measured) out.dequeued[item.index - offset] = ns(Clock::now() - origin);
                 const auto update = handler.on_event(replay.events[item.index]);
                 if (measured) {
                     auto& row = out.samples[item.index - offset];
@@ -186,8 +197,13 @@ Result feed(const Replay& replay, const Options& o) {
         for (std::size_t i = 0; i < count; i += o.burst) {
             const auto release = static_cast<std::int64_t>(i * 1000000000ULL / o.rate);
             const auto deadline = origin + Nanoseconds(release);
-            if (deadline - Clock::now() > std::chrono::microseconds(150))
+            if (deadline - Clock::now() > std::chrono::microseconds(150)) {
+                if constexpr (Trace)
+                    if (measured && i == 0) out.first_sleep_started = ns(Clock::now() - origin);
                 std::this_thread::sleep_until(deadline - std::chrono::microseconds(100));
+                if constexpr (Trace)
+                    if (measured && i == 0) out.first_sleep_returned = ns(Clock::now() - origin);
+            }
             while (Clock::now() < deadline) {}
             for (std::size_t j = 0; j < o.burst; ++j) {
                 const auto arrival = ns(Clock::now() - origin);
@@ -263,6 +279,27 @@ void distribution(std::vector<std::int64_t>& values) {
     std::cout << '}';
 }
 
+void write_trace(const Replay& replay, const Result& result, const Options& o) {
+    std::ofstream out{std::filesystem::path(o.trace)};
+    if (!out) throw std::runtime_error("could not open trace");
+    out << "sequence,status,scheduled_ns,arrival_ns,dequeued_ns,published_ns\n";
+    for (std::size_t i = 0; i < result.samples.size(); ++i) {
+        const auto& row = result.samples[i];
+        if (!row.update.sequence) {
+            out << replay.events[o.warmup + i].sequence << ",dropped,,,,\n";
+            continue;
+        }
+        const auto dequeued = result.dequeued[i];
+        if (row.arrival > dequeued || dequeued > row.published)
+            throw std::runtime_error("invalid dequeue timestamp");
+        constexpr std::string_view statuses[] = {"published", "duplicate", "gap", "stale", "invalid"};
+        out << row.update.sequence << ',' << statuses[static_cast<unsigned>(row.update.status)] << ','
+            << row.scheduled << ',' << row.arrival << ',' << dequeued << ',' << row.published << '\n';
+    }
+    out.close();
+    if (!out) throw std::runtime_error("could not write trace");
+}
+
 void run(const Options& o) {
     const auto replay = generate(o.count + o.warmup, o.seed);
     if (o.profile_ms) {
@@ -276,10 +313,13 @@ void run(const Options& o) {
     }
     const auto benchmark = [&]<class Book> {
         if (!o.feed) return direct<Book>(replay, o);
-        return o.spsc ? feed<Book, SpscPipeline<Item>>(replay, o) : feed<Book, Pipeline>(replay, o);
+        if (o.trace.empty())
+            return o.spsc ? feed<Book, SpscPipeline<Item>>(replay, o) : feed<Book, Pipeline>(replay, o);
+        return o.spsc ? feed<Book, SpscPipeline<Item>, true>(replay, o) : feed<Book, Pipeline, true>(replay, o);
     };
     const auto r = o.dense ? benchmark.operator()<DenseBook>() : benchmark.operator()<ReferenceBook>();
     auto v = validate(replay,r,o);
+    if (!o.trace.empty()) write_trace(replay, r, o);
     const bool valid = !r.warmup_dropped && !r.dropped && v.published == o.count;
     std::cout << "{\"schema\":1,\"mode\":\"" << (o.feed ? "feed" : "direct")
               << "\",\"book\":\"" << (o.dense ? "dense" : "reference")
@@ -304,6 +344,13 @@ void run(const Options& o) {
     distribution(v.actual);
     std::cout << ",\"scheduled_to_publication_ns\":"; distribution(v.scheduled);
     std::cout << ",\"producer_lag_ns\":"; distribution(v.delivery);
+    if (!o.trace.empty()) {
+        std::cout << ",\"diagnostic\":{\"first_sleep_started_ns\":";
+        if (r.first_sleep_started) std::cout << r.first_sleep_started; else std::cout << "null";
+        std::cout << ",\"first_sleep_returned_ns\":";
+        if (r.first_sleep_started) std::cout << r.first_sleep_returned; else std::cout << "null";
+        std::cout << '}';
+    }
     std::cout << "}\n";
 }
 }
@@ -311,7 +358,8 @@ void run(const Options& o) {
 int main(int argc, char** argv) {
     if (argc == 2 && std::string_view(argv[1]) == "--help") {
         std::cout << "jitter_market --mode direct|feed --book reference|dense [--seed N] [--events N]\n"
-                     "  [--queue mutex|spsc] [--warmup N] [--rate N] [--burst N] [--capacity N] [--profile-ms N (direct)]\n";
+                     "  [--queue mutex|spsc] [--warmup N] [--rate N] [--burst N] [--capacity N] [--profile-ms N (direct)]\n"
+                     "  [--trace FILE (feed diagnostics only; perturbs timings)]\n";
         return 0;
     }
     try { run(parse(argc,argv)); }

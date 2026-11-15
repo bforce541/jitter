@@ -20,17 +20,22 @@ OPTIONS = {
 SWEEP = (100000, 250000, 500000, 1000000, 2000000, 4000000)
 
 
-def measure(binary, mode, rate, burst, book, index, events, warmup, queue=None):
+def measure(binary, mode, rate, burst, book, index, events, warmup, queue=None, trace=None):
     command = [str(binary), "--mode", mode, "--rate", str(rate), "--burst", str(burst),
                "--book", book, "--events", str(events), "--warmup", str(warmup),
                "--seed", str(17 + index), "--capacity", "4096"]
     if queue is not None:
         command.extend(("--queue", queue))
+    if trace is not None:
+        command.extend(("--trace", str(trace.resolve())))
     execution = subprocess.run(command, capture_output=True, text=True, timeout=120)
     if execution.returncode:
         raise RuntimeError(f"{command}: {execution.stderr}")
     result = json.loads(execution.stdout)
-    return {"argv": command, "result": result}
+    row = {"argv": command, "result": result}
+    if trace is not None:
+        row["trace_file"] = trace.name
+    return row
 
 
 def summarize(rows):
@@ -74,12 +79,15 @@ def main():
     parser.add_argument("--sweep-only", action="store_true")
     parser.add_argument("--sweep-rate", type=int, action="append")
     parser.add_argument("--sweep-events", type=int, default=100000)
+    parser.add_argument("--trace-sweep", action="store_true", help="diagnostic CSVs for sweep points; changes timing")
     parser.add_argument("--sweep-repeats", type=int, choices=range(1, 9), default=1)
     args = parser.parse_args()
     if args.queue_study and args.case and "direct" in args.case:
         parser.error("queue comparison requires feed mode")
     if args.reference == args.candidate and not args.queue_study:
         parser.error("choose distinct implementations")
+    if args.trace_sweep and not args.sweep_only:
+        parser.error("--trace-sweep requires --sweep-only")
     if args.skip_sweep and args.sweep_only:
         parser.error("--skip-sweep and --sweep-only are mutually exclusive")
     if not 0 <= args.seed_base <= (1 << 64) - 8:
@@ -91,9 +99,9 @@ def main():
     if any(not 1000 <= rate <= 10000000 for rate in args.sweep_rate or ()):
         parser.error("--sweep-rate must be in [1000, 10000000]")
     treatments = ("mutex", "spsc") if args.queue_study else (args.reference, args.candidate)
-    def run(binary, mode, rate, burst, treatment, i, events, warmup):
+    def run(binary, mode, rate, burst, treatment, i, events, warmup, trace=None):
         return measure(binary, mode, rate, burst, "dense" if args.queue_study else treatment,
-                       i + args.seed_base - 17, events, warmup, treatment if args.queue_study else None)
+                       i + args.seed_base - 17, events, warmup, treatment if args.queue_study else None, trace)
     binary = args.binary.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
     evidence = {"schema": 1, "host": platform.uname()._asdict(), "python": platform.python_version(),
@@ -103,6 +111,8 @@ def main():
                 "comparison": {"reference": treatments[0], "candidate": treatments[1],
                                "axis": "queue" if args.queue_study else "book"},
                 "cases": {}, "sweep": []}
+    if args.trace_sweep:
+        evidence["diagnostic_sweep"] = True
     def save():
         (args.output / "study.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     save()
@@ -125,7 +135,10 @@ def main():
             for i in range(args.sweep_repeats):
                 order = treatments if i % 2 == 0 else treatments[::-1]
                 for treatment in order:
-                    evidence["sweep"].append(run(binary, "feed", rate, burst, treatment, i, args.sweep_events, 20000))
+                    trace = None
+                    if args.trace_sweep:
+                        trace = args.output / f"{treatment}-{rate}-burst{burst}-seed{args.seed_base + i}.csv"
+                    evidence["sweep"].append(run(binary, "feed", rate, burst, treatment, i, args.sweep_events, 20000, trace))
                     save()
         print("sweep", rate, flush=True)
 
