@@ -1,0 +1,173 @@
+Analysis of sampling jitter_market (pid 20330) every 1 millisecond
+Process:         jitter_market [20330]
+Path:            /Users/USER/Documents/*/jitter_market
+Load Address:    0x104600000
+Identifier:      jitter_market
+Version:         ???
+Code Type:       ARM64
+Parent Process:  zsh [19916]
+Target Type:     live task
+
+Date/Time:       2026-11-15 12:04:14.728 -0600
+Launch Time:     2026-11-15 12:04:14.705 -0600
+OS Version:      macOS 26.6.2 (25G83)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         8224K
+Physical footprint (peak):  8224K
+Idle exit:                  untracked
+----
+
+Call graph:
+    144 Thread_559907: Main Thread
+    + 140 _dyld_start  (in dyld) + 0  [0x1046489c0]
+    + 2 start  (in dyld) + 6904  [0x18b08c48c]
+    + ! 2 dyld4::start(dyld4::KernelArgs*, void*, void*, unsigned long long)::$_1::operator()() const  (in dyld) + 320  [0x18b08cb30]
+    + !   1 dyld4::prepare(dyld4::APIs&, mach_o::UnsafeHeader const*)  (in dyld) + 3996  [0x18b08dae8]
+    + !   : 1 dyld4::RuntimeState::notifyDebuggerLoad(std::span<dyld4::Loader const*, 18446744073709551615ul> const&)  (in dyld) + 528  [0x18b09cc8c]
+    + !   :   1 dyld4::ExternallyViewableState::addImages(lsl::Allocator&, lsl::Allocator&, std::span<dyld4::ExternallyViewableState::ImageInfo, 18446744073709551615ul> const&)  (in dyld) + 1084  [0x18b0a7c80]
+    + !   :     1 dyld4::ExternallyViewableState::triggerNotifications(dyld_image_mode, unsigned int, dyld_image_info const*)  (in dyld) + 296  [0x18b0a7524]
+    + !   :       1 dyld4::RemoteNotificationResponder::blockOnSynchronousEvent(unsigned int)  (in dyld) + 48  [0x18b0edc90]
+    + !   :         1 dyld4::RemoteNotificationResponder::sendMessage(int, unsigned int, mach_msg_header_t*)  (in dyld) + 244  [0x18b0ed904]
+    + !   :           1 mach_msg_overwrite  (in dyld) + 244  [0x18b10718c]
+    + !   :             1 mach_msg2_internal  (in dyld) + 76  [0x18b106fe4]
+    + !   :               1 mach_msg2_trap  (in dyld) + 8  [0x18b06d72c]
+    + !   1 dyld4::prepare(dyld4::APIs&, mach_o::UnsafeHeader const*)  (in dyld) + 4056  [0x18b08db24]
+    + !     1 dyld4::RuntimeState::notifyDtrace(std::span<dyld4::Loader const*, 18446744073709551615ul> const&)  (in dyld) + 332  [0x18b09c8dc]
+    + !       1 dyld4::SyscallDelegate::dtraceRegisterUserProbes(dof_ioctl_data*) const  (in dyld) + 40  [0x18b0891ac]
+    + !         1 open  (in dyld) + 40  [0x18b06e664]
+    + !           1 __open  (in dyld) + 8  [0x18b071f70]
+    + 1 start  (in dyld) + 6008  [0x10466410c]
+    + ! 1 dyld4::ExternallyViewableState::createMinimalInfo(lsl::Allocator&, unsigned long long, char const*, unsigned long long, char const*, DyldSharedCache const*)  (in dyld) + 1336  [0x10467e948]
+    + !   1 dyld4::Atlas::ProcessSnapshot::serialize()  (in dyld) + 56  [0x1046ae4a0]
+    + !     1 dyld4::Atlas::ProcessSnapshot::Serializer::serialize()  (in dyld) + 1848  [0x1046aecd0]
+    + !       1 <deduplicated_symbol>  (in dyld) + 56  [0x104693d54]
+    + !         1 <deduplicated_symbol>  (in dyld) + 28  [0x104683178]
+    + 1 start  (in dyld) + 4028  [0x18b08b950]
+    +   1 dyld4::ExternallyViewableState::createMinimalInfo(lsl::Allocator&, unsigned long long, char const*, unsigned long long, char const*, DyldSharedCache const*)  (in dyld) + 2116  [0x18b0a6c54]
+    +     1 dyld4::ExternallyViewableState::triggerNotifications(dyld_image_mode, unsigned int, dyld_image_info const*)  (in dyld) + 296  [0x18b0a7524]
+    +       1 dyld4::RemoteNotificationResponder::blockOnSynchronousEvent(unsigned int)  (in dyld) + 48  [0x18b0edc90]
+    +         1 dyld4::RemoteNotificationResponder::sendMessage(int, unsigned int, mach_msg_header_t*)  (in dyld) + 244  [0x18b0ed904]
+    +           1 mach_msg_overwrite  (in dyld) + 244  [0x18b10718c]
+    +             1 mach_msg2_internal  (in dyld) + 76  [0x18b106fe4]
+    +               1 mach_msg2_trap  (in dyld) + 8  [0x18b06d72c]
+    3199 Thread_559907   DispatchQueue_1: com.apple.main-thread  (serial)
+      3199 start  (in dyld) + 6992  [0x18b08c4e4]
+        2949 main  (in jitter_market) + 1896  [0x104601480]
+        ! 1925 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 656,228,...  [0x104604e14,0x104604c68,...]
+        ! 360 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 180  [0x104604c38]
+        ! : 256 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market) + 264  [0x10460818c]
+        ! : | 237 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x18b40e7e8]
+        ! : | + 88 _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib) + 256,88,...  [0x18b27903c,0x18b278f94,...]
+        ! : | + 59 malloc_type_malloc  (in libsystem_malloc.dylib) + 16,44,...  [0x18b267040,0x18b26705c,...]
+        ! : | + 39 <deduplicated_symbol>  (in libsystem_malloc.dylib) + 112,136,...  [0x18b2731cc,0x18b2731e4,...]
+        ! : | + 30 _xzm_xzone_malloc  (in libsystem_malloc.dylib) + 8,192,...  [0x18b273958,0x18b273a10,...]
+        ! : | + 19 DYLD-STUB$$malloc_type_malloc  (in libc++abi.dylib) + 12  [0x18b40ec1c]
+        ! : | + 1 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 324  [0x18b27a7e4]
+        ! : | + ! 1 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 336  [0x18b27b0cc]
+        ! : | + !   1 _xzm_xzone_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 588  [0x18b27adcc]
+        ! : | + 1 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 352  [0x18b27a800]
+        ! : | 17 DYLD-STUB$$operator new(unsigned long)  (in jitter_market) + 4,0  [0x104608e20,0x104608e1c]
+        ! : | 2 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x18b40e7e8]
+        ! : 100 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market) + 120,72,...  [0x1046080fc,0x1046080cc,...]
+        ! : 4 operator new(unsigned long)  (in libc++abi.dylib) + 80  [0x18b40e804]
+        ! 220 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 860  [0x104604ee0]
+        ! : 94 _xzm_free  (in libsystem_malloc.dylib) + 996,0,...  [0x18b2744fc,0x18b274118,...]
+        ! : 58 _xzm_free  (in libsystem_malloc.dylib) + 352  [0x18b274278]
+        ! : | 39 __bzero  (in libsystem_platform.dylib) + 0  [0x18b461030]
+        ! : | 16 _platform_memset  (in libsystem_platform.dylib) + 180,208,...  [0x18b461144,0x18b461160,...]
+        ! : | 3 DYLD-STUB$$_platform_bzero  (in libsystem_malloc.dylib) + 12  [0x18b28b87c]
+        ! : 52 _free  (in libsystem_malloc.dylib) + 0,36,...  [0x18b283cd0,0x18b283cf4,...]
+        ! : 10 DYLD-STUB$$free  (in libc++abi.dylib) + 12,0  [0x18b40ebdc,0x18b40ebd0]
+        ! : 6 DYLD-STUB$$operator delete(void*)  (in jitter_market) + 4  [0x104608e14]
+        ! 145 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 844  [0x104604ed0]
+        ! : 145 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::remove(std::__hash_const_iterator<std::__hash_node<std::__hash_value_type<unsigned int, jitter::market::Order>, void*>*>)  (in jitter_market) + 28,160,...  [0x104608b2c,0x104608bb0,...]
+        ! 84 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 812  [0x104604eb0]
+        ! : 37 _xzm_free  (in libsystem_malloc.dylib) + 0,28,...  [0x18b274118,0x18b274134,...]
+        ! : 27 _xzm_free  (in libsystem_malloc.dylib) + 352  [0x18b274278]
+        ! : | 14 __bzero  (in libsystem_platform.dylib) + 0  [0x18b461030]
+        ! : | 13 _platform_memset  (in libsystem_platform.dylib) + 180,176,...  [0x18b461144,0x18b461140,...]
+        ! : 12 _free  (in libsystem_malloc.dylib) + 0,36,...  [0x18b283cd0,0x18b283cf4,...]
+        ! : 7 DYLD-STUB$$operator delete(void*)  (in jitter_market) + 4  [0x104608e14]
+        ! : 1 DYLD-STUB$$free  (in libc++abi.dylib) + 12  [0x18b40ebdc]
+        ! 76 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 288  [0x104604ca4]
+        ! : 71 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x18b40e7e8]
+        ! : | 30 _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib) + 88,256,...  [0x18b278f94,0x18b27903c,...]
+        ! : | 21 malloc_type_malloc  (in libsystem_malloc.dylib) + 16,80  [0x18b267040,0x18b267080]
+        ! : | 6 <deduplicated_symbol>  (in libsystem_malloc.dylib) + 112,212  [0x18b2731cc,0x18b273230]
+        ! : | 6 DYLD-STUB$$malloc_type_malloc  (in libc++abi.dylib) + 12  [0x18b40ec1c]
+        ! : | 6 _xzm_xzone_malloc  (in libsystem_malloc.dylib) + 8,324,...  [0x18b273958,0x18b273a94,...]
+        ! : | 1 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 324  [0x18b27a7e4]
+        ! : | + 1 _xzm_xzone_find_and_malloc_from_freelist_chunk  (in libsystem_malloc.dylib) + 168  [0x18b27b024]
+        ! : | +   1 _xzm_chunk_list_pop  (in libsystem_malloc.dylib) + 12  [0x18b27b8f4]
+        ! : | 1 _xzm_xzone_malloc_freelist_outlined  (in libsystem_malloc.dylib) + 756  [0x18b27a994]
+        ! : 4 DYLD-STUB$$operator new(unsigned long)  (in jitter_market) + 4,0  [0x104608e20,0x104608e1c]
+        ! : 1 operator new(unsigned long)  (in libc++abi.dylib) + 36  [0x18b40e7d8]
+        ! 63 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 340  [0x104604cd8]
+        ! : 63 std::__tree_balance_after_insert[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)  (in jitter_market) + 48,464,...  [0x10460853c,0x1046086dc,...]
+        ! 45 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 804  [0x104604ea8]
+        ! : 45 std::__tree_remove[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)  (in jitter_market) + 32,12,...  [0x104608700,0x1046086ec,...]
+        ! 17 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market) + 724,716,...  [0x104608358,0x104608350,...]
+        ! 11 _xzm_free  (in libsystem_malloc.dylib) + 1568  [0x18b274738]
+        ! 3 operator new(unsigned long)  (in libc++abi.dylib) + 80  [0x18b40e804]
+        175 main  (in jitter_market) + 1912  [0x104601490]
+        ! 175 jitter::market::ReferenceBook::top() const  (in jitter_market) + 40,112,...  [0x104604f0c,0x104604f54,...]
+        38 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 612  [0x104604de8]
+        17 main  (in jitter_market) + 1916,1912,...  [0x104601494,0x104601490,...]
+        15 main  (in jitter_market) + 1856  [0x104601458]
+        ! 7 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 228,208,...  [0x104604c68,0x104604c54,...]
+        ! 4 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 180  [0x104604c38]
+        ! : 4 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market) + 264  [0x10460818c]
+        ! :   4 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x18b40e7e8]
+        ! :     2 malloc_type_malloc  (in libsystem_malloc.dylib) + 16  [0x18b267040]
+        ! :     1 <deduplicated_symbol>  (in libsystem_malloc.dylib) + 80  [0x18b2731ac]
+        ! :     1 _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib) + 256  [0x18b27903c]
+        ! 2 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 288  [0x104604ca4]
+        ! : 2 operator new(unsigned long)  (in libc++abi.dylib) + 52  [0x18b40e7e8]
+        ! :   1 _xzm_xzone_malloc  (in libsystem_malloc.dylib) + 192  [0x18b273a10]
+        ! :   1 _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib) + 256  [0x18b27903c]
+        ! 1 jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market) + 340  [0x104604cd8]
+        ! : 1 std::__tree_balance_after_insert[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)  (in jitter_market) + 48  [0x10460853c]
+        ! 1 std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market) + 716  [0x104608350]
+        3 main  (in jitter_market) + 1964  [0x1046014c4]
+        ! 3 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !   3 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !     3 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !       3 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !         2 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !         : 1 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+        !         : | 1 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 60  [0x104602d74]
+        !         : 1 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 0  [0x104602d38]
+        !         1 std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 52  [0x104602d6c]
+        !           1 DYLD-STUB$$free  (in libc++abi.dylib) + 12  [0x18b40ebdc]
+        2 main  (in jitter_market) + 1232  [0x1046011e8]
+          2 jitter::market::generate(unsigned long, unsigned long long)  (in jitter_market) + 828  [0x10460593c]
+
+Total number in stack (recursive counted multiple, when >=5):
+        6       std::__tree<std::__value_type<unsigned int, unsigned long long>, std::__map_value_compare<unsigned int, std::pair<unsigned int const, unsigned long long>>>::__tree_deleter::operator()[abi:nqe220106](std::__tree_node<std::__value_type<unsigned int, unsigned long long>, void*>*)  (in jitter_market) + 40  [0x104602d60]
+
+Sort by top of stack, same collapsed (when >= 5):
+        jitter::market::ReferenceBook::apply(jitter::market::Event const&)  (in jitter_market)        1970
+        jitter::market::ReferenceBook::top() const  (in jitter_market)        175
+        std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::remove(std::__hash_const_iterator<std::__hash_node<std::__hash_value_type<unsigned int, jitter::market::Order>, void*>*>)  (in jitter_market)        145
+        _xzm_free  (in libsystem_malloc.dylib)        142
+        _dyld_start  (in dyld)        140
+        _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib)        120
+        std::__hash_table<std::__hash_value_type<unsigned int, jitter::market::Order>>::__emplace_unique[abi:nqe220106]<unsigned int const&, jitter::market::Order const&>(unsigned int const&, jitter::market::Order const&)::'lambda'(unsigned int const&, unsigned int const&, jitter::market::Order const&)::operator()(unsigned int const&, unsigned int const&, jitter::market::Order const&) const  (in jitter_market)        118
+        malloc_type_malloc  (in libsystem_malloc.dylib)        82
+        _free  (in libsystem_malloc.dylib)        64
+        std::__tree_balance_after_insert[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)  (in jitter_market)        64
+        __bzero  (in libsystem_platform.dylib)        53
+        <deduplicated_symbol>  (in libsystem_malloc.dylib)        46
+        std::__tree_remove[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)  (in jitter_market)        45
+        _xzm_xzone_malloc  (in libsystem_malloc.dylib)        37
+        _platform_memset  (in libsystem_platform.dylib)        29
+        DYLD-STUB$$malloc_type_malloc  (in libc++abi.dylib)        25
+        DYLD-STUB$$operator new(unsigned long)  (in jitter_market)        21
+        main  (in jitter_market)        17
+        DYLD-STUB$$operator delete(void*)  (in jitter_market)        13
+        DYLD-STUB$$free  (in libc++abi.dylib)        12
+        operator new(unsigned long)  (in libc++abi.dylib)        10
+
+Binary images description not available

@@ -1,0 +1,3450 @@
+{
+  "schema": 1,
+  "host": {
+    "system": "Darwin",
+    "node": "Yoshuas-MacBook-Pro-3.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:17:26 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6041",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "python": "3.12.2",
+  "checkout_revision": "a7a51b94e5fd9101f3db94b0a1a7f9ea64317968",
+  "checkout_dirty": false,
+  "binary_sha256": "8285dd8d780ea9ff8c84252f1a5f752cbe534e285c40f0fbf2316e6e72797952",
+  "comparison": {
+    "reference": "dense",
+    "candidate": "cached"
+  },
+  "cases": {
+    "direct": {
+      "observations": [
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2931959,
+              "processed_per_second": 34106900.0,
+              "published_per_second": 34106900.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 83
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 83
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2982000,
+              "processed_per_second": 33534500.0,
+              "published_per_second": 33534500.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2898875,
+              "processed_per_second": 34496100.0,
+              "published_per_second": 34496100.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 3076333,
+              "processed_per_second": 32506200.0,
+              "published_per_second": 32506200.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 83
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 83
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2893041,
+              "processed_per_second": 34565700.0,
+              "published_per_second": 34565700.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2957209,
+              "processed_per_second": 33815700.0,
+              "published_per_second": 33815700.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 125
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2645666,
+              "processed_per_second": 37797700.0,
+              "published_per_second": 37797700.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2840000,
+              "processed_per_second": 35211300.0,
+              "published_per_second": 35211300.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2666083,
+              "processed_per_second": 37508200.0,
+              "published_per_second": 37508200.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2863709,
+              "processed_per_second": 34919700.0,
+              "published_per_second": 34919700.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2771458,
+              "processed_per_second": 36082100.0,
+              "published_per_second": 36082100.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2857709,
+              "processed_per_second": 34993100.0,
+              "published_per_second": 34993100.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2714917,
+              "processed_per_second": 36833500.0,
+              "published_per_second": 36833500.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2766208,
+              "processed_per_second": 36150600.0,
+              "published_per_second": 36150600.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "dense",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2676834,
+              "processed_per_second": 37357600.0,
+              "published_per_second": 37357600.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "direct",
+              "--rate",
+              "100000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "direct",
+              "book": "cached",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": null,
+              "burst": 1,
+              "queue_capacity": 0,
+              "peak_queue_depth": 0,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 0,
+              "elapsed_ns": 2772458,
+              "processed_per_second": 36069100.0,
+              "published_per_second": 36069100.0,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 42,
+                "p999": 42
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 0,
+                "p999": 0
+              }
+            }
+          }
+        ]
+      ],
+      "summary": {
+        "pairs": 8,
+        "all_full_coverage": true,
+        "arrival_to_publication_ns": {
+          "p99": {
+            "reference_median_ns": 42.0,
+            "candidate_median_ns": 42.0,
+            "median_paired_improvement": 0.0,
+            "bounds": {
+              "lower_bound": 0.0,
+              "upper_bound": 0.0,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 42.0,
+            "candidate_median_ns": 42.0,
+            "median_paired_improvement": 0.0,
+            "bounds": {
+              "lower_bound": 0.0,
+              "upper_bound": 0.0,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        },
+        "scheduled_to_publication_ns": {
+          "p99": {
+            "reference_median_ns": 42.0,
+            "candidate_median_ns": 42.0,
+            "median_paired_improvement": 0.0,
+            "bounds": {
+              "lower_bound": 0.0,
+              "upper_bound": 0.0,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 42.0,
+            "candidate_median_ns": 42.0,
+            "median_paired_improvement": 0.0,
+            "bounds": {
+              "lower_bound": 0.0,
+              "upper_bound": 0.0,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        }
+      }
+    },
+    "steady-500k": {
+      "observations": [
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 191,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 173,
+              "elapsed_ns": 200001416,
+              "processed_per_second": 499996,
+              "published_per_second": 499996,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2250,
+                "p99": 10583,
+                "p999": 47291
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 10875,
+                "p999": 270625
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3291,
+                "p999": 227625
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 111,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 181,
+              "elapsed_ns": 200000416,
+              "processed_per_second": 499999,
+              "published_per_second": 499999,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2250,
+                "p99": 10583,
+                "p999": 32334
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 10708,
+                "p999": 235041
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 2958,
+                "p999": 225666
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 114,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 182,
+              "elapsed_ns": 200003375,
+              "processed_per_second": 499992,
+              "published_per_second": 499992,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2250,
+                "p99": 10417,
+                "p999": 26959
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 10625,
+                "p999": 238208
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3041,
+                "p999": 220166
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 75,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 171,
+              "elapsed_ns": 200000292,
+              "processed_per_second": 499999,
+              "published_per_second": 499999,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2333,
+                "p99": 11291,
+                "p999": 61292
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2375,
+                "p99": 13583,
+                "p999": 221708
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 2958,
+                "p999": 210958
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 91,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 181,
+              "elapsed_ns": 200000167,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2250,
+                "p99": 10500,
+                "p999": 37833
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2292,
+                "p99": 10708,
+                "p999": 236333
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3000,
+                "p999": 227042
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 69,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 177,
+              "elapsed_ns": 200000875,
+              "processed_per_second": 499998,
+              "published_per_second": 499998,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 10125,
+                "p999": 12292
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2333,
+                "p99": 10541,
+                "p999": 221250
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 2958,
+                "p999": 215541
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 220,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 271,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2333,
+                "p99": 15917,
+                "p999": 117750
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2375,
+                "p99": 23000,
+                "p999": 343417
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 5750,
+                "p999": 228667
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 120,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 181,
+              "elapsed_ns": 200000125,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2292,
+                "p99": 11208,
+                "p999": 39334
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2333,
+                "p99": 11708,
+                "p999": 272208
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 2541,
+                "p999": 236916
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 139,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 156,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2042,
+                "p99": 9625,
+                "p999": 23333
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2167,
+                "p99": 11375,
+                "p999": 207542
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 4375,
+                "p999": 197209
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 59,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 153,
+              "elapsed_ns": 200001250,
+              "processed_per_second": 499997,
+              "published_per_second": 499997,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 1917,
+                "p99": 8625,
+                "p999": 53625
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 1958,
+                "p99": 11833,
+                "p999": 201625
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3375,
+                "p999": 198583
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 63,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 150,
+              "elapsed_ns": 200002250,
+              "processed_per_second": 499994,
+              "published_per_second": 499994,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2083,
+                "p99": 9458,
+                "p999": 29375
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2208,
+                "p99": 12541,
+                "p999": 197541
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3958,
+                "p999": 194083
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 65,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 152,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2166,
+                "p99": 9584,
+                "p999": 24250
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2250,
+                "p99": 12250,
+                "p999": 197833
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 4541,
+                "p999": 194791
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 175,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 152,
+              "elapsed_ns": 200000666,
+              "processed_per_second": 499998,
+              "published_per_second": 499998,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 11167,
+                "p999": 26666
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2333,
+                "p99": 11666,
+                "p999": 215875
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 3916,
+                "p999": 197750
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 88,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 176,
+              "elapsed_ns": 200007291,
+              "processed_per_second": 499982,
+              "published_per_second": 499982,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 11625,
+                "p999": 27875
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2291,
+                "p99": 15291,
+                "p999": 244416
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 4000,
+                "p999": 231250
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 191,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 151,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2417,
+                "p99": 19250,
+                "p999": 74584
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2417,
+                "p99": 23542,
+                "p999": 226917
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 6500,
+                "p999": 193959
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "1",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": 500000,
+              "burst": 1,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 116,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 159,
+              "elapsed_ns": 200002416,
+              "processed_per_second": 499994,
+              "published_per_second": 499994,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 2500,
+                "p99": 22500,
+                "p999": 119375
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 2541,
+                "p99": 29500,
+                "p999": 220916
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 0,
+                "p99": 6666,
+                "p999": 208916
+              }
+            }
+          }
+        ]
+      ],
+      "summary": {
+        "pairs": 8,
+        "all_full_coverage": true,
+        "arrival_to_publication_ns": {
+          "p50": {
+            "reference_median_ns": 2250.0,
+            "candidate_median_ns": 2291.0,
+            "median_paired_improvement": -0.00911111111111107,
+            "bounds": {
+              "lower_bound": -0.03688888888888897,
+              "upper_bound": 0.017573939134162053,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p99": {
+            "reference_median_ns": 10541.5,
+            "candidate_median_ns": 10895.5,
+            "median_paired_improvement": -0.006661027701416744,
+            "bounds": {
+              "lower_bound": -0.08390131515791488,
+              "upper_bound": 0.10389610389610393,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 33604.0,
+            "candidate_median_ns": 35834.0,
+            "median_paired_improvement": 0.06456472582027323,
+            "bounds": {
+              "lower_bound": -1.2735264661152121,
+              "upper_bound": 0.6659532908704884,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        },
+        "scheduled_to_publication_ns": {
+          "p50": {
+            "reference_median_ns": 2291.5,
+            "candidate_median_ns": 2312.0,
+            "median_paired_improvement": -0.008944153577661429,
+            "bounds": {
+              "lower_bound": -0.03666521169794845,
+              "upper_bound": 0.018002571795970868,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p99": {
+            "reference_median_ns": 11520.5,
+            "candidate_median_ns": 12041.5,
+            "median_paired_improvement": -0.012453707212327969,
+            "bounds": {
+              "lower_bound": -0.2784,
+              "upper_bound": 0.02320389123674349,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 231625.0,
+            "candidate_median_ns": 221479.0,
+            "median_paired_improvement": 0.04616542823011177,
+            "bounds": {
+              "lower_bound": -0.0014781741511888935,
+              "upper_bound": 0.13148822170900698,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        }
+      }
+    },
+    "burst32-500k": {
+      "observations": [
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 224,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 6042,
+                "p99": 10875,
+                "p999": 19250
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 7834,
+                "p99": 14625,
+                "p999": 215709
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 1375,
+                "p99": 7375,
+                "p999": 202500
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "17",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 17,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "881810a418098232",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 195,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5583,
+                "p99": 10833,
+                "p999": 36250
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6542,
+                "p99": 12459,
+                "p999": 226709
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 959,
+                "p99": 2875,
+                "p999": 206000
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 96,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 32,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5834,
+                "p99": 31958,
+                "p999": 92125
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 7000,
+                "p99": 36875,
+                "p999": 98458
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 1125,
+                "p99": 7708,
+                "p999": 41666
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "18",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 18,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "dda15029484667ea",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 221,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5458,
+                "p99": 8334,
+                "p999": 20291
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6375,
+                "p99": 10375,
+                "p999": 230292
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 917,
+                "p99": 2167,
+                "p999": 209959
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 204,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5625,
+                "p99": 11459,
+                "p999": 37917
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6625,
+                "p99": 15167,
+                "p999": 216167
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 1000,
+                "p99": 4333,
+                "p999": 197042
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "19",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 19,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "eef1d6566e323dd6",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 223,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5375,
+                "p99": 9667,
+                "p999": 25209
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6208,
+                "p99": 11916,
+                "p999": 216791
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 833,
+                "p99": 4541,
+                "p999": 206708
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 223,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5542,
+                "p99": 10666,
+                "p999": 37833
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6333,
+                "p99": 13125,
+                "p999": 243166
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 833,
+                "p99": 4541,
+                "p999": 212250
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "20",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 20,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "50adfbe2a044e024",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 185,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 165,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5291,
+                "p99": 9709,
+                "p999": 27834
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6125,
+                "p99": 11542,
+                "p999": 245750
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 792,
+                "p99": 4709,
+                "p999": 215542
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 171,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 178,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5375,
+                "p99": 10375,
+                "p999": 41417
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6208,
+                "p99": 14916,
+                "p999": 251875
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 833,
+                "p99": 5333,
+                "p999": 213666
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "21",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 21,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "d1959b0e7b7c982",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 223,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5250,
+                "p99": 8042,
+                "p999": 25167
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6083,
+                "p99": 10833,
+                "p999": 236000
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 792,
+                "p99": 4167,
+                "p999": 210458
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 216,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5708,
+                "p99": 13750,
+                "p999": 61458
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6625,
+                "p99": 19083,
+                "p999": 246958
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 875,
+                "p99": 5916,
+                "p999": 214458
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "22",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 22,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "6fc516a0ec24ee21",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 106,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5250,
+                "p99": 7917,
+                "p999": 29292
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6042,
+                "p99": 10709,
+                "p999": 231167
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 792,
+                "p99": 2625,
+                "p999": 221417
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 207,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5334,
+                "p99": 8958,
+                "p999": 24458
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6208,
+                "p99": 10875,
+                "p999": 232750
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 792,
+                "p99": 4042,
+                "p999": 202458
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "23",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 23,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "52e3670dff7d9e27",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 218,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5291,
+                "p99": 8208,
+                "p999": 23708
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6084,
+                "p99": 11125,
+                "p999": 227875
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 792,
+                "p99": 4125,
+                "p999": 204750
+              }
+            }
+          }
+        ],
+        [
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "dense",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "dense",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 192,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5542,
+                "p99": 10208,
+                "p999": 35042
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6416,
+                "p99": 13208,
+                "p999": 220833
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 875,
+                "p99": 6041,
+                "p999": 201708
+              }
+            }
+          },
+          {
+            "argv": [
+              "/Users/Yoshua/Documents/ChatGPT/quant/jitter/results/market-native/jitter_market",
+              "--mode",
+              "feed",
+              "--rate",
+              "500000",
+              "--burst",
+              "32",
+              "--book",
+              "cached",
+              "--events",
+              "100000",
+              "--warmup",
+              "20000",
+              "--seed",
+              "24",
+              "--capacity",
+              "4096"
+            ],
+            "result": {
+              "schema": 1,
+              "mode": "feed",
+              "book": "cached",
+              "seed": 24,
+              "warmup_events": 20000,
+              "events": 100000,
+              "input_id": "fc7a67f609598f2e",
+              "offered_rate": 500000,
+              "burst": 32,
+              "queue_capacity": 4096,
+              "peak_queue_depth": 223,
+              "dropped": 0,
+              "warmup_dropped": 0,
+              "processed": 100000,
+              "published": 100000,
+              "gaps": 0,
+              "stale": 0,
+              "invalid": 0,
+              "duplicates": 0,
+              "late_over_100us_processed": 160,
+              "elapsed_ns": 200000000,
+              "processed_per_second": 500000,
+              "published_per_second": 500000,
+              "full_coverage": true,
+              "arrival_to_publication_ns": {
+                "count": 100000,
+                "p50": 5250,
+                "p99": 9041,
+                "p999": 20458
+              },
+              "scheduled_to_publication_ns": {
+                "count": 100000,
+                "p50": 6041,
+                "p99": 12500,
+                "p999": 203041
+              },
+              "producer_lag_ns": {
+                "count": 100000,
+                "p50": 791,
+                "p99": 5833,
+                "p999": 195041
+              }
+            }
+          }
+        ]
+      ],
+      "summary": {
+        "pairs": 8,
+        "all_full_coverage": true,
+        "arrival_to_publication_ns": {
+          "p50": {
+            "reference_median_ns": 5583.5,
+            "candidate_median_ns": 5291.0,
+            "median_paired_improvement": 0.04898953446409243,
+            "bounds": {
+              "lower_bound": 0.023255813953488413,
+              "upper_bound": 0.07596822244289969,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p99": {
+            "reference_median_ns": 10770.5,
+            "candidate_median_ns": 8687.5,
+            "median_paired_improvement": 0.1353528644511809,
+            "bounds": {
+              "lower_bound": 0.08372404554588075,
+              "upper_bound": 0.4242181818181818,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 37875.0,
+            "candidate_median_ns": 25188.0,
+            "median_paired_improvement": 0.36375203227470787,
+            "bounds": {
+              "lower_bound": 0.03066481314907188,
+              "upper_bound": 0.5233818217319145,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        },
+        "scheduled_to_publication_ns": {
+          "p50": {
+            "reference_median_ns": 6520.5,
+            "candidate_median_ns": 6104.5,
+            "median_paired_improvement": 0.06069551357455416,
+            "bounds": {
+              "lower_bound": 0.0201353092783505,
+              "upper_bound": 0.0892857142857143,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p99": {
+            "reference_median_ns": 14770.5,
+            "candidate_median_ns": 11333.5,
+            "median_paired_improvement": 0.18122475076625533,
+            "bounds": {
+              "lower_bound": 0.05360387643852216,
+              "upper_bound": 0.4388198920505162,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          },
+          "p999": {
+            "reference_median_ns": 226791.5,
+            "candidate_median_ns": 229083.5,
+            "median_paired_improvement": 0.009029281559011837,
+            "bounds": {
+              "lower_bound": -0.05099462702066204,
+              "upper_bound": 0.06394204682577609,
+              "order_statistic_rank": 2,
+              "confidence": 0.95,
+              "achieved_one_sided_confidence": 0.96484375,
+              "method": "exact_binomial_median_order_statistics",
+              "bounds_are_separately_one_sided": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "sweep": []
+}

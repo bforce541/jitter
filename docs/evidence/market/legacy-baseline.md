@@ -2,7 +2,9 @@
 
 Captured before measuring the new market workload. Source and executable build: clean
 `d110fb2c902d34ca281aa19df783326f07cb1ec3`. Apple M4 Pro, arm64,
-Darwin 25.6.0, Apple clang 21.0.0 (clang-2100.4.1.1), CMake 4.1.1, CMake Release.
+Darwin 25.6.0, Apple clang 21.0.0 (clang-2100.4.1.1), CMake 4.1.1, CMake Release. The executable built without an explicit architecture was
+x86-64 under Rosetta, as confirmed by `file`; arm64 describes the host. Both
+market variants were subsequently rebuilt explicitly for native ARM64.
 
 ```sh
 cmake -S . -B results/market-baseline/build -DCMAKE_BUILD_TYPE=Release

@@ -4,6 +4,33 @@ Jitter investigates C++ tail latency with controlled workloads, dependency evide
 
 Supported integrations are an immutable shared-index service, pinned nlohmann/json parsing and projection, and pinned SQLite aggregation with explicit indexing alternatives. Jitter owns the workload drivers. It does not safely rewrite arbitrary C++ or establish performance in an untested production service.
 
+## Flagship workload: C++ market-data replay
+
+The market engine rebuilds a two-sided order book from a seeded local feed. It
+handles partial fills, duplicate messages, sequence gaps and recovery from an
+authoritative snapshot. A sparse reference checks the dense order book and its
+published updates. Direct replay isolates book work; open-loop feed replay
+includes sequencing, queueing and producer lateness.
+
+On an M4 Pro, the dense book cut **median paired scheduled-to-publication p99 by
+38.4%** at 500,000 steady offered events/s (run medians **27.333 → 17.771 µs**)
+with all events published in eight pairs. In isolated direct replay, median
+processed throughput was **14.51M → 36.83M events/s**. Other feed scenarios had
+mixed tails. These are synthetic in-process measurements, with no live
+exchange or transport latency.
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+# On Apple Silicon add -DCMAKE_OSX_ARCHITECTURES=arm64 to the command above.
+cmake --build build --target jitter_market --parallel 4
+build/jitter_market --mode direct --book dense --events 100000 --warmup 20000
+build/jitter_market --mode feed --book dense --events 100000 --warmup 20000 --rate 500000 --burst 32
+```
+
+[Architecture, benchmark table and reproduction](docs/market-replay.md) ·
+[Paired observations](docs/evidence/market/paired-arm64.json) ·
+[Saturation sweep](docs/evidence/market/saturation-arm64.json)
+
 ## Install and check
 
 Requires Linux or macOS, Python 3.9+, Git, CMake 3.20+, a C compiler and a C++20 compiler. Upstream sources are vendored; building the application requires no dependency download. The optional editable CLI installation downloads its Python build tooling.
