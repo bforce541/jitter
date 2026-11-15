@@ -67,6 +67,9 @@ def main():
     parser.add_argument("--queue-study", action="store_true",
                         help="compare mutex and SPSC with the dense book fixed")
     parser.add_argument("--case", action="append", choices=OPTIONS)
+    parser.add_argument("--seed-base", type=int, default=17,
+                        help="first replay seed used by pairs and sweeps")
+    parser.add_argument("--pair-events", type=int, default=100000)
     parser.add_argument("--skip-sweep", action="store_true")
     parser.add_argument("--sweep-only", action="store_true")
     parser.add_argument("--sweep-rate", type=int, action="append")
@@ -79,6 +82,10 @@ def main():
         parser.error("choose distinct implementations")
     if args.skip_sweep and args.sweep_only:
         parser.error("--skip-sweep and --sweep-only are mutually exclusive")
+    if not 0 <= args.seed_base <= (1 << 64) - 8:
+        parser.error("--seed-base must leave room for eight uint64 seeds")
+    if not 32 <= args.pair_events <= 2000000 or args.pair_events % 32:
+        parser.error("--pair-events must be a multiple of 32 in [32, 2000000]")
     if not 32 <= args.sweep_events <= 2000000 or args.sweep_events % 32:
         parser.error("--sweep-events must be a multiple of 32 in [32, 2000000]")
     if any(not 1000 <= rate <= 10000000 for rate in args.sweep_rate or ()):
@@ -86,7 +93,7 @@ def main():
     treatments = ("mutex", "spsc") if args.queue_study else (args.reference, args.candidate)
     def run(binary, mode, rate, burst, treatment, i, events, warmup):
         return measure(binary, mode, rate, burst, "dense" if args.queue_study else treatment,
-                       i, events, warmup, treatment if args.queue_study else None)
+                       i + args.seed_base - 17, events, warmup, treatment if args.queue_study else None)
     binary = args.binary.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
     evidence = {"schema": 1, "host": platform.uname()._asdict(), "python": platform.python_version(),
@@ -105,7 +112,7 @@ def main():
         case = evidence["cases"][name] = {"observations": []}
         for i in range(8):
             order = treatments if i % 2 == 0 else treatments[::-1]
-            pair = {treatment: run(binary, mode, rate, burst, treatment, i, 100000, 20000) for treatment in order}
+            pair = {treatment: run(binary, mode, rate, burst, treatment, i, args.pair_events, 20000) for treatment in order}
             if pair[treatments[0]]["result"]["input_id"] != pair[treatments[1]]["result"]["input_id"]:
                 raise RuntimeError("paired workloads differ")
             case["observations"].append([pair[treatments[0]], pair[treatments[1]]])
