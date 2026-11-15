@@ -1,4 +1,5 @@
 #include "jitter/market.hpp"
+#include "jitter/spsc.hpp"
 
 #include <charconv>
 #include <chrono>
@@ -8,6 +9,7 @@
 #include <stdexcept>
 #include <string_view>
 #include <thread>
+#include <sys/resource.h>
 
 using namespace jitter::market;
 using Clock = std::chrono::steady_clock;
@@ -17,7 +19,7 @@ namespace {
 std::int64_t ns(Clock::duration duration) { return std::chrono::duration_cast<Nanoseconds>(duration).count(); }
 struct Options {
     std::uint64_t seed{17}, count{100000}, warmup{20000}, rate{100000}, burst{1}, capacity{4096};
-    bool feed{}, dense{};
+    bool feed{}, dense{}, spsc{};
     std::uint64_t profile_ms{};
 };
 std::uint64_t integer(std::string_view value) {
@@ -33,6 +35,7 @@ Options parse(int argc, char** argv) {
         const std::string_view k = argv[i], v = argv[i+1];
         if (k == "--mode" && (v == "direct" || v == "feed")) o.feed = v == "feed";
         else if (k == "--book" && (v == "reference" || v == "dense")) o.dense = v == "dense";
+        else if (k == "--queue" && (v == "mutex" || v == "spsc")) o.spsc = v == "spsc";
         else if (k == "--seed") o.seed = integer(v);
         else if (k == "--events") o.count = integer(v);
         else if (k == "--warmup") o.warmup = integer(v);
@@ -46,6 +49,8 @@ Options parse(int argc, char** argv) {
         o.burst < 1 || o.burst > 1024 || o.capacity < 1 || o.capacity > 1048576 || o.profile_ms > 30000 ||
         (o.feed && (o.profile_ms || o.count % o.burst || o.warmup % o.burst)))
         throw std::runtime_error("out-of-range option or feed event counts not divisible by burst");
+    if (o.spsc && (!o.feed || !std::has_single_bit(o.capacity)))
+        throw std::runtime_error("SPSC requires feed mode and a power-of-two capacity");
     return o;
 }
 
@@ -58,7 +63,7 @@ struct Result {
     Entries final;
     std::size_t peak_depth{}, dropped{};
     std::size_t warmup_dropped{};
-    std::int64_t elapsed{};
+    std::int64_t elapsed{}, cpu_ns{};
 };
 struct Item {
     std::size_t index;
@@ -141,7 +146,16 @@ Result direct(const Replay& replay, const Options& o) {
     return out;
 }
 
-template<class Book>
+std::int64_t process_cpu_ns() {
+    rusage usage{};
+    if (getrusage(RUSAGE_SELF, &usage)) throw std::runtime_error("could not read process CPU");
+    const auto time_ns = [](const timeval& t) {
+        return std::int64_t(t.tv_sec) * 1000000000 + std::int64_t(t.tv_usec) * 1000;
+    };
+    return time_ns(usage.ru_utime) + time_ns(usage.ru_stime);
+}
+
+template<class Book, class Queue>
 Result feed(const Replay& replay, const Options& o) {
     Feed<Book> handler;
     if (!handler.snapshot(0, replay.initial)) throw std::runtime_error("invalid initial snapshot");
@@ -151,8 +165,9 @@ Result feed(const Replay& replay, const Options& o) {
     out.samples.resize(o.count);
     auto phase = [&](std::size_t offset, std::size_t count, bool measured) {
         if (!count) return;
-        Pipeline queue(o.capacity);
-        Clock::time_point origin;
+        Queue queue(o.capacity);
+        const auto cpu_start = measured ? process_cpu_ns() : 0;
+        const auto origin = Clock::now() + std::chrono::milliseconds(2);
         std::size_t drops{}, max_depth{};
         std::int64_t last_update{};
         std::thread worker([&] {
@@ -168,9 +183,6 @@ Result feed(const Replay& replay, const Options& o) {
                 }
             }
         });
-        // Store the origin before enqueueing the first item; the queue mutex
-        // publishes it to the consumer along with the descriptor.
-        origin = Clock::now() + std::chrono::milliseconds(2);
         for (std::size_t i = 0; i < count; i += o.burst) {
             const auto release = static_cast<std::int64_t>(i * 1000000000ULL / o.rate);
             const auto deadline = origin + Nanoseconds(release);
@@ -186,6 +198,7 @@ Result feed(const Replay& replay, const Options& o) {
         queue.close();
         worker.join();
         if (measured) {
+            out.cpu_ns = process_cpu_ns() - cpu_start;
             out.dropped = drops;
             out.peak_depth = max_depth;
             out.elapsed = std::max({producer_end, last_update, static_cast<std::int64_t>(count * 1000000000ULL / o.rate)});
@@ -261,8 +274,11 @@ void run(const Options& o) {
         // Ensure the generator's full stream is valid even when the queue drops work.
         verify(replay);
     }
-    const auto r = o.feed ? (o.dense ? feed<DenseBook>(replay,o) : feed<ReferenceBook>(replay,o)) :
-               (o.dense ? direct<DenseBook>(replay,o) : direct<ReferenceBook>(replay,o));
+    const auto benchmark = [&]<class Book> {
+        if (!o.feed) return direct<Book>(replay, o);
+        return o.spsc ? feed<Book, SpscPipeline<Item>>(replay, o) : feed<Book, Pipeline>(replay, o);
+    };
+    const auto r = o.dense ? benchmark.operator()<DenseBook>() : benchmark.operator()<ReferenceBook>();
     auto v = validate(replay,r,o);
     const bool valid = !r.warmup_dropped && !r.dropped && v.published == o.count;
     std::cout << "{\"schema\":1,\"mode\":\"" << (o.feed ? "feed" : "direct")
@@ -273,7 +289,10 @@ void run(const Options& o) {
     if (o.feed) std::cout << o.rate; else std::cout << "null";
     std::cout << ",\"burst\":" << (o.feed ? o.burst : 1)
               << ",\"queue_capacity\":" << (o.feed ? o.capacity : 0)
-              << ",\"peak_queue_depth\":" << r.peak_depth << ",\"dropped\":" << r.dropped
+              << ",\"queue\":\"" << (o.feed ? (o.spsc ? "spsc" : "mutex") : "none") << "\""
+              << ",\"feed_phase_cpu_ns\":";
+    if (o.feed) std::cout << r.cpu_ns; else std::cout << "null";
+    std::cout << ",\"peak_queue_depth\":" << r.peak_depth << ",\"dropped\":" << r.dropped
               << ",\"warmup_dropped\":" << r.warmup_dropped << ",\"processed\":" << v.processed
               << ",\"published\":" << v.published << ",\"gaps\":" << v.gap << ",\"stale\":" << v.stale
               << ",\"invalid\":" << v.invalid << ",\"duplicates\":" << v.duplicate
@@ -292,7 +311,7 @@ void run(const Options& o) {
 int main(int argc, char** argv) {
     if (argc == 2 && std::string_view(argv[1]) == "--help") {
         std::cout << "jitter_market --mode direct|feed --book reference|dense [--seed N] [--events N]\n"
-                     "  [--warmup N] [--rate N] [--burst N] [--capacity N] [--profile-ms N (direct)]\n";
+                     "  [--queue mutex|spsc] [--warmup N] [--rate N] [--burst N] [--capacity N] [--profile-ms N (direct)]\n";
         return 0;
     }
     try { run(parse(argc,argv)); }
