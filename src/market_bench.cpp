@@ -17,7 +17,8 @@ namespace {
 std::int64_t ns(Clock::duration duration) { return std::chrono::duration_cast<Nanoseconds>(duration).count(); }
 struct Options {
     std::uint64_t seed{17}, count{100000}, warmup{20000}, rate{100000}, burst{1}, capacity{4096};
-    bool feed{}, dense{};
+    bool feed{};
+    std::string_view book{"reference"};
     std::uint64_t profile_ms{};
 };
 std::uint64_t integer(std::string_view value) {
@@ -32,7 +33,7 @@ Options parse(int argc, char** argv) {
         if (i + 1 == argc) throw std::runtime_error("options take a value; see --help");
         const std::string_view k = argv[i], v = argv[i+1];
         if (k == "--mode" && (v == "direct" || v == "feed")) o.feed = v == "feed";
-        else if (k == "--book" && (v == "reference" || v == "dense")) o.dense = v == "dense";
+        else if (k == "--book" && (v == "reference" || v == "dense" || v == "cached")) o.book = v;
         else if (k == "--seed") o.seed = integer(v);
         else if (k == "--events") o.count = integer(v);
         else if (k == "--warmup") o.warmup = integer(v);
@@ -253,7 +254,8 @@ void distribution(std::vector<std::int64_t>& values) {
 void run(const Options& o) {
     const auto replay = generate(o.count + o.warmup, o.seed);
     if (o.profile_ms) {
-        if (o.dense) profile<DenseBook>(replay, o);
+        if (o.book == "cached") profile<CachedBook>(replay, o);
+        else if (o.book == "dense") profile<DenseBook>(replay, o);
         else profile<ReferenceBook>(replay, o);
         return;
     }
@@ -261,12 +263,13 @@ void run(const Options& o) {
         // Ensure the generator's full stream is valid even when the queue drops work.
         verify(replay);
     }
-    const auto r = o.feed ? (o.dense ? feed<DenseBook>(replay,o) : feed<ReferenceBook>(replay,o)) :
-               (o.dense ? direct<DenseBook>(replay,o) : direct<ReferenceBook>(replay,o));
+    auto benchmark = [&]<class Book>() { return o.feed ? feed<Book>(replay, o) : direct<Book>(replay, o); };
+    const auto r = o.book == "cached" ? benchmark.operator()<CachedBook>() :
+                   o.book == "dense" ? benchmark.operator()<DenseBook>() : benchmark.operator()<ReferenceBook>();
     auto v = validate(replay,r,o);
     const bool valid = !r.warmup_dropped && !r.dropped && v.published == o.count;
     std::cout << "{\"schema\":1,\"mode\":\"" << (o.feed ? "feed" : "direct")
-              << "\",\"book\":\"" << (o.dense ? "dense" : "reference")
+              << "\",\"book\":\"" << o.book
               << "\",\"seed\":" << o.seed << ",\"warmup_events\":" << o.warmup
               << ",\"events\":" << o.count << ",\"input_id\":\"" << std::hex << fingerprint(replay) << std::dec
               << "\",\"offered_rate\":";
@@ -291,7 +294,7 @@ void run(const Options& o) {
 
 int main(int argc, char** argv) {
     if (argc == 2 && std::string_view(argv[1]) == "--help") {
-        std::cout << "jitter_market --mode direct|feed --book reference|dense [--seed N] [--events N]\n"
+        std::cout << "jitter_market --mode direct|feed --book reference|dense|cached [--seed N] [--events N]\n"
                      "  [--warmup N] [--rate N] [--burst N] [--capacity N] [--profile-ms N (direct)]\n";
         return 0;
     }

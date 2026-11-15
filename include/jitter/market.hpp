@@ -7,6 +7,7 @@
 #include <limits>
 #include <map>
 #include <span>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -51,9 +52,10 @@ private:
     std::array<std::map<std::uint32_t, std::uint64_t>, 2> levels_;
 };
 
-class DenseBook {
+template<bool CacheBest>
+class ArrayBook {
 public:
-    DenseBook();
+    ArrayBook();
     bool apply(const Event& event);
     Top top() const;
     Entries entries() const;
@@ -61,8 +63,14 @@ private:
     std::vector<Order> orders_;
     std::array<std::array<std::uint64_t, tick_limit + 1>, 2> levels_{};
     std::array<std::array<std::uint64_t, tick_limit / 64>, 2> occupied_{};
+    struct NoCache {};
+    [[no_unique_address]] std::conditional_t<CacheBest, std::array<std::uint32_t, 2>, NoCache> best_{};
+    std::uint32_t best_tick(unsigned index) const;
     void adjust(Side side, std::uint32_t tick, std::int64_t quantity);
 };
+
+using DenseBook = ArrayBook<false>;
+using CachedBook = ArrayBook<true>;
 
 enum class Status : std::uint8_t { published, duplicate, gap, stale, invalid };
 struct Update {
