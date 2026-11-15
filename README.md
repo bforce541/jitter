@@ -27,6 +27,12 @@ build/jitter_market --mode direct --book dense --events 100000 --warmup 20000
 build/jitter_market --mode feed --book dense --events 100000 --warmup 20000 --rate 500000 --burst 32
 ```
 
+A second study held the dense book fixed and compared two feed queues. The
+optional polling SPSC queue lowered steady 500k/s scheduled p99 from
+**10.313 to 0.542 µs** across eight longer pairs on the M4 Pro; approximate CPU
+rose from **1.36 to 2.00 cores**. The sleeping mutex remains the default.
+See the [queue study and tested latency/CPU envelope](docs/market-queue.md).
+
 [Architecture, benchmark table and reproduction](docs/market-replay.md) ·
 [Paired observations](docs/evidence/market/paired-arm64.json) ·
 [Saturation sweep](docs/evidence/market/saturation-arm64.json)

@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "axis": "queue",
+  "p99_ns": 20000.0,
+  "p999_ns": 500000.0,
+  "max_late_fraction": 0.01,
+  "max_cpu_cores": 2.1,
+  "note": "All recorded repeats at a rate must pass. Untested rates and future runs have no guarantee.",
+  "series": [
+    {
+      "treatment": "mutex",
+      "burst": 1,
+      "passing_prefix_max_rate": 500000,
+      "highest_passing_rate": 500000,
+      "first_failed_rate": 2000000,
+      "rates": [
+        {
+          "offered_rate": 500000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 9708,
+          "min_published_per_second": 500000,
+          "max_peak_queue_depth": 378
+        },
+        {
+          "offered_rate": 2000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p999": 2
+          },
+          "worst_scheduled_p99_ns": 11333,
+          "min_published_per_second": 1999990.0,
+          "max_peak_queue_depth": 1770
+        },
+        {
+          "offered_rate": 4000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p99": 2,
+            "p999": 2,
+            "coverage": 1
+          },
+          "worst_scheduled_p99_ns": 1077292,
+          "min_published_per_second": 20007.7,
+          "max_peak_queue_depth": 4096
+        },
+        {
+          "offered_rate": 8000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "coverage": 2,
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 1636791,
+          "min_published_per_second": 37937.4,
+          "max_peak_queue_depth": 4096
+        },
+        {
+          "offered_rate": 10000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "coverage": 2,
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 2104509,
+          "min_published_per_second": 35451.8,
+          "max_peak_queue_depth": 4096
+        }
+      ]
+    },
+    {
+      "treatment": "mutex",
+      "burst": 32,
+      "passing_prefix_max_rate": 500000,
+      "highest_passing_rate": 500000,
+      "first_failed_rate": 2000000,
+      "rates": [
+        {
+          "offered_rate": 500000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 14084,
+          "min_published_per_second": 500000,
+          "max_peak_queue_depth": 342
+        },
+        {
+          "offered_rate": 2000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "coverage": 1,
+            "p99": 1,
+            "p999": 2,
+            "late": 1
+          },
+          "worst_scheduled_p99_ns": 1401708,
+          "min_published_per_second": 891456,
+          "max_peak_queue_depth": 4096
+        },
+        {
+          "offered_rate": 4000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p999": 2
+          },
+          "worst_scheduled_p99_ns": 7916,
+          "min_published_per_second": 4000000.0,
+          "max_peak_queue_depth": 2917
+        },
+        {
+          "offered_rate": 8000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "coverage": 2,
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 1029542,
+          "min_published_per_second": 42863.4,
+          "max_peak_queue_depth": 4096
+        },
+        {
+          "offered_rate": 10000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "coverage": 2,
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 1334225,
+          "min_published_per_second": 47270,
+          "max_peak_queue_depth": 4096
+        }
+      ]
+    },
+    {
+      "treatment": "spsc",
+      "burst": 1,
+      "passing_prefix_max_rate": 2000000,
+      "highest_passing_rate": 2000000,
+      "first_failed_rate": 4000000,
+      "rates": [
+        {
+          "offered_rate": 500000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 500,
+          "min_published_per_second": 500000,
+          "max_peak_queue_depth": 23
+        },
+        {
+          "offered_rate": 2000000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 333,
+          "min_published_per_second": 2000000.0,
+          "max_peak_queue_depth": 78
+        },
+        {
+          "offered_rate": 4000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p999": 2
+          },
+          "worst_scheduled_p99_ns": 250,
+          "min_published_per_second": 4000000.0,
+          "max_peak_queue_depth": 181
+        },
+        {
+          "offered_rate": 8000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 556333,
+          "min_published_per_second": 8000000.0,
+          "max_peak_queue_depth": 169
+        },
+        {
+          "offered_rate": 10000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 818817,
+          "min_published_per_second": 10000000.0,
+          "max_peak_queue_depth": 223
+        }
+      ]
+    },
+    {
+      "treatment": "spsc",
+      "burst": 32,
+      "passing_prefix_max_rate": 2000000,
+      "highest_passing_rate": 2000000,
+      "first_failed_rate": 4000000,
+      "rates": [
+        {
+          "offered_rate": 500000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 8792,
+          "min_published_per_second": 500000,
+          "max_peak_queue_depth": 124
+        },
+        {
+          "offered_rate": 2000000,
+          "runs": 2,
+          "pass": true,
+          "failures_by_rule": {},
+          "worst_scheduled_p99_ns": 5541,
+          "min_published_per_second": 2000000.0,
+          "max_peak_queue_depth": 111
+        },
+        {
+          "offered_rate": 4000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p999": 2
+          },
+          "worst_scheduled_p99_ns": 6083,
+          "min_published_per_second": 4000000.0,
+          "max_peak_queue_depth": 261
+        },
+        {
+          "offered_rate": 8000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 234000,
+          "min_published_per_second": 8000000.0,
+          "max_peak_queue_depth": 128
+        },
+        {
+          "offered_rate": 10000000,
+          "runs": 2,
+          "pass": false,
+          "failures_by_rule": {
+            "p99": 2,
+            "p999": 2,
+            "late": 2
+          },
+          "worst_scheduled_p99_ns": 389391,
+          "min_published_per_second": 10000000.0,
+          "max_peak_queue_depth": 898
+        }
+      ]
+    }
+  ]
+}
