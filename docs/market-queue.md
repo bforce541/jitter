@@ -88,7 +88,7 @@ late-arrival budget. Reducing the CPU cap to 1.5 cores makes SPSC fail the
 lowest tested rate for both shapes. This tool distinguishes the highest tested
 passing point from the end of a passing prefix, preserving any later isolated
 passes rather than extrapolating through a failure. These are observed envelopes,
-not capacity guarantees, and no untested rate is implied.
+not capacity guarantees, and no untested rate is implied. The [4M follow-up](market-tail.md) includes byte-identical reruns, event-level traces and a rejected startup pacing candidate.
 
 ## Reproduce
 

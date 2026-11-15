@@ -1,41 +1,32 @@
-# Jitter
+# Jitter | C++20 Market-Data Replay & Order-Book Engine
 
-Jitter investigates C++ tail latency with controlled workloads, dependency evidence, adaptive experiments, independent correctness checks, and fresh confirmation. It returns a supported configuration with evidence, or explains why it cannot recommend one.
+Jitter rebuilds a single-instrument, two-sided order book from a deterministic synthetic feed. A direct replay isolates book work. An open-loop, two-thread replay measures how producer pacing, queue handoff and book updates affect publication latency under load.
 
-Supported integrations are an immutable shared-index service, pinned nlohmann/json parsing and projection, and pinned SQLite aggregation with explicit indexing alternatives. Jitter owns the workload drivers. It does not safely rewrite arbitrary C++ or establish performance in an untested production service.
+| Experiment on native M4 Pro | Baseline → candidate | Evidence |
+| --- | ---: | --- |
+| Direct replay, sparse reference → dense book | **14.51M → 36.83M events/s** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
+| 500K steady feed, same mutex queue, reference → dense book | **27.333 → 17.771 µs scheduled p99** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
+| 500K steady feed, same dense book, sleeping mutex → polling SPSC | **10.313 → 0.542 µs scheduled p99** | [Eight queue confirmation pairs](docs/evidence/market/queue-confirmation-arm64.json) |
+| Process CPU in that queue comparison | **1.36 → 2.00 approximate cores** | [Queue study](docs/market-queue.md) |
 
-## Flagship workload: C++ market-data replay
+Values are medians of per-run measurements. The dense-book and queue studies used separate paired runs. Their median paired p99 reductions were **38.4%** and **94.8%**, respectively, with every measured event published. Scheduled p99 starts at the prescribed release and ends when the consumer writes its in-process update. These are synthetic replay measurements.
 
-The market engine rebuilds a two-sided order book from a seeded local feed. It
-handles partial fills, duplicate messages, sequence gaps and recovery from an
-authoritative snapshot. A sparse reference checks the dense order book and its
-published updates. Direct replay isolates book work; open-loop feed replay
-includes sequencing, queueing and producer lateness.
-
-On an M4 Pro, the dense book cut **median paired scheduled-to-publication p99 by
-38.4%** at 500,000 steady offered events/s (run medians **27.333 → 17.771 µs**)
-with all events published in eight pairs. In isolated direct replay, median
-processed throughput was **14.51M → 36.83M events/s**. Other feed scenarios had
-mixed tails. These are synthetic in-process measurements, with no live
-exchange or transport latency.
+The dense book uses fixed order-ID and tick arrays with a bitmap per side. The feed supports partial fills, duplicate suppression and sequence-gap detection. A gap suppresses further delta publication until a validated authoritative snapshot covers the discarded sequences. Differential replay tests compare its published updates and recovered state with the sparse reference. [Architecture and correctness](docs/market-replay.md).
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-# On Apple Silicon add -DCMAKE_OSX_ARCHITECTURES=arm64 to the command above.
-cmake --build build --target jitter_market --parallel 4
-build/jitter_market --mode direct --book dense --events 100000 --warmup 20000
-build/jitter_market --mode feed --book dense --events 100000 --warmup 20000 --rate 500000 --burst 32
+# On Apple Silicon, add -DCMAKE_OSX_ARCHITECTURES=arm64 to configure.
+cmake --build build --parallel 4
+ctest --test-dir build --output-on-failure
+build/jitter_market --mode direct --book dense --events 100000 --warmup 20000 --seed 17
+build/jitter_market --mode feed --book dense --queue spsc --events 400000 --warmup 20000 --seed 1001 --rate 500000
 ```
 
-A second study held the dense book fixed and compared two feed queues. The
-optional polling SPSC queue lowered steady 500k/s scheduled p99 from
-**10.313 to 0.542 µs** across eight longer pairs on the M4 Pro; approximate CPU
-rose from **1.36 to 2.00 cores**. The sleeping mutex remains the default.
-See the [queue study and tested latency/CPU envelope](docs/market-queue.md).
+The sleeping mutex is the default. The original sweep's passing tested prefix ended at 500K events/s for the mutex and 2M for polling. Polling passed p99 and failed p99.9 at 4M. In a later trace, startup release lateness dominated the 4M tail. The matching uninstrumented reruns showed that the failing percentile varies across runs. [Load envelope](docs/market-queue.md#load-envelope) · [4M investigation and Linux reproduction](docs/market-tail.md).
 
-[Architecture, benchmark table and reproduction](docs/market-replay.md) ·
-[Paired observations](docs/evidence/market/paired-arm64.json) ·
-[Saturation sweep](docs/evidence/market/saturation-arm64.json)
+## Performance investigation toolkit
+
+The original `jitter` CLI investigates C++ tail latency using dependency evidence, adaptive experiments, correctness checks and fresh confirmation. It supports the shared-index service, pinned nlohmann/json parsing and pinned SQLite aggregation. An offline dashboard opens the resulting evidence. Market replay emits a separate JSON schema.
 
 ## Install and check
 
