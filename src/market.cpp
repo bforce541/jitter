@@ -50,11 +50,9 @@ Entries ReferenceBook::entries() const {
     return result;
 }
 
-template<bool CacheBest>
-ArrayBook<CacheBest>::ArrayBook() : orders_(id_limit) {}
+DenseBook::DenseBook() : orders_(id_limit) {}
 
-template<bool CacheBest>
-void ArrayBook<CacheBest>::adjust(Side side, std::uint32_t tick, std::int64_t amount) {
+void DenseBook::adjust(Side side, std::uint32_t tick, std::int64_t amount) {
     const auto index = static_cast<unsigned>(side);
     auto& total = levels_[index][tick];
     const bool was_empty = total == 0;
@@ -63,16 +61,10 @@ void ArrayBook<CacheBest>::adjust(Side side, std::uint32_t tick, std::int64_t am
     if (was_empty != (total == 0)) {
         const auto bit = tick - 1;
         occupied_[index][bit / 64] ^= std::uint64_t{1} << (bit % 64);
-        if constexpr (CacheBest) {
-            auto& best = best_[index];
-            if (was_empty && (!best || (index == 0 ? tick > best : tick < best))) best = tick;
-            else if (!total && best == tick) best = best_tick(index);
-        }
     }
 }
 
-template<bool CacheBest>
-bool ArrayBook<CacheBest>::apply(const Event& e) {
+bool DenseBook::apply(const Event& e) {
     if (e.id == 0 || e.id >= id_limit) return false;
     auto& slot = orders_[e.id];
     if (e.kind == Kind::add) {
@@ -89,37 +81,33 @@ bool ArrayBook<CacheBest>::apply(const Event& e) {
     return true;
 }
 
-template<bool CacheBest>
-std::uint32_t ArrayBook<CacheBest>::best_tick(unsigned index) const {
-    const auto& words = occupied_[index];
-    if (index == 0) {
-        for (std::size_t i = words.size(); i-- != 0;)
-            if (words[i]) return static_cast<std::uint32_t>(i * 64 + 64 - std::countl_zero(words[i]));
-    } else {
-        for (std::size_t i = 0; i < words.size(); ++i)
-            if (words[i]) return static_cast<std::uint32_t>(i * 64 + 1 + std::countr_zero(words[i]));
+Top DenseBook::top() const {
+    Top result;
+    for (std::size_t i = occupied_[0].size(); i-- != 0;) {
+        const auto word = occupied_[0][i];
+        if (word) {
+            const auto tick = static_cast<std::uint32_t>(i * 64 + 64 - std::countl_zero(word));
+            result.bid = {tick, levels_[0][tick]};
+            break;
+        }
     }
-    return 0;
+    for (std::size_t i = 0; i < occupied_[1].size(); ++i) {
+        const auto word = occupied_[1][i];
+        if (word) {
+            const auto tick = static_cast<std::uint32_t>(i * 64 + 1 + std::countr_zero(word));
+            result.ask = {tick, levels_[1][tick]};
+            break;
+        }
+    }
+    return result;
 }
 
-template<bool CacheBest>
-Top ArrayBook<CacheBest>::top() const {
-    std::array<std::uint32_t, 2> ticks;
-    if constexpr (CacheBest) ticks = best_;
-    else ticks = {best_tick(0), best_tick(1)};
-    return {{ticks[0], levels_[0][ticks[0]]}, {ticks[1], levels_[1][ticks[1]]}};
-}
-
-template<bool CacheBest>
-Entries ArrayBook<CacheBest>::entries() const {
+Entries DenseBook::entries() const {
     Entries result;
     for (std::uint32_t id = 1; id < orders_.size(); ++id)
         if (orders_[id].quantity) result.emplace_back(id, orders_[id]);
     return result;
 }
-
-template class ArrayBook<false>;
-template class ArrayBook<true>;
 
 namespace {
 class Random {
@@ -171,18 +159,15 @@ Replay generate(std::size_t count, std::uint64_t seed) {
 void verify(const Replay& replay) {
     Feed<ReferenceBook> reference;
     Feed<DenseBook> candidate;
-    Feed<CachedBook> cached;
     if (!reference.snapshot(0, replay.initial) || !candidate.snapshot(0, replay.initial) ||
-        !cached.snapshot(0, replay.initial) || cached.book().entries() != candidate.book().entries() ||
         reference.book().entries() != candidate.book().entries())
         throw std::runtime_error("initial book mismatch");
     for (std::size_t i = 0; i < replay.events.size(); ++i) {
         const auto first = reference.on_event(replay.events[i]);
         const auto second = candidate.on_event(replay.events[i]);
-        if (first.status != Status::published || first != second || first != cached.on_event(replay.events[i]) ||
+        if (first.status != Status::published || first != second ||
             ((i % 1024 == 0 || i + 1 == replay.events.size()) &&
-             (reference.book().entries() != candidate.book().entries() ||
-              reference.book().entries() != cached.book().entries())))
+             reference.book().entries() != candidate.book().entries()))
             throw std::runtime_error("book or published update mismatch at event " + std::to_string(i + 1));
     }
 }

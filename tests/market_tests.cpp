@@ -31,12 +31,11 @@ void recovery() {
     check(feed.on_event({10, Kind::execute, 4, {{}, 0, 1}}).status == Status::invalid, "unknown order invalid");
 }
 
-template<class Candidate>
 void recovery_replay(std::uint64_t seed) {
     const auto replay = generate(2100, seed);
     Feed<ReferenceBook> truth;
     Feed<ReferenceBook> reference;
-    Feed<Candidate> dense;
+    Feed<DenseBook> dense;
     check(truth.snapshot(0, replay.initial) && reference.snapshot(0, replay.initial) &&
           dense.snapshot(0, replay.initial), "seeded snapshots");
     for (const auto& event : replay.events) {
@@ -71,11 +70,9 @@ int main() {
     try {
         recovery<ReferenceBook>();
         recovery<DenseBook>();
-        recovery<CachedBook>();
         for (const auto seed : {0, 17, 2028, 4321}) {
             verify(generate(40000, seed));
-            recovery_replay<DenseBook>(seed);
-            recovery_replay<CachedBook>(seed);
+            recovery_replay(seed);
         }
         auto replay = generate(3000, 17);
         check(fingerprint(replay) == fingerprint(generate(3000, 17)), "deterministic replay");

@@ -54,13 +54,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--reference", choices=("reference", "dense", "cached"), default="reference")
-    parser.add_argument("--candidate", choices=("reference", "dense", "cached"), default="dense")
+    parser.add_argument("--reference", choices=("reference", "dense"), default="reference")
+    parser.add_argument("--candidate", choices=("reference", "dense"), default="dense")
     parser.add_argument("--case", action="append", choices=OPTIONS)
     parser.add_argument("--skip-sweep", action="store_true")
+    parser.add_argument("--sweep-only", action="store_true")
+    parser.add_argument("--sweep-rate", type=int, action="append")
+    parser.add_argument("--sweep-events", type=int, default=100000)
+    parser.add_argument("--sweep-repeats", type=int, choices=range(1, 9), default=1)
     args = parser.parse_args()
     if args.reference == args.candidate:
         parser.error("choose distinct implementations")
+    if args.skip_sweep and args.sweep_only:
+        parser.error("--skip-sweep and --sweep-only are mutually exclusive")
+    if not 32 <= args.sweep_events <= 2000000 or args.sweep_events % 32:
+        parser.error("--sweep-events must be a multiple of 32 in [32, 2000000]")
+    if any(not 1000 <= rate <= 10000000 for rate in args.sweep_rate or ()):
+        parser.error("--sweep-rate must be in [1000, 10000000]")
     binary = args.binary.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
     evidence = {"schema": 1, "host": platform.uname()._asdict(), "python": platform.python_version(),
@@ -72,7 +82,7 @@ def main():
     def save():
         (args.output / "study.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     save()
-    for name in args.case or OPTIONS:
+    for name in (() if args.sweep_only else (args.case or OPTIONS)):
         mode, rate, burst = OPTIONS[name]
         case = evidence["cases"][name] = {"observations": []}
         for i in range(8):
@@ -85,11 +95,13 @@ def main():
         case["summary"] = summarize(case["observations"])
         save()
         print(name, case["summary"]["all_full_coverage"], flush=True)
-    for rate in (() if args.skip_sweep else SWEEP):
+    for rate in (() if args.skip_sweep else (args.sweep_rate or SWEEP)):
         for burst in (1, 32):
-            for book in (args.reference, args.candidate):
-                evidence["sweep"].append(measure(binary, "feed", rate, burst, book, 0, 100000, 20000))
-                save()
+            for i in range(args.sweep_repeats):
+                order = (args.reference, args.candidate) if i % 2 == 0 else (args.candidate, args.reference)
+                for book in order:
+                    evidence["sweep"].append(measure(binary, "feed", rate, burst, book, i, args.sweep_events, 20000))
+                    save()
         print("sweep", rate, flush=True)
 
 
