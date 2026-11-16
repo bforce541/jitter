@@ -44,6 +44,15 @@ def status(value):
 def render(incident):
     market, desk = incident["market"], incident["desk"]
     report = desk["result"]
+    active_feeds = [market["feed_a"]] + ([market["feed_b"]] if market["dual"] else [])
+    delivering = sum(feed["sent"] > 0 and feed["missing_datagrams"] == feed["malformed"] == 0
+                     for feed in active_feeds)
+    market_headline = ("Feed B supplied sequence 2 when A omitted it." if market["dual"]
+                       else "Feed A carried the single-channel scenario.")
+    unresolved = [row for row in report["history"] if row["state"] == "confirmed"]
+    action = unresolved[0]
+    impact = ", ".join(f"{instrument} {quantity:+}" for instrument, quantity in action["evidence"]["position_impact"].items())
+    proof = market["recovery_proof"]
     lifecycle = table(("Replay elapsed", "Book", "Sequence", "Observed action", "Buffered"), [
         (f'<span class="num">{step["elapsed_ns"] / 1e6:.3f} ms</span>', status(step["state"]),
          text(step["sequence"]), text(step["operation"]), text(step["backlog"]))
@@ -74,14 +83,18 @@ def render(incident):
 <p>Simulated market data and executions · local UDP replay · verified against reference state</p></header>
 <dl class="summary"><div><dt>Book state</dt><dd class="ok">Current</dd></div>
 <div><dt>Last sequence</dt><dd>{market["sequence"]}</dd></div>
+<div><dt>Feeds delivering</dt><dd>{delivering}/{len(active_feeds)}</dd></div>
 <div><dt>Unresolved executions</dt><dd>{len(report["open"])}</dd></div>
 <div><dt>Recovered state</dt><dd class="ok">Verified</dd></div></dl>
-<section><h2>Market data lifecycle</h2>{lifecycle}
+<section><h2>Market data lifecycle</h2>
+<p>{text(market_headline)} Recovery used snapshot {proof["snapshot_through"]} and replayed buffered updates through
+{proof["last_verified"]}. Reference-matched book ID <code>{text(proof["book_id"])}</code>.</p>{lifecycle}
 <p>Gap detected in {market["detection_ns"] / 1e6:.3f} ms from the omitted event.
 Snapshot and buffered replay independently verified {market["recovery_ns"] / 1e6:.3f} ms after detection.
 {market["duplicate_publications"]} duplicate publications.</p>
 {channels}</section>
 <section><h2>Execution reconciliation</h2><p>Simulation clock · 50 ms late-report grace period</p>
+<p>{text(action["execution_id"])} affected the desk-minus-venue position by {text(impact)} until the delayed drop copy arrived.</p>
 {discrepancies}<p>Final positions, in signed units</p>{positions}
 <p>All {report["records"]} original records retained. Reimport produced the same audit and positions.</p></section>
 <section><h2>Evidence</h2><p><a href="market.json">Market events and publications</a> ·

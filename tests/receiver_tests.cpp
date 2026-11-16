@@ -55,6 +55,20 @@ int main() {
         check(rx.recover(9, snapshots[9], output) == "snapshot-applied");
         push(10, 15ms);
         check(rx.current() && output.back().update == expected[9] && rx.book().entries() == snapshots[10]);
+
+        // One good row is staged before the invalid row. An aborted recovery
+        // leaves both the old sequence and the publication sink untouched.
+        Receiver atomic(4, 3ms);
+        std::vector<Publication> staged_output;
+        check(atomic.initialize(input.initial));
+        atomic.receive({input.events[1], zero, zero, 'A'}, zero, staged_output);
+        const Event invalid{3, Kind::add, 0, {Side::ask, 1, 1}};
+        atomic.receive({invalid, zero, zero, 'A'}, zero, staged_output);
+        atomic.expire(zero + 3ms);
+        check(atomic.recover(1, snapshots[1], staged_output) == "invalid-buffered-update");
+        check(atomic.last() == 0 && staged_output.empty() && atomic.backlog() == 2 && !atomic.current());
+        check(atomic.recover(3, snapshots[3], staged_output) == "snapshot-applied");
+        check(atomic.book().entries() == snapshots[3] && staged_output.empty());
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';
         return 1;

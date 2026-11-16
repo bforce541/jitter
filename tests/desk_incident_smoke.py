@@ -16,6 +16,10 @@ with TemporaryDirectory() as root:
     report = json.loads((output / "incident.json").read_text())
     market, desk = report["market"], report["desk"]
     assert market["book_verified"] and desk["verified"] and desk["idempotent"]
+    proof = market["recovery_proof"]
+    assert (proof["snapshot_through"], proof["last_verified"]) == (5, 7)
+    assert proof["book_id"] == proof["reference_book_id"]
+    assert market["final_book_id"] == market["reference_book_id"]
     assert market["feed_b_publications"] == 1 and market["duplicate_publications"] == 0
     assert [r["sequence"] for r in market["publications"]] == [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12]
     assert [r["sequence"] for r in market["publications"] if r["replayed"]] == [6, 7]

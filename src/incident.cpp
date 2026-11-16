@@ -25,6 +25,12 @@ std::int64_t ns(ReceiverTime start, ReceiverTime end) {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 }
 
+std::string hex(std::uint64_t value) {
+    char buffer[16];
+    const auto end = std::to_chars(buffer, buffer + sizeof(buffer), value, 16);
+    return std::string(buffer, end.ptr);
+}
+
 Wire encode(const Event& event) {
     Wire wire{};
     auto put = [&](unsigned start, unsigned width, std::uint64_t n) {
@@ -183,6 +189,7 @@ json run(Options options) {
         if (!drain(true, policy)) throw std::logic_error("scheduled local datagram not received");
     };
     std::optional<std::int64_t> detection, recovery;
+    json recovery_proof;
     auto steady_release = [&](std::size_t seq) {
         const auto burst_start = (seq - 1) / options.burst * options.burst;
         return start + std::chrono::nanoseconds(burst_start * 1000000000ULL / options.rate);
@@ -229,12 +236,16 @@ json run(Options options) {
         if (receiver.last() != 4) throw std::logic_error("publication while stale");
         note("sequence 7 buffered while stale");
         note("validating snapshot and buffered updates", true);
-        if (receiver.recover(5, recovery_snapshot, output) != "snapshot-applied" ||
-            receiver.book().entries() != recovered_reference || receiver.last() != 7 ||
-            output.size() != 6 || output[4].update != expected[5] || output[5].update != expected[6])
+        if (receiver.recover(5, recovery_snapshot, output) != "snapshot-applied")
+            throw std::logic_error("snapshot could not be applied");
+        const auto recovered_book = receiver.book().entries();
+        if (recovered_book != recovered_reference || receiver.last() != 7 || output.size() != 6 ||
+            output[4].update != expected[5] || output[5].update != expected[6])
             throw std::logic_error("snapshot or buffered replay differs from reference");
-        const auto recovered = ReceiverClock::now();
-        recovery = ns(detected, recovered);
+        recovery = ns(detected, ReceiverClock::now());
+        recovery_proof = {{"snapshot_through", 5}, {"last_verified", receiver.last()},
+                          {"book_id", hex(fingerprint({recovered_book, {}}))},
+                          {"reference_book_id", hex(fingerprint({recovered_reference, {}}))}};
         note("snapshot through 5 installed; 6 and 7 replayed");
         for (std::size_t i = 8; i <= options.count; ++i) { send(i, true, true); step(policy + 4ms); }
         note("replay complete");
@@ -268,7 +279,8 @@ json run(Options options) {
         if (!options.benchmark)
             publications.push_back({{"sequence", item.update.sequence}, {"replayed", item.replayed}, {"channel", std::string(1, item.channel)},
                                     {"elapsed_ns", ns(start, item.published)},
-                                    {"bid_tick", item.update.top.bid.tick}, {"ask_tick", item.update.top.ask.tick}});
+                                    {"bid_tick", item.update.top.bid.tick}, {"ask_tick", item.update.top.ask.tick},
+                                    {"bid_quantity", item.update.top.bid.quantity}, {"ask_quantity", item.update.top.ask.quantity}});
         if (item.replayed) continue;
         decode_ns.push_back(ns(item.received, item.decoded));
         handoff_ns.push_back(ns(item.decoded, item.apply_started));
@@ -285,8 +297,10 @@ json run(Options options) {
             if (!worst_udp || transport > max_udp) { worst_udp = &item; max_udp = transport; }
         }
     }
+    const auto reference_book = oracle.book().entries();
+    const auto final_book = receiver.current() ? receiver.book().entries() : Entries{};
     const bool verified = receiver.current() && quotes_match && duplicate_publications == 0 &&
-        receiver.last() == options.count && next == options.count + 1 && receiver.book().entries() == oracle.book().entries();
+        receiver.last() == options.count && next == options.count + 1 && final_book == reference_book;
     if (!options.benchmark && (options.dual ? b_publications != 1 : b_publications != 0))
         throw std::logic_error("unexpected feed repair attribution");
     auto channel = [](const Channel& c) {
@@ -311,10 +325,12 @@ json run(Options options) {
     const auto active_end = options.benchmark ?
         std::max(last_send, output.empty() ? last_send : output.back().published) : end;
     return {{"schema", 1}, {"mode", options.benchmark ? "benchmark" : "incident"}, {"dual", options.dual},
-            {"events", options.count}, {"seed", options.seed}, {"burst", options.burst}, {"offered_rate", options.benchmark ? json(options.rate) : json(nullptr)}, {"input_id", fingerprint(input)},
+            {"events", options.count}, {"seed", options.seed}, {"burst", options.burst}, {"offered_rate", options.benchmark ? json(options.rate) : json(nullptr)}, {"input_id", hex(fingerprint(input))},
             {"elapsed_ns", ns(start, end)}, {"process_cpu_ns", cpu_ns}, {"drain_every", options.drain_every}, {"active_elapsed_ns", ns(start, active_end)},
             {"terminal_drain_after_activity_ns", ns(active_end, end)}, {"current", receiver.current()}, {"sequence", receiver.last()},
-            {"book_verified", verified}, {"published", output.size()}, {"duplicates_suppressed", receiver.duplicates()},
+            {"book_verified", verified}, {"recovery_proof", recovery_proof},
+            {"final_book_id", receiver.current() ? json(hex(fingerprint({final_book, {}}))) : json(nullptr)},
+            {"reference_book_id", hex(fingerprint({reference_book, {}}))}, {"published", output.size()}, {"duplicates_suppressed", receiver.duplicates()},
             {"duplicate_publications", duplicate_publications}, {"feed_a_publications", a_publications}, {"feed_b_publications", b_publications}, {"discarded_buffer", receiver.discarded()}, {"peak_reorder", receiver.peak_backlog()},
             {"feed_a_scheduled_omissions", options.benchmark ? 0 : options.dual ? 2 : 1}, {"feed_b_scheduled_omissions", options.benchmark || !options.dual ? 0 : 1},
             {"feed_a", channel(a)}, {"feed_b", channel(b)}, {"detection_ns", optional(detection)},

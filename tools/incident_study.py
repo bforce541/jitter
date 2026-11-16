@@ -13,9 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def capture(command):
     execution = subprocess.run(command, capture_output=True, text=True, timeout=120)
-    return {"argv": command, "exit_code": execution.returncode,
-            "stderr": execution.stderr,
-            "result": json.loads(execution.stdout) if execution.stdout else None}
+    row = {"argv": command, "exit_code": execution.returncode, "stderr": execution.stderr}
+    try:
+        row["result"] = json.loads(execution.stdout)
+    except json.JSONDecodeError:
+        row["result"] = None
+        row["stdout"] = execution.stdout
+    return row
 
 
 def system(*command):
@@ -58,7 +62,8 @@ def study(args):
         intervals = ("4096", "32") if i % 2 == 0 else ("32", "4096")
         for interval in intervals:
             add("drain_comparison", [*common, "--burst", "4096", "--drain-every", interval])
-    failures = sum(row["exit_code"] != 0 for key in ("faults", "steady_burst", "drain_comparison") for row in report[key])
+    failures = sum(row["exit_code"] != 0 or not row["result"] or not row["result"]["book_verified"]
+                   for key in ("faults", "steady_burst", "drain_comparison") for row in report[key])
     print(f"Retained {8 * args.repeats} runs ({failures} unverified) in {path}")
     return 2 if failures else 0
 
@@ -68,10 +73,15 @@ def main():
     parser.add_argument("--binary", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--compile-commands", type=Path)
-    parser.add_argument("--events", type=int, default=40000, choices=range(20000, 1000001), metavar="20000..1000000")
-    parser.add_argument("--rate", type=int, default=100000, choices=range(1, 1000001), metavar="1..1000000")
+    parser.add_argument("--events", type=int, default=40000, metavar="20000..1000000")
+    parser.add_argument("--rate", type=int, default=100000, metavar="1..1000000")
     parser.add_argument("--repeats", type=int, default=3, choices=range(1, 9))
-    return study(parser.parse_args())
+    args = parser.parse_args()
+    if not 20000 <= args.events <= 1000000 or not 1 <= args.rate <= 1000000:
+        parser.error("events must be 20000..1000000 and rate 1..1000000")
+    if args.events / args.rate > 90:
+        parser.error("nominal run time must fit within 90 seconds")
+    return study(args)
 
 
 if __name__ == "__main__":
