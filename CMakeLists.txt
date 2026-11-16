@@ -125,3 +125,8 @@ if(BUILD_TESTING)
     add_test(NAME incident_receiver_policy COMMAND jitter_receiver_tests)
     set_tests_properties(incident_dual_udp incident_single_udp incident_receiver_policy PROPERTIES TIMEOUT 10)
 endif()
+if(BUILD_TESTING)
+    add_test(NAME incident_operator_demo COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_SOURCE_DIR}/tests/desk_incident_smoke.py" $<TARGET_FILE:jitter_incident>)
+    set_tests_properties(incident_operator_demo PROPERTIES TIMEOUT 20)
+endif()
