@@ -9,6 +9,7 @@
 #include <array>
 #include <cerrno>
 #include <charconv>
+#include <ctime>
 #include <iostream>
 #include <system_error>
 #include <thread>
@@ -69,7 +70,8 @@ public:
 
 struct Channel {
     Socket rx, tx;
-    std::size_t sent{}, received{}, malformed{};
+    std::size_t sent{}, received{}, malformed{}, peak_in_flight{};
+    int receive_buffer{};
     Channel() {
         sockaddr_in addr{};
         addr.sin_family = AF_INET;
@@ -81,11 +83,14 @@ struct Channel {
         // Receive only from this simulator's particular sender.
         checked(getsockname(tx.fd, reinterpret_cast<sockaddr*>(&addr), &size), "sender getsockname");
         checked(connect(rx.fd, reinterpret_cast<sockaddr*>(&addr), size), "connect receiver");
+        socklen_t buffer_size = sizeof(receive_buffer);
+        checked(getsockopt(rx.fd, SOL_SOCKET, SO_RCVBUF, &receive_buffer, &buffer_size), "getsockopt receive buffer");
     }
     void send_event(Event event) {
         const auto wire = encode(event);
         checked(static_cast<int>(send(tx.fd, wire.data(), wire.size(), 0)), "send UDP");
         ++sent;
+        peak_in_flight = std::max(peak_in_flight, sent - received);
     }
     void drain(Receiver& receiver, std::vector<Publication>& output, char channel, std::optional<ReceiverTime> policy = {}) {
         while (true) {
@@ -121,7 +126,7 @@ json distribution(std::vector<std::int64_t> data) {
 
 struct Options {
     bool benchmark{}, dual{true};
-    std::size_t count{12}, burst{1}, seed{17}, rate{100000};
+    std::size_t count{12}, burst{1}, seed{17}, rate{100000}, drain_every{32};
 };
 
 json run(Options options) {
@@ -144,15 +149,24 @@ json run(Options options) {
     output.reserve(options.count);
     if (!receiver.initialize(input.initial)) throw std::logic_error("initial snapshot");
     json timeline = json::array();
+    const auto cpu_start = std::clock();
     const auto start = ReceiverClock::now();
     auto note = [&](std::string_view operation, bool recovering = false) {
         timeline.push_back({{"operation", operation}, {"elapsed_ns", ns(start, ReceiverClock::now())},
                             {"current", receiver.current()}, {"state", recovering ? "recovering" : receiver.current() ? "current" : receiver.waiting() ? "waiting-gap" : "stale"}, {"reason", receiver.reason()},
                             {"sequence", receiver.last()}, {"backlog", receiver.backlog()}});
     };
+    std::vector<std::array<ReceiverTime, 2>> send_started(options.benchmark ? options.count : 0);
     auto send = [&](std::size_t seq, bool to_a, bool to_b) {
-        if (to_a) a.send_event(input.events.at(seq - 1));
-        if (to_b && options.dual) b.send_event(input.events.at(seq - 1));
+        const auto& event = input.events.at(seq - 1);
+        if (to_a) {
+            if (options.benchmark) send_started[seq - 1][0] = ReceiverClock::now();
+            a.send_event(event);
+        }
+        if (to_b && options.dual) {
+            if (options.benchmark) send_started[seq - 1][1] = ReceiverClock::now();
+            b.send_event(event);
+        }
     };
     auto drain = [&](bool wait = false, std::optional<ReceiverTime> policy = {}) {
         const auto deadline = ReceiverClock::now() + 250ms;
@@ -169,12 +183,22 @@ json run(Options options) {
         if (!drain(true, policy)) throw std::logic_error("scheduled local datagram not received");
     };
     std::optional<std::int64_t> detection, recovery;
+    auto steady_release = [&](std::size_t seq) {
+        const auto burst_start = (seq - 1) / options.burst * options.burst;
+        return start + std::chrono::nanoseconds(burst_start * 1000000000ULL / options.rate);
+    };
+    ReceiverTime last_send;
     if (options.benchmark) {
         for (std::size_t i = 1; i <= options.count; i += options.burst) {
-            const auto release = start + std::chrono::nanoseconds((i - 1) * 1000000000ULL / options.rate);
+            const auto release = steady_release(i);
             if (release - ReceiverClock::now() > 150us) std::this_thread::sleep_until(release - 100us);
             while (ReceiverClock::now() < release) {}
-            for (auto j = i; j <= options.count && j < i + options.burst; ++j) send(j, true, true);
+            const auto last = std::min(options.count, i + options.burst - 1);
+            for (auto j = i; j <= last; ++j) {
+                send(j, true, true);
+                if (j != last && (j - i + 1) % options.drain_every == 0) drain();
+            }
+            if (options.count - i < options.burst) last_send = ReceiverClock::now();
             drain();
         }
         drain(true);
@@ -216,10 +240,20 @@ json run(Options options) {
         note("replay complete");
     }
     const auto end = ReceiverClock::now();
+    const auto cpu_end = std::clock();
+    const json cpu_ns = cpu_start == std::clock_t(-1) || cpu_end < cpu_start ? json(nullptr) :
+        json(static_cast<std::int64_t>(1e9 * (cpu_end - cpu_start) / CLOCKS_PER_SEC));
     std::size_t next{1}, duplicate_publications{}, a_publications{}, b_publications{};
     bool quotes_match = true;
     std::vector<bool> published_sequences(options.count + 1);
-    std::vector<std::int64_t> decode_ns, handoff_ns, apply_ns, receipt_ns;
+    std::vector<std::int64_t> decode_ns, handoff_ns, apply_ns, receipt_ns, sender_lag_ns, local_udp_ns;
+    std::vector<std::int64_t> release_to_publication_ns;
+    const Publication* worst_receipt = nullptr;
+    const Publication* worst_udp = nullptr;
+    std::int64_t max_udp{};
+    auto sent_at = [&](const Publication& item) {
+        return send_started.at(item.update.sequence - 1)[item.channel == 'A' ? 0 : 1];
+    };
     json publications = json::array();
     for (const auto& item : output) {
         if (!options.benchmark && next == 5) ++next;
@@ -239,7 +273,17 @@ json run(Options options) {
         decode_ns.push_back(ns(item.received, item.decoded));
         handoff_ns.push_back(ns(item.decoded, item.apply_started));
         apply_ns.push_back(ns(item.apply_started, item.published));
-        receipt_ns.push_back(ns(item.received, item.published));
+        const auto elapsed = ns(item.received, item.published);
+        receipt_ns.push_back(elapsed);
+        if (!worst_receipt || elapsed > ns(worst_receipt->received, worst_receipt->published)) worst_receipt = &item;
+        if (options.benchmark) {
+            const auto sent = sent_at(item);
+            sender_lag_ns.push_back(ns(steady_release(sequence), sent));
+            const auto transport = ns(sent, item.received);
+            local_udp_ns.push_back(transport);
+            release_to_publication_ns.push_back(ns(steady_release(sequence), item.published));
+            if (!worst_udp || transport > max_udp) { worst_udp = &item; max_udp = transport; }
+        }
     }
     const bool verified = receiver.current() && quotes_match && duplicate_publications == 0 &&
         receiver.last() == options.count && next == options.count + 1 && receiver.book().entries() == oracle.book().entries();
@@ -247,19 +291,41 @@ json run(Options options) {
         throw std::logic_error("unexpected feed repair attribution");
     auto channel = [](const Channel& c) {
         return json{{"sent", c.sent}, {"received", c.received}, {"missing_datagrams", c.sent - c.received},
-                    {"malformed", c.malformed}};
+                    {"malformed", c.malformed}, {"receive_buffer_bytes", c.receive_buffer},
+                    {"peak_sent_minus_received", c.peak_in_flight}};
     };
     auto optional = [](auto n) { return n ? json(*n) : json(nullptr); };
+    auto witness = [&](const Publication* item) -> json {
+        if (!item) return nullptr;
+        json row{{"sequence", item->update.sequence}, {"channel", std::string(1, item->channel)},
+                 {"decode_ns", ns(item->received, item->decoded)},
+                 {"sequencing_wait_ns", ns(item->decoded, item->apply_started)},
+                 {"apply_and_publish_ns", ns(item->apply_started, item->published)},
+                 {"receipt_to_publication_ns", ns(item->received, item->published)}};
+        if (options.benchmark) {
+            row["sender_lag_ns"] = ns(steady_release(item->update.sequence), sent_at(*item));
+            row["local_udp_ns"] = ns(sent_at(*item), item->received);
+        }
+        return row;
+    };
+    const auto active_end = options.benchmark ?
+        std::max(last_send, output.empty() ? last_send : output.back().published) : end;
     return {{"schema", 1}, {"mode", options.benchmark ? "benchmark" : "incident"}, {"dual", options.dual},
             {"events", options.count}, {"seed", options.seed}, {"burst", options.burst}, {"offered_rate", options.benchmark ? json(options.rate) : json(nullptr)}, {"input_id", fingerprint(input)},
-            {"elapsed_ns", ns(start, end)}, {"current", receiver.current()}, {"sequence", receiver.last()},
+            {"elapsed_ns", ns(start, end)}, {"process_cpu_ns", cpu_ns}, {"drain_every", options.drain_every}, {"active_elapsed_ns", ns(start, active_end)},
+            {"terminal_drain_after_activity_ns", ns(active_end, end)}, {"current", receiver.current()}, {"sequence", receiver.last()},
             {"book_verified", verified}, {"published", output.size()}, {"duplicates_suppressed", receiver.duplicates()},
             {"duplicate_publications", duplicate_publications}, {"feed_a_publications", a_publications}, {"feed_b_publications", b_publications}, {"discarded_buffer", receiver.discarded()}, {"peak_reorder", receiver.peak_backlog()},
             {"feed_a_scheduled_omissions", options.benchmark ? 0 : options.dual ? 2 : 1}, {"feed_b_scheduled_omissions", options.benchmark || !options.dual ? 0 : 1},
             {"feed_a", channel(a)}, {"feed_b", channel(b)}, {"detection_ns", optional(detection)},
             {"recovery_ns", optional(recovery)}, {"receipt_to_publication_ns", distribution(std::move(receipt_ns))},
             {"decode_ns", distribution(std::move(decode_ns))}, {"sequencing_wait_ns", distribution(std::move(handoff_ns))},
-            {"apply_and_publish_ns", distribution(std::move(apply_ns))}, {"timeline", timeline},
+            {"apply_and_publish_ns", distribution(std::move(apply_ns))},
+            {"sender_schedule_to_send_ns", distribution(std::move(sender_lag_ns))},
+            {"send_to_receipt_ns", distribution(std::move(local_udp_ns))},
+            {"scheduled_to_publication_ns", distribution(std::move(release_to_publication_ns))},
+            {"worst_receipt_sample", witness(worst_receipt)}, {"worst_local_udp_sample", witness(worst_udp)},
+            {"timeline", timeline},
             {"publications", publications}};
 }
 std::size_t number(std::string_view s) {
@@ -278,18 +344,20 @@ int main(int argc, char** argv) {
             const std::string_view arg(argv[i]);
             if (arg == "--benchmark") { options.benchmark = true; }
             else if (arg == "--single-feed") options.dual = false;
-            else if ((arg == "--events" || arg == "--seed" || arg == "--burst" || arg == "--rate") && i + 1 < argc) {
+            else if ((arg == "--events" || arg == "--seed" || arg == "--burst" || arg == "--rate" || arg == "--drain-every") && i + 1 < argc) {
                 const auto n = number(argv[++i]);
                 if (arg == "--events") { options.count = n; count_set = true; }
                 else if (arg == "--seed") options.seed = n;
                 else if (arg == "--rate") options.rate = n;
+                else if (arg == "--drain-every") options.drain_every = n;
                 else options.burst = n;
-            } else throw std::invalid_argument("use [--single-feed] [--benchmark --events N --burst N --rate HZ] [--seed N]");
+            } else throw std::invalid_argument("use [--single-feed] [--benchmark --events N --burst N --rate HZ --drain-every N] [--seed N]");
         }
         if (options.benchmark && !count_set) options.count = 20000;
+        if (!options.drain_every || options.drain_every > 4096) throw std::invalid_argument("drain interval must be 1..4096");
         if (!options.rate || options.rate > 1000000) throw std::invalid_argument("rate must be 1..1000000");
-        if (options.count < 8 || options.count > 1000000 || !options.burst || options.burst > 64)
-            throw std::invalid_argument("events must be 8..1000000 and burst 1..64");
+        if (options.count < 8 || options.count > 1000000 || !options.burst || options.burst > 4096)
+            throw std::invalid_argument("events must be 8..1000000 and burst 1..4096");
         const auto result = run(options);
         std::cout << result.dump() << '\n';
         return result.at("book_verified").get<bool>() ? 0 : 2;
