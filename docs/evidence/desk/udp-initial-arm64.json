@@ -1,0 +1,4041 @@
+{
+  "schema": 1,
+  "host": {
+    "system": "Darwin",
+    "node": "Yoshuas-MacBook-Pro-3.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:17:26 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6041",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "python": "3.12.2",
+  "checkout_revision": "01c62a90d21175eeb186e645370838b39ed26300",
+  "checkout_dirty": false,
+  "binary_sha256": "3e9bf27ec7f632ee5f82e4457473e57911461a631fe7711e14e1e0e1c798f03c",
+  "configuration": {
+    "rate": 100000,
+    "events": 40000,
+    "repeats": 3,
+    "steady_bursts": [
+      1,
+      32
+    ],
+    "stress_burst": 4096,
+    "first_seed": 17
+  },
+  "faults": [
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "17"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6652083,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6050958,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 11,
+        "elapsed_ns": 6652083,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_a_publications": 10,
+        "feed_a_scheduled_omissions": 2,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_b_publications": 1,
+        "feed_b_scheduled_omissions": 1,
+        "input_id": 1513709189476124026,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 452000,
+        "publications": [
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 85542,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "B",
+            "elapsed_ns": 127042,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 242583,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 243000,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6449667,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6449708,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6511708,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6545250,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6579708,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6612292,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6647250,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 172458,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 16750,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 128375,
+            "operation": "feed A loss repaired by feed B",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 169417,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 245708,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6303917,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6364042,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6428875,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6432042,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6475458,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6649792,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 0,
+          "receipt_to_publication_ns": 76625,
+          "sequence": 4,
+          "sequencing_wait_ns": 76583
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "17",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6666125,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6051041,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 1,
+        "elapsed_ns": 6666125,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 12,
+          "sent": 12
+        },
+        "feed_a_publications": 11,
+        "feed_a_scheduled_omissions": 1,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 1513709189476124026,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 395000,
+        "publications": [
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 60125,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 96875,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 202208,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 202708,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6416625,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6416667,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6476958,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6510250,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6541667,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6630250,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 514,
+            "bid_tick": 511,
+            "channel": "A",
+            "elapsed_ns": 6662417,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 179792,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 2042,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 98625,
+            "operation": "single feed delivered sequence 2",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 134458,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 204292,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6261625,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6336833,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6395417,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6400792,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6440667,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6663917,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 41,
+          "channel": "A",
+          "decode_ns": 42,
+          "receipt_to_publication_ns": 70208,
+          "sequence": 4,
+          "sequencing_wait_ns": 70125
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "18",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6196250,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6013625,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 1,
+        "elapsed_ns": 6196250,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 12,
+          "sent": 12
+        },
+        "feed_a_publications": 11,
+        "feed_a_scheduled_omissions": 1,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 5251879664865332042,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 172000,
+        "publications": [
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 24000,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 36959,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 68167,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 68334,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6130084,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6130084,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6152750,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6159834,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6168584,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6181250,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6192125,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 57667,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 1459,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 38000,
+            "operation": "single feed delivered sequence 2",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 50459,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 68959,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6085250,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6108084,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6121167,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6122500,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6143500,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6193709,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 0,
+          "receipt_to_publication_ns": 18750,
+          "sequence": 4,
+          "sequencing_wait_ns": 18708
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "18"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6218333,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6017917,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 11,
+        "elapsed_ns": 6218333,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_a_publications": 10,
+        "feed_a_scheduled_omissions": 2,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_b_publications": 1,
+        "feed_b_scheduled_omissions": 1,
+        "input_id": 5251879664865332042,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 192000,
+        "publications": [
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 22917,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "B",
+            "elapsed_ns": 36833,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 82500,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 82708,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6171333,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6171375,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6193125,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6199792,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6205750,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6210833,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 509,
+            "channel": "A",
+            "elapsed_ns": 6216000,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 79583,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 1250,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 37708,
+            "operation": "feed A loss repaired by feed B",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 58125,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 84000,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6106125,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6133542,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6156167,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6160792,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6185417,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6217250,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 41,
+          "channel": "A",
+          "decode_ns": 0,
+          "receipt_to_publication_ns": 26583,
+          "sequence": 4,
+          "sequencing_wait_ns": 26542
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "19"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6226333,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6023625,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 11,
+        "elapsed_ns": 6226333,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_a_publications": 10,
+        "feed_a_scheduled_omissions": 2,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 11,
+          "sent": 11
+        },
+        "feed_b_publications": 1,
+        "feed_b_scheduled_omissions": 1,
+        "input_id": 6638743695387817384,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 203000,
+        "publications": [
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 29041,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "B",
+            "elapsed_ns": 42666,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 95375,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 95666,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6180500,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6180500,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6201541,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6207041,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6212208,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6217791,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6223750,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 69250,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 1458,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 43916,
+            "operation": "feed A loss repaired by feed B",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 64708,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 97083,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6124541,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6151375,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6167791,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6169500,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6193541,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6225000,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 41,
+          "channel": "A",
+          "decode_ns": 41,
+          "receipt_to_publication_ns": 33416,
+          "sequence": 4,
+          "sequencing_wait_ns": 33334
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--seed",
+        "19",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 6261667,
+        "apply_and_publish_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "detection_ns": 6023666,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 1,
+        "elapsed_ns": 6261667,
+        "events": 12,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 1,
+          "receive_buffer_bytes": 786896,
+          "received": 12,
+          "sent": 12
+        },
+        "feed_a_publications": 11,
+        "feed_a_scheduled_omissions": 1,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 6638743695387817384,
+        "mode": "incident",
+        "offered_rate": null,
+        "peak_reorder": 2,
+        "process_cpu_ns": 229000,
+        "publications": [
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 20167,
+            "replayed": false,
+            "sequence": 1
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 31750,
+            "replayed": false,
+            "sequence": 2
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 72500,
+            "replayed": false,
+            "sequence": 3
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 72709,
+            "replayed": false,
+            "sequence": 4
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6200042,
+            "replayed": true,
+            "sequence": 6
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6200084,
+            "replayed": true,
+            "sequence": 7
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6224709,
+            "replayed": false,
+            "sequence": 8
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6234584,
+            "replayed": false,
+            "sequence": 9
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6243500,
+            "replayed": false,
+            "sequence": 10
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6251750,
+            "replayed": false,
+            "sequence": 11
+          },
+          {
+            "ask_tick": 513,
+            "bid_tick": 512,
+            "channel": "A",
+            "elapsed_ns": 6259667,
+            "replayed": false,
+            "sequence": 12
+          }
+        ],
+        "published": 11,
+        "receipt_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "recovery_ns": 112209,
+        "scheduled_to_publication_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 0
+        },
+        "sequence": 12,
+        "sequencing_wait_ns": {
+          "p50": null,
+          "p99": null,
+          "p999": null,
+          "samples": 9
+        },
+        "terminal_drain_after_activity_ns": 0,
+        "timeline": [
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 1125,
+            "operation": "book initialized",
+            "reason": "",
+            "sequence": 0,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 33209,
+            "operation": "single feed delivered sequence 2",
+            "reason": "",
+            "sequence": 2,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 47709,
+            "operation": "sequence 4 held while awaiting 3",
+            "reason": "",
+            "sequence": 2,
+            "state": "waiting-gap"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 73500,
+            "operation": "reordered and duplicate packets drained",
+            "reason": "",
+            "sequence": 4,
+            "state": "current"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6101834,
+            "operation": "sequence 5 missing on all enabled feeds",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 1,
+            "current": false,
+            "elapsed_ns": 6171584,
+            "operation": "snapshot through 4 rejected: sequence 5 still missing",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6189417,
+            "operation": "sequence 7 buffered while stale",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "stale"
+          },
+          {
+            "backlog": 2,
+            "current": false,
+            "elapsed_ns": 6191042,
+            "operation": "validating snapshot and buffered updates",
+            "reason": "gap-timeout",
+            "sequence": 4,
+            "state": "recovering"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6213042,
+            "operation": "snapshot through 5 installed; 6 and 7 replayed",
+            "reason": "",
+            "sequence": 7,
+            "state": "current"
+          },
+          {
+            "backlog": 0,
+            "current": true,
+            "elapsed_ns": 6260375,
+            "operation": "replay complete",
+            "reason": "",
+            "sequence": 12,
+            "state": "current"
+          }
+        ],
+        "worst_local_udp_sample": null,
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 0,
+          "receipt_to_publication_ns": 26125,
+          "sequence": 4,
+          "sequencing_wait_ns": 26083
+        }
+      }
+    }
+  ],
+  "steady_burst": [
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "1"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 400001458,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1458,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 400002292,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 8,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 39882,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 8,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 118,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399793000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1500,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 13292,
+          "p99": 20042,
+          "p999": 53583,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 13208,
+          "p99": 17917,
+          "p999": 29209,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 2583,
+          "p999": 36333,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 834,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 75750,
+          "receipt_to_publication_ns": 84,
+          "sender_lag_ns": 1583,
+          "sequence": 1396,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 48708,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 13208,
+          "receipt_to_publication_ns": 48750,
+          "sender_lag_ns": 0,
+          "sequence": 27555,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "1",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 400000875,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1417,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 400001458,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 6,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399745000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1459,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 11958,
+          "p99": 13250,
+          "p999": 22000,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 11875,
+          "p99": 13000,
+          "p999": 19500,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 41,
+          "p999": 2333,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 583,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 0,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 52833,
+          "receipt_to_publication_ns": 42,
+          "sender_lag_ns": 0,
+          "sequence": 37442,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 43125,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 12084,
+          "receipt_to_publication_ns": 43166,
+          "sender_lag_ns": 41,
+          "sequence": 6889,
+          "sequencing_wait_ns": 41
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399786041,
+        "apply_and_publish_ns": {
+          "p50": 0,
+          "p99": 83,
+          "p999": 1459,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 399795583,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 51,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 51,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 209301000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1500,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 102583,
+          "p99": 131291,
+          "p999": 146666,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 54459,
+          "p99": 108250,
+          "p999": 131167,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 49500,
+          "p99": 104208,
+          "p999": 116458,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 9542,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 379208,
+          "receipt_to_publication_ns": 84,
+          "sender_lag_ns": 38708,
+          "sequence": 29422,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 27458,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 48083,
+          "receipt_to_publication_ns": 27458,
+          "sender_lag_ns": 52625,
+          "sequence": 17874,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "32",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399768875,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 83,
+          "p999": 2000,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 399769917,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 64,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 149968000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 2000,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 69959,
+          "p99": 153959,
+          "p999": 441667,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 42167,
+          "p99": 115083,
+          "p999": 404750,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 31417,
+          "p99": 92917,
+          "p999": 113542,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1042,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 0,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 426584,
+          "receipt_to_publication_ns": 41,
+          "sender_lag_ns": 11875,
+          "sequence": 34918,
+          "sequencing_wait_ns": 41
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 19750,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 19958,
+          "receipt_to_publication_ns": 19792,
+          "sender_lag_ns": 62209,
+          "sequence": 27742,
+          "sequencing_wait_ns": 42
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "1",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 400001042,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1375,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 400001792,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 3,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399795000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1417,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 11959,
+          "p99": 13125,
+          "p999": 18750,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 11875,
+          "p99": 12917,
+          "p999": 18417,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 1084,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 750,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 0,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 25583,
+          "receipt_to_publication_ns": 42,
+          "sender_lag_ns": 2084,
+          "sequence": 8413,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 11959,
+          "channel": "A",
+          "decode_ns": 41,
+          "local_udp_ns": 11584,
+          "receipt_to_publication_ns": 12000,
+          "sender_lag_ns": 0,
+          "sequence": 25880,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "1"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 400004708,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 125,
+          "p999": 1666,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 400005667,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 5,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 39888,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 5,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 112,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399707000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 166,
+          "p999": 1708,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 13292,
+          "p99": 16708,
+          "p999": 35625,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 13208,
+          "p99": 16292,
+          "p999": 22917,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 83,
+          "p999": 18250,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 959,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 708,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 59750,
+          "receipt_to_publication_ns": 833,
+          "sender_lag_ns": 0,
+          "sequence": 14087,
+          "sequencing_wait_ns": 83
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 38875,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 13250,
+          "receipt_to_publication_ns": 38917,
+          "sender_lag_ns": 0,
+          "sequence": 21970,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "32",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399769625,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 84,
+          "p999": 2042,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 399771500,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 37,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 131955000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 2083,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 70833,
+          "p99": 91167,
+          "p999": 112250,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 39417,
+          "p99": 70666,
+          "p999": 88583,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 30708,
+          "p99": 67375,
+          "p999": 75875,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1875,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 0,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 330500,
+          "receipt_to_publication_ns": 42,
+          "sender_lag_ns": 57708,
+          "sequence": 34972,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 71333,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 58250,
+          "receipt_to_publication_ns": 71375,
+          "sender_lag_ns": 17708,
+          "sequence": 33513,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399844875,
+        "apply_and_publish_ns": {
+          "p50": 0,
+          "p99": 84,
+          "p999": 1417,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 399862709,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 60,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 39993,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 56,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 7,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 271811000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 1458,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 115625,
+          "p99": 175125,
+          "p999": 230000,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 65916,
+          "p99": 150042,
+          "p999": 197417,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 54875,
+          "p99": 141875,
+          "p999": 153834,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 17834,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 449666,
+          "receipt_to_publication_ns": 42,
+          "sender_lag_ns": 19834,
+          "sequence": 32009,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 8416,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 68750,
+          "receipt_to_publication_ns": 8458,
+          "sender_lag_ns": 57417,
+          "sequence": 2607,
+          "sequencing_wait_ns": 42
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "1"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399998042,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 83,
+          "p999": 1625,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 399999000,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 3,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 39922,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 3,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 78,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399774000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 1625,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 13292,
+          "p99": 16209,
+          "p999": 23917,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 13209,
+          "p99": 16084,
+          "p999": 21292,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 5709,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 958,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 1209,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 43250,
+          "receipt_to_publication_ns": 1334,
+          "sender_lag_ns": 0,
+          "sequence": 22317,
+          "sequencing_wait_ns": 83
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 11500,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 12959,
+          "receipt_to_publication_ns": 11500,
+          "sender_lag_ns": 0,
+          "sequence": 35934,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "1",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 400001417,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1333,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 1,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 400002292,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 3,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 399780000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1375,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 11958,
+          "p99": 13125,
+          "p999": 18917,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 11875,
+          "p99": 12916,
+          "p999": 18083,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 1375,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 875,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 42,
+          "channel": "A",
+          "decode_ns": 41,
+          "local_udp_ns": 25542,
+          "receipt_to_publication_ns": 83,
+          "sender_lag_ns": 1000,
+          "sequence": 11657,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 10208,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 11583,
+          "receipt_to_publication_ns": 10250,
+          "sender_lag_ns": 0,
+          "sequence": 24577,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399791042,
+        "apply_and_publish_ns": {
+          "p50": 0,
+          "p99": 83,
+          "p999": 1417,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 399801459,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 32,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 32,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 212865000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1458,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 104459,
+          "p99": 135459,
+          "p999": 150292,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 55958,
+          "p99": 109041,
+          "p999": 125333,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 49834,
+          "p99": 105042,
+          "p999": 120834,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 10417,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 83,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 143250,
+          "receipt_to_publication_ns": 125,
+          "sender_lag_ns": 42,
+          "sequence": 20705,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 9417,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 59042,
+          "receipt_to_publication_ns": 9417,
+          "sender_lag_ns": 56375,
+          "sequence": 14895,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "32",
+        "--single-feed"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 399773708,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 125,
+          "p999": 2250,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 32,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": false,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 0,
+        "elapsed_ns": 399774750,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 64,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 0,
+          "receive_buffer_bytes": 786896,
+          "received": 0,
+          "sent": 0
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 152842000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 167,
+          "p999": 2292,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 70916,
+          "p99": 158500,
+          "p999": 452333,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 43833,
+          "p99": 117875,
+          "p999": 422208,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 30833,
+          "p99": 92833,
+          "p999": 116458,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1042,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 83,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 435208,
+          "receipt_to_publication_ns": 125,
+          "sender_lag_ns": 13500,
+          "sequence": 29319,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 7000,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 36541,
+          "receipt_to_publication_ns": 7042,
+          "sender_lag_ns": 28250,
+          "sequence": 559,
+          "sequencing_wait_ns": 0
+        }
+      }
+    }
+  ],
+  "drain_comparison": [
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "4096"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 387901375,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 125,
+          "p999": 1125,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 4096,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 389064417,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 195488000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 166,
+          "p999": 1166,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 23788292,
+          "p99": 28677917,
+          "p999": 28801250,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 8264916,
+          "p99": 17089041,
+          "p999": 18832334,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 14808042,
+          "p99": 25636250,
+          "p999": 26836917,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1163042,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 3583,
+          "channel": "A",
+          "decode_ns": 41,
+          "local_udp_ns": 19009959,
+          "receipt_to_publication_ns": 3708,
+          "sender_lag_ns": 6065625,
+          "sequence": 32769,
+          "sequencing_wait_ns": 84
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 38875,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 2730375,
+          "receipt_to_publication_ns": 38875,
+          "sender_lag_ns": 18222625,
+          "sequence": 16012,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "17",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 388425041,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1417,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 388436166,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 51,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 52,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13272086690160495624,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 170325000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1458,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 15734000,
+          "p99": 26904041,
+          "p999": 28219500,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 17,
+        "send_to_receipt_ns": {
+          "p50": 64209,
+          "p99": 125291,
+          "p999": 139709,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 15662583,
+          "p99": 26824750,
+          "p999": 28178166,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 11125,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 2250,
+          "channel": "A",
+          "decode_ns": 41,
+          "local_udp_ns": 198459,
+          "receipt_to_publication_ns": 2291,
+          "sender_lag_ns": 6158166,
+          "sequence": 8193,
+          "sequencing_wait_ns": 0
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 4875,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 67834,
+          "receipt_to_publication_ns": 4875,
+          "sender_lag_ns": 2342291,
+          "sequence": 559,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 387987958,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1333,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 387999542,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 32,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 32,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 184590000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1375,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 16178958,
+          "p99": 28947667,
+          "p999": 30363375,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 69708,
+          "p99": 149666,
+          "p999": 166958,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 16125833,
+          "p99": 28886875,
+          "p999": 30324333,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 11584,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 1792,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 204166,
+          "receipt_to_publication_ns": 1834,
+          "sender_lag_ns": 9916042,
+          "sequence": 4097,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 11458,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 57750,
+          "receipt_to_publication_ns": 11500,
+          "sender_lag_ns": 23776625,
+          "sequence": 32210,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "18",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "4096"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 389542416,
+        "apply_and_publish_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 1125,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 4096,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 390674541,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 15013421169981653365,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 177575000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 1125,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 22870625,
+          "p99": 27007250,
+          "p999": 27139458,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 18,
+        "send_to_receipt_ns": {
+          "p50": 7876000,
+          "p99": 15357500,
+          "p999": 16123083,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 14315666,
+          "p99": 24364375,
+          "p999": 25422833,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1132125,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 3125,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 16283167,
+          "receipt_to_publication_ns": 3250,
+          "sender_lag_ns": 7653291,
+          "sequence": 28673,
+          "sequencing_wait_ns": 83
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 31250,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 8901083,
+          "receipt_to_publication_ns": 31292,
+          "sender_lag_ns": 11397083,
+          "sequence": 10054,
+          "sequencing_wait_ns": 0
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "4096"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 388595917,
+        "apply_and_publish_ns": {
+          "p50": 0,
+          "p99": 83,
+          "p999": 1042,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 4096,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 389779292,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 4096,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 191816000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 125,
+          "p999": 1083,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 21630042,
+          "p99": 29299292,
+          "p999": 29422292,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 8278334,
+          "p99": 17818708,
+          "p999": 18704292,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 13806459,
+          "p99": 26588375,
+          "p999": 27453584,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 1183375,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 4500,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 18858500,
+          "receipt_to_publication_ns": 4542,
+          "sender_lag_ns": 2750,
+          "sequence": 1,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 11625,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 3196667,
+          "receipt_to_publication_ns": 11667,
+          "sender_lag_ns": 16539125,
+          "sequence": 39471,
+          "sequencing_wait_ns": 42
+        }
+      }
+    },
+    {
+      "argv": [
+        "/private/tmp/jitter-desk.WTeVhm/measured/build/jitter_incident",
+        "--benchmark",
+        "--events",
+        "40000",
+        "--rate",
+        "100000",
+        "--seed",
+        "19",
+        "--burst",
+        "4096",
+        "--drain-every",
+        "32"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "result": {
+        "active_elapsed_ns": 384753958,
+        "apply_and_publish_ns": {
+          "p50": 41,
+          "p99": 42,
+          "p999": 1292,
+          "samples": 40000
+        },
+        "book_verified": true,
+        "burst": 4096,
+        "current": true,
+        "decode_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "detection_ns": null,
+        "discarded_buffer": 0,
+        "drain_every": 32,
+        "dual": true,
+        "duplicate_publications": 0,
+        "duplicates_suppressed": 40000,
+        "elapsed_ns": 384763833,
+        "events": 40000,
+        "feed_a": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 54,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_a_publications": 40000,
+        "feed_a_scheduled_omissions": 0,
+        "feed_b": {
+          "malformed": 0,
+          "missing_datagrams": 0,
+          "peak_sent_minus_received": 55,
+          "receive_buffer_bytes": 786896,
+          "received": 40000,
+          "sent": 40000
+        },
+        "feed_b_publications": 0,
+        "feed_b_scheduled_omissions": 0,
+        "input_id": 13989760390496723028,
+        "mode": "benchmark",
+        "offered_rate": 100000,
+        "peak_reorder": 0,
+        "process_cpu_ns": 174679000,
+        "publications": [],
+        "published": 40000,
+        "receipt_to_publication_ns": {
+          "p50": 42,
+          "p99": 84,
+          "p999": 1333,
+          "samples": 40000
+        },
+        "recovery_ns": null,
+        "scheduled_to_publication_ns": {
+          "p50": 14839083,
+          "p99": 27464166,
+          "p999": 28992750,
+          "samples": 40000
+        },
+        "schema": 1,
+        "seed": 19,
+        "send_to_receipt_ns": {
+          "p50": 66333,
+          "p99": 128416,
+          "p999": 152833,
+          "samples": 40000
+        },
+        "sender_schedule_to_send_ns": {
+          "p50": 14763458,
+          "p99": 27394583,
+          "p999": 28950708,
+          "samples": 40000
+        },
+        "sequence": 40000,
+        "sequencing_wait_ns": {
+          "p50": 0,
+          "p99": 42,
+          "p999": 42,
+          "samples": 40000
+        },
+        "terminal_drain_after_activity_ns": 9875,
+        "timeline": [],
+        "worst_local_udp_sample": {
+          "apply_and_publish_ns": 1667,
+          "channel": "A",
+          "decode_ns": 0,
+          "local_udp_ns": 194125,
+          "receipt_to_publication_ns": 1709,
+          "sender_lag_ns": 7606916,
+          "sequence": 24577,
+          "sequencing_wait_ns": 42
+        },
+        "worst_receipt_sample": {
+          "apply_and_publish_ns": 35166,
+          "channel": "A",
+          "decode_ns": 42,
+          "local_udp_ns": 67250,
+          "receipt_to_publication_ns": 35208,
+          "sender_lag_ns": 9858083,
+          "sequence": 29231,
+          "sequencing_wait_ns": 0
+        }
+      }
+    }
+  ],
+  "compile_commands": [
+    {
+      "directory": "/tmp/jitter-desk.WTeVhm/measured/build",
+      "command": "/usr/bin/c++  -I/tmp/jitter-desk.WTeVhm/measured/include -O3 -DNDEBUG -std=c++20 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/jitter_market_core.dir/src/market.cpp.o -c /tmp/jitter-desk.WTeVhm/measured/src/market.cpp",
+      "file": "/tmp/jitter-desk.WTeVhm/measured/src/market.cpp",
+      "output": "CMakeFiles/jitter_market_core.dir/src/market.cpp.o"
+    },
+    {
+      "directory": "/tmp/jitter-desk.WTeVhm/measured/build",
+      "command": "/usr/bin/c++  -I/tmp/jitter-desk.WTeVhm/measured/include -isystem /tmp/jitter-desk.WTeVhm/measured/third_party -O3 -DNDEBUG -std=c++20 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/jitter_incident.dir/src/incident.cpp.o -c /tmp/jitter-desk.WTeVhm/measured/src/incident.cpp",
+      "file": "/tmp/jitter-desk.WTeVhm/measured/src/incident.cpp",
+      "output": "CMakeFiles/jitter_incident.dir/src/incident.cpp.o"
+    }
+  ],
+  "cpu": "Apple M4 Pro",
+  "os_release": "26.6.2"
+}

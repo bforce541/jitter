@@ -1,0 +1,457 @@
+{
+  "schema": 1,
+  "market": {
+    "active_elapsed_ns": 5055417,
+    "apply_and_publish_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 9
+    },
+    "book_verified": true,
+    "burst": 1,
+    "current": true,
+    "decode_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 9
+    },
+    "detection_ns": 4796792,
+    "discarded_buffer": 0,
+    "drain_every": 32,
+    "dual": true,
+    "duplicate_publications": 0,
+    "duplicates_suppressed": 11,
+    "elapsed_ns": 5055417,
+    "events": 12,
+    "feed_a": {
+      "malformed": 0,
+      "missing_datagrams": 0,
+      "peak_sent_minus_received": 1,
+      "receive_buffer_bytes": 786896,
+      "received": 11,
+      "sent": 11
+    },
+    "feed_a_publications": 10,
+    "feed_a_scheduled_omissions": 2,
+    "feed_b": {
+      "malformed": 0,
+      "missing_datagrams": 0,
+      "peak_sent_minus_received": 1,
+      "receive_buffer_bytes": 786896,
+      "received": 11,
+      "sent": 11
+    },
+    "feed_b_publications": 1,
+    "feed_b_scheduled_omissions": 1,
+    "final_book_id": "f6a2fa0fb17c6d30",
+    "input_id": "1501c67ce3f8057a",
+    "mode": "incident",
+    "offered_rate": null,
+    "peak_reorder": 2,
+    "process_cpu_ns": 271000,
+    "publications": [
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 34708,
+        "replayed": false,
+        "sequence": 1
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "B",
+        "elapsed_ns": 46000,
+        "replayed": false,
+        "sequence": 2
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 68750,
+        "replayed": false,
+        "sequence": 3
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 68917,
+        "replayed": false,
+        "sequence": 4
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 4977917,
+        "replayed": true,
+        "sequence": 6
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 4977917,
+        "replayed": true,
+        "sequence": 7
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 5028875,
+        "replayed": false,
+        "sequence": 8
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 5035167,
+        "replayed": false,
+        "sequence": 9
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 5040917,
+        "replayed": false,
+        "sequence": 10
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 5047042,
+        "replayed": false,
+        "sequence": 11
+      },
+      {
+        "ask_quantity": 34,
+        "ask_tick": 514,
+        "bid_quantity": 72,
+        "bid_tick": 511,
+        "channel": "A",
+        "elapsed_ns": 5053125,
+        "replayed": false,
+        "sequence": 12
+      }
+    ],
+    "published": 11,
+    "receipt_to_publication_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 9
+    },
+    "recovery_ns": 122458,
+    "recovery_proof": {
+      "book_id": "2bdac3feb4c77abd",
+      "last_verified": 7,
+      "reference_book_id": "2bdac3feb4c77abd",
+      "snapshot_through": 5
+    },
+    "reference_book_id": "f6a2fa0fb17c6d30",
+    "scheduled_to_publication_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 0
+    },
+    "schema": 1,
+    "seed": 17,
+    "send_to_receipt_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 0
+    },
+    "sender_schedule_to_send_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 0
+    },
+    "sequence": 12,
+    "sequencing_wait_ns": {
+      "p50": null,
+      "p99": null,
+      "p999": null,
+      "samples": 9
+    },
+    "terminal_drain_after_activity_ns": 0,
+    "timeline": [
+      {
+        "backlog": 0,
+        "current": true,
+        "elapsed_ns": 917,
+        "operation": "book initialized",
+        "reason": "",
+        "sequence": 0,
+        "state": "current"
+      },
+      {
+        "backlog": 0,
+        "current": true,
+        "elapsed_ns": 46917,
+        "operation": "feed A loss repaired by feed B",
+        "reason": "",
+        "sequence": 2,
+        "state": "current"
+      },
+      {
+        "backlog": 1,
+        "current": false,
+        "elapsed_ns": 55542,
+        "operation": "sequence 4 held while awaiting 3",
+        "reason": "",
+        "sequence": 2,
+        "state": "waiting-gap"
+      },
+      {
+        "backlog": 0,
+        "current": true,
+        "elapsed_ns": 70000,
+        "operation": "reordered and duplicate packets drained",
+        "reason": "",
+        "sequence": 4,
+        "state": "current"
+      },
+      {
+        "backlog": 1,
+        "current": false,
+        "elapsed_ns": 4872500,
+        "operation": "sequence 5 missing on all enabled feeds",
+        "reason": "gap-timeout",
+        "sequence": 4,
+        "state": "stale"
+      },
+      {
+        "backlog": 1,
+        "current": false,
+        "elapsed_ns": 4948958,
+        "operation": "snapshot through 4 rejected: sequence 5 still missing",
+        "reason": "gap-timeout",
+        "sequence": 4,
+        "state": "stale"
+      },
+      {
+        "backlog": 2,
+        "current": false,
+        "elapsed_ns": 4969250,
+        "operation": "sequence 7 buffered while stale",
+        "reason": "gap-timeout",
+        "sequence": 4,
+        "state": "stale"
+      },
+      {
+        "backlog": 2,
+        "current": false,
+        "elapsed_ns": 4970333,
+        "operation": "validating snapshot and buffered updates",
+        "reason": "gap-timeout",
+        "sequence": 4,
+        "state": "recovering"
+      },
+      {
+        "backlog": 0,
+        "current": true,
+        "elapsed_ns": 5022958,
+        "operation": "snapshot through 5 installed; 6 and 7 replayed",
+        "reason": "",
+        "sequence": 7,
+        "state": "current"
+      },
+      {
+        "backlog": 0,
+        "current": true,
+        "elapsed_ns": 5054333,
+        "operation": "replay complete",
+        "reason": "",
+        "sequence": 12,
+        "state": "current"
+      }
+    ],
+    "worst_local_udp_sample": null,
+    "worst_receipt_sample": {
+      "apply_and_publish_ns": 0,
+      "channel": "A",
+      "decode_ns": 42,
+      "receipt_to_publication_ns": 14917,
+      "sequence": 4,
+      "sequencing_wait_ns": 14875
+    }
+  },
+  "desk": {
+    "verified": true,
+    "idempotent": true,
+    "grace_ns": 50000000,
+    "logical_detection_ns": 50000000,
+    "logical_resolution_after_detection_ns": 40000000,
+    "analysis_runtime_ns": [
+      2435833,
+      477625,
+      454875
+    ],
+    "result": {
+      "as_of_ns": 120000000,
+      "records": 6,
+      "positions": {
+        "ABC": {
+          "desk": 70,
+          "venue": 70,
+          "desk_minus_venue": 0
+        },
+        "XYZ": {
+          "desk": 5,
+          "venue": 5,
+          "desk_minus_venue": 0
+        }
+      },
+      "history": [
+        {
+          "ordinal": 1,
+          "as_of_ns": 40000000,
+          "session": "SIM-01",
+          "execution_id": "EX-02",
+          "state": "pending",
+          "discrepancy": "missing-venue",
+          "evidence": {
+            "first_observed_ns": 30000000,
+            "position_impact": {
+              "ABC": -30
+            },
+            "records": {
+              "desk": [
+                {
+                  "executed_ns": 25000000,
+                  "execution_id": "EX-02",
+                  "instrument": "ABC",
+                  "observed_ns": 30000000,
+                  "price_ticks": 12349,
+                  "quantity": 30,
+                  "record_id": "B-102",
+                  "revision": 1,
+                  "session": "SIM-01",
+                  "side": "SELL",
+                  "source": "desk"
+                }
+              ],
+              "venue": []
+            }
+          }
+        },
+        {
+          "ordinal": 2,
+          "as_of_ns": 80000000,
+          "session": "SIM-01",
+          "execution_id": "EX-02",
+          "state": "confirmed",
+          "discrepancy": "missing-venue",
+          "evidence": {
+            "first_observed_ns": 30000000,
+            "position_impact": {
+              "ABC": -30
+            },
+            "records": {
+              "desk": [
+                {
+                  "executed_ns": 25000000,
+                  "execution_id": "EX-02",
+                  "instrument": "ABC",
+                  "observed_ns": 30000000,
+                  "price_ticks": 12349,
+                  "quantity": 30,
+                  "record_id": "B-102",
+                  "revision": 1,
+                  "session": "SIM-01",
+                  "side": "SELL",
+                  "source": "desk"
+                }
+              ],
+              "venue": []
+            }
+          }
+        },
+        {
+          "ordinal": 3,
+          "as_of_ns": 120000000,
+          "session": "SIM-01",
+          "execution_id": "EX-02",
+          "state": "resolved",
+          "discrepancy": "",
+          "evidence": {
+            "first_observed_ns": 30000000,
+            "position_impact": {
+              "ABC": 0
+            },
+            "records": {
+              "desk": [
+                {
+                  "executed_ns": 25000000,
+                  "execution_id": "EX-02",
+                  "instrument": "ABC",
+                  "observed_ns": 30000000,
+                  "price_ticks": 12349,
+                  "quantity": 30,
+                  "record_id": "B-102",
+                  "revision": 1,
+                  "session": "SIM-01",
+                  "side": "SELL",
+                  "source": "desk"
+                }
+              ],
+              "venue": [
+                {
+                  "executed_ns": 25000000,
+                  "execution_id": "EX-02",
+                  "instrument": "ABC",
+                  "observed_ns": 120000000,
+                  "price_ticks": 12349,
+                  "quantity": 30,
+                  "record_id": "V-812",
+                  "revision": 1,
+                  "session": "SIM-01",
+                  "side": "SELL",
+                  "source": "venue"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "open": []
+    }
+  },
+  "command": [
+    "/private/tmp/jitter-desk.WTeVhm/confirmation/build/jitter_incident"
+  ],
+  "host": "macOS-26.6.2-arm64-arm-64bit",
+  "binary_sha256": "8e75a546e2faf96ec7414249d9953453fde89bd12096aa8d44bbe018ec16dba0"
+}

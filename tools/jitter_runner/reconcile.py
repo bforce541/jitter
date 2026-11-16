@@ -169,7 +169,7 @@ def export_csv(path, report):
     fields = ("session", "execution_id", "instrument", "discrepancy", "desk_minus_venue_quantity",
               "status", "as_of_ns", "desk_record_ids", "venue_record_ids", "previous_discrepancy")
     with path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         prior = {}
         for transition in report["history"]:

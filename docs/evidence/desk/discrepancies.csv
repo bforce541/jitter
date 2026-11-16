@@ -1,0 +1,4 @@
+session,execution_id,instrument,discrepancy,desk_minus_venue_quantity,status,as_of_ns,desk_record_ids,venue_record_ids,previous_discrepancy
+SIM-01,EX-02,ABC,missing-venue,-30,pending,40000000,B-102,,
+SIM-01,EX-02,ABC,missing-venue,-30,confirmed,80000000,B-102,,missing-venue
+SIM-01,EX-02,ABC,,0,resolved,120000000,B-102,V-812,missing-venue

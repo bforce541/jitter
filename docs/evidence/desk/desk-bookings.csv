@@ -1,0 +1,4 @@
+source,record_id,session,execution_id,revision,instrument,side,quantity,price_ticks,executed_ns,observed_ns
+desk,B-101,SIM-01,EX-01,1,ABC,BUY,100,12345,10000000,20000000
+desk,B-102,SIM-01,EX-02,1,ABC,SELL,30,12349,25000000,30000000
+desk,B-103,SIM-01,EX-03,1,XYZ,BUY,5,859,31000000,39000000

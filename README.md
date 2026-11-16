@@ -1,6 +1,20 @@
 # Jitter | C++20 Market-Data Replay & Order-Book Engine
 
-Jitter rebuilds a single-instrument, two-sided order book from a deterministic synthetic feed. A direct replay isolates book work. An open-loop, two-thread replay measures how producer pacing, queue handoff and book updates affect publication latency under load.
+Jitter replays a simulated trading-desk incident. A C++20 receiver reconstructs and recovers a market-data book over redundant UDP. A SQLite audit matches the desk's booked fills against a simulated venue drop copy.
+
+## Run the desk incident
+
+```sh
+python3 tools/desk_incident.py --output results/desk-incident
+```
+
+Open `results/desk-incident/report.html`. It shows a lost packet repaired by the second feed, a dual-feed gap and verified snapshot recovery, and a missing fill that affects a position until the delayed report arrives. The report links the source records, state proof and operator CSV. [Runbook and reproduction](docs/desk-incident.md) · [Receiver measurements](docs/desk-results.md)
+
+On the native M4 Pro, dual-feed steady replay at 100K events/s published every event across five runs with median receiver p99 **0.084 µs** and scheduled-to-publication p99 **16.125 µs**. The receiver clock begins after the local receive system call. In the separate burst stress test, bounded drains reduced local send-to-receipt p99 **18.554 → 0.147 ms**. [Raw paired runs](docs/evidence/desk/udp-confirmation-arm64.json)
+
+## In-process market replay
+
+The original deterministic book engine and benchmarks isolate book work and measure open-loop queue handoff. These controlled results use different timing boundaries from the UDP lab.
 
 | Experiment on native M4 Pro | Baseline → candidate | Evidence |
 | --- | ---: | --- |

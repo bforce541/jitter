@@ -19,7 +19,7 @@ MS = 1_000_000
 
 def write_input(path, source, rows):
     with path.open("x", newline="", encoding="utf-8") as stream:
-        writer = csv.writer(stream)
+        writer = csv.writer(stream, lineterminator="\n")
         writer.writerow(FIELDS)
         for ident, execution, instrument, side, quantity, ticks, executed, observed in rows:
             writer.writerow([source, ident, "SIM-01", execution, 1, instrument, side, quantity,
