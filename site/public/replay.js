@@ -1,6 +1,6 @@
 const byId = (id) => document.getElementById(id);
 const display = Object.fromEntries(
-  ['start', 'play', 'back', 'next', 'state', 'sequence', 'buffered', 'packets', 'clock', 'event', 'chapters', 'audit-rows']
+  ['play', 'back', 'next', 'state', 'sequence', 'buffered', 'packets', 'clock', 'event', 'chapters', 'audit-rows']
     .map((id) => [id, byId(id)]),
 );
 const labels = {
@@ -111,10 +111,6 @@ function initialize(replay) {
     render();
   }
 
-  display.start.addEventListener('click', () => {
-    byId('incident').scrollIntoView({ block: 'nearest' });
-    play();
-  });
   display.play.addEventListener('click', () => {
     if (timer) {
       stop();
@@ -139,13 +135,12 @@ function initialize(replay) {
     return row;
   }));
 
-  display.start.disabled = false;
   display.play.disabled = false;
   render();
 }
 
 try {
-  const response = await fetch('./replay.json');
+  const response = await fetch('/replay.json');
   if (!response.ok) throw new Error('Replay data is unavailable.');
   initialize(await response.json());
 } catch (error) {

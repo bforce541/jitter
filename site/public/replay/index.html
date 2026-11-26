@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f6">
+  <meta name="description" content="Step through a recorded Jitter desk incident from redundant UDP failover to verified snapshot recovery.">
+  <title>Desk incident — Jitter</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/replay.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="shell topbar">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
+    <nav aria-label="Main navigation">
+      <a href="/">Overview</a>
+      <a href="/replay/" aria-current="page">Replay</a>
+      <a href="/#evidence">Benchmarks</a>
+    </nav>
+    <a class="nav-source" href="https://github.com/bforce541/jitter">GitHub</a>
+  </header>
+
+  <main id="main" class="shell">
+    <header class="page-intro">
+      <p class="kicker">Recorded simulation</p>
+      <h1>Desk incident</h1>
+      <p class="lede">Step through a sequence gap on two UDP feeds and see how an authoritative snapshot restores the order book.</p>
+    </header>
+
+    <section class="console" aria-labelledby="incident-title">
+      <header class="console-bar">
+        <h2 id="incident-title">Market data replay</h2>
+        <span>Loopback UDP</span>
+      </header>
+      <div class="chapters" id="chapters" role="group" aria-label="Incident steps"></div>
+      <div class="console-body">
+        <div class="readout">
+          <div>
+            <span class="field-label">Order book</span>
+            <strong class="state" id="state">Loading</strong>
+          </div>
+          <dl class="counters">
+            <div><dt>Book sequence</dt><dd id="sequence">—</dd></div>
+            <div><dt>Buffered</dt><dd id="buffered">—</dd></div>
+          </dl>
+        </div>
+        <div class="packet-head"><span>Sequence ledger</span><span id="clock">Replay clock</span></div>
+        <ol class="packets" id="packets" aria-label="Market-data sequence ledger"></ol>
+        <div class="legend" aria-label="Packet state legend">
+          <span><i class="key published"></i> Published</span>
+          <span><i class="key backup"></i> Feed B</span>
+          <span><i class="key missing"></i> Missing</span>
+          <span><i class="key restored"></i> Recovered</span>
+        </div>
+        <p class="event" id="event" role="status">Loading the recorded incident.</p>
+        <div class="controls">
+          <button type="button" class="button primary" id="play" disabled>Play from start</button>
+          <div class="step-controls">
+            <button class="button secondary" type="button" id="back" aria-label="Previous step" disabled>Previous</button>
+            <button class="button secondary" type="button" id="next" aria-label="Next step" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+      <noscript><p class="static-note">The interactive timeline uses JavaScript. <a class="text-link" href="/replay.json">Read the replay data.</a></p></noscript>
+    </section>
+
+    <section class="section audit" aria-labelledby="audit-title">
+      <header>
+        <h2 id="audit-title">Execution audit</h2>
+        <p>On a separate simulation clock, a late venue report left the desk’s ABC position 30 units lower. The SQLite audit reconciled the difference when the report arrived.</p>
+        <a class="text-link" href="/replay.json">Replay evidence (JSON)</a>
+      </header>
+      <div class="audit-panel">
+        <table>
+          <caption>Execution EX-02 <span>Desk − venue</span></caption>
+          <thead><tr><th scope="col">Sim. time</th><th scope="col">Status</th><th scope="col">ABC units</th></tr></thead>
+          <tbody id="audit-rows">
+            <tr><td>40 ms</td><td>Pending</td><td>−30</td></tr>
+            <tr><td>80 ms</td><td>Confirmed</td><td>−30</td></tr>
+            <tr><td>120 ms</td><td>Resolved</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
+    <a href="https://github.com/bforce541/jitter/blob/main/docs/desk-incident.md">Incident runbook</a>
+  </footer>
+</body>
+</html>

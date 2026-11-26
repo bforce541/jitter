@@ -3,133 +3,106 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101210">
-  <meta name="description" content="Replay a simulated trading-desk incident. Follow redundant UDP, a sequence gap, and a reference-verified order-book recovery.">
-  <title>Jitter — Market data under failure</title>
-  <link rel="stylesheet" href="./style.css">
-  <script src="./replay.js" type="module"></script>
+  <meta name="theme-color" content="#f7f7f6">
+  <meta name="description" content="Jitter is a C++20 market-data lab for order-book recovery and reproducible latency measurements.">
+  <title>Jitter — Market data replay lab</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/overview.js" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="shell topbar">
-    <a class="brand" href="./"><span class="mark" aria-hidden="true"></span> Jitter</a>
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
     <nav aria-label="Main navigation">
-      <a href="#incident">Replay</a>
+      <a href="/" aria-current="page">Overview</a>
+      <a href="/replay/">Replay</a>
       <a href="#evidence">Benchmarks</a>
-      <a href="https://github.com/bforce541/jitter">GitHub</a>
     </nav>
+    <a class="nav-source" href="https://github.com/bforce541/jitter">GitHub</a>
   </header>
 
   <main id="main" class="shell">
     <section class="hero" aria-labelledby="title">
       <div class="intro">
-        <p class="eyebrow"><span class="dash"></span> C++20 market-data lab</p>
-        <h1 id="title">Market data<br>under <em>failure.</em></h1>
-        <p class="lede">Follow a simulated trading-desk incident from the first lost packet to a reference-verified order book.</p>
-        <div class="hero-actions">
-          <button type="button" class="primary" id="start" disabled><span class="play-icon" aria-hidden="true"></span> Play incident</button>
-          <a class="link" href="#evidence">See the benchmarks</a>
+        <p class="kicker">C++20 &middot; Systems research</p>
+        <h1 id="title">Jitter</h1>
+        <p class="subtitle">A market data replay lab.</p>
+        <p class="lede">Reconstruct a limit order book, recover it after packet loss, and measure where the latency comes from.</p>
+        <div class="actions">
+          <a class="button primary" href="/replay/"><span class="play-icon" aria-hidden="true"></span> Open replay</a>
+          <a class="button secondary" href="https://github.com/bforce541/jitter">View source</a>
         </div>
       </div>
 
-      <section class="console" id="incident" aria-labelledby="incident-title">
-        <header class="console-bar">
-          <h2 id="incident-title"><span class="mark small" aria-hidden="true"></span> Incident replay</h2>
-          <span class="console-meta">Loopback UDP</span>
-        </header>
-        <div class="console-body">
-          <div class="readout">
-            <div>
-              <p class="micro">ORDER BOOK</p>
-              <strong class="state" id="state">Loading</strong>
-            </div>
-            <dl class="counters">
-              <div><dt>Book sequence</dt><dd id="sequence">—</dd></div>
-              <div><dt>Buffered</dt><dd id="buffered">—</dd></div>
-            </dl>
+      <a class="incident-card" id="incident" href="/replay/" aria-labelledby="card-title">
+        <div class="card-top"><span>Desk incident</span><span>Recorded replay</span></div>
+        <div class="card-heading">
+          <div>
+            <h2 id="card-title">Order book recovery</h2>
+            <p>Dual-feed UDP &middot; Loopback</p>
           </div>
-          <div class="packet-head"><span>Sequence ledger</span><span id="clock">Replay clock</span></div>
-          <ol class="packets" id="packets" aria-label="Market-data sequence ledger"></ol>
-          <div class="legend" aria-label="Packet state legend">
-            <span><i class="key published"></i> Published</span>
-            <span><i class="key backup"></i> Feed B</span>
-            <span><i class="key missing"></i> Missing</span>
-            <span><i class="key restored"></i> Recovered</span>
-          </div>
-          <p class="event" id="event" role="status">Loading the recorded incident.</p>
-          <div class="controls">
-            <button type="button" class="replay-toggle" id="play" disabled>Play from start</button>
-            <div class="step-controls">
-              <button type="button" id="back" aria-label="Previous step" disabled>‹</button>
-              <button type="button" id="next" aria-label="Next step" disabled>›</button>
-            </div>
-          </div>
+          <span class="verified"><span aria-hidden="true"></span> Verified</span>
         </div>
-        <div class="chapters" id="chapters" role="group" aria-label="Incident steps"></div>
-        <noscript><p class="static-note">The interactive timeline uses JavaScript. <a href="./replay.json">Read the replay data.</a></p></noscript>
-      </section>
+        <div class="card-ledger" aria-hidden="true">
+          <div class="trace-bars">
+            <i></i><i class="trace-alternate"></i><i></i><i></i><i class="trace-snapshot"></i><i class="trace-replayed"></i>
+            <i class="trace-replayed"></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="trace-labels"><span>01</span><span>05</span><span>12</span></div>
+        </div>
+        <dl class="card-results">
+          <div><dt>Snapshot through</dt><dd>05</dd></div>
+          <div><dt>Buffered replay</dt><dd>06–07</dd></div>
+          <div><dt>Final sequence</dt><dd>12</dd></div>
+        </dl>
+      </a>
     </section>
 
-    <section class="benchmarks" id="evidence" aria-labelledby="benchmark-title">
+    <section class="section benchmarks" id="evidence" aria-labelledby="benchmark-title">
       <header class="section-head">
-        <div>
-          <p class="eyebrow"><span class="dash"></span> Measured on Apple M4 Pro</p>
-          <h2 id="benchmark-title">Three timing boundaries.</h2>
-        </div>
-        <p>Synthetic, native ARM64 replay. Numbers are medians from the recorded studies.</p>
+        <h2 id="benchmark-title">Benchmarks</h2>
+        <p>Recorded medians from synthetic workloads on a native Apple M4 Pro.</p>
       </header>
       <div class="metrics">
         <article>
-          <p class="micro">DIRECT BOOK REPLAY</p>
-          <p class="value">36.83<span> M/s</span></p>
-          <p>Dense book throughput. The sparse reference measured 14.51M events/s.</p>
+          <h3>Direct book replay</h3>
+          <p class="metric-value">36.83 <small>M events/s</small></p>
+          <p>Dense order-book throughput. The sparse reference measured 14.51M events/s.</p>
+          <a class="text-link" href="https://github.com/bforce541/jitter/blob/main/docs/market-replay.md">Book study</a>
         </article>
         <article>
-          <p class="micro">IN-PROCESS FEED</p>
-          <p class="value">0.542<span> µs</span></p>
-          <p>Scheduled p99 for the polling SPSC ring at 500K events/s, with about two CPU cores.</p>
+          <h3>In-process feed</h3>
+          <p class="metric-value">0.542 <small>µs</small></p>
+          <p>Scheduled p99 with a polling SPSC queue at 500K events/s and about two CPU cores.</p>
+          <a class="text-link" href="https://github.com/bforce541/jitter/blob/main/docs/market-queue.md">Queue study</a>
         </article>
         <article>
-          <p class="micro">DUAL-FEED UDP</p>
-          <p class="value">16.125<span> µs</span></p>
-          <p>Scheduled p99 at 100K events/s. Timing includes the sender, loopback transport, and publication.</p>
+          <h3>Redundant UDP</h3>
+          <p class="metric-value">16.125 <small>µs</small></p>
+          <p>Scheduled p99 at 100K events/s, including sender, loopback delivery, and publication.</p>
+          <a class="text-link" href="https://github.com/bforce541/jitter/blob/main/docs/desk-results.md">Receiver study</a>
         </article>
       </div>
     </section>
 
-    <section class="audit" aria-labelledby="audit-title">
-      <div>
-        <p class="eyebrow"><span class="dash"></span> Execution audit</p>
-        <h2 id="audit-title">The missing fill.</h2>
-        <p>On a separate simulation clock, a delayed venue report left the desk’s ABC position 30 units lower than the venue’s. The SQLite audit reconciled the difference when the report arrived.</p>
-      </div>
-      <div class="audit-panel">
-        <table>
-          <caption>Execution EX-02 <span>Desk − venue</span></caption>
-          <thead><tr><th scope="col">Sim. time</th><th scope="col">Status</th><th scope="col">ABC units</th></tr></thead>
-          <tbody id="audit-rows">
-            <tr><td>40 ms</td><td>Pending</td><td>−30</td></tr>
-            <tr><td>80 ms</td><td>Confirmed</td><td>−30</td></tr>
-            <tr><td>120 ms</td><td>Resolved</td><td>0</td></tr>
-          </tbody>
-        </table>
-        <a class="link" href="./replay.json">Open replay evidence (JSON)</a>
-      </div>
-    </section>
-
-    <section class="local" aria-labelledby="local-title">
-      <h2 id="local-title">Run it locally.</h2>
-      <div>
-        <p>From the source checkout with Python 3.9+, CMake 3.20+, and C/C++20 compilers.</p>
-        <pre><code>python3 tools/desk_incident.py --output results/desk-incident</code></pre>
-        <p>Open <code>results/desk-incident/report.html</code> for the full operator report.</p>
+    <section class="section local" aria-labelledby="local-title">
+      <header>
+        <h2 id="local-title">Run it locally</h2>
+        <p>Python 3.9+, CMake 3.20+, and C and C++20 compilers on macOS or Linux.</p>
+      </header>
+      <div class="command-panel">
+        <div class="command">
+          <code id="local-command">python3 tools/desk_incident.py --output results/desk-incident</code>
+          <button type="button" id="copy-command" class="button secondary" hidden>Copy</button>
+        </div>
+        <p>Run from the source checkout, then open <code>results/desk-incident/report.html</code>.</p>
+        <span id="copy-status" class="sr-only" role="status"></span>
       </div>
     </section>
   </main>
 
   <footer class="shell footer">
-    <a class="brand" href="./"><span class="mark small" aria-hidden="true"></span> Jitter</a>
-    <span>Synthetic workloads · local replay · recorded evidence</span>
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
     <a href="https://github.com/bforce541/jitter">Source on GitHub</a>
   </footer>
 </body>
