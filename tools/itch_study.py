@@ -62,7 +62,7 @@ def evaluate(sender, receiver, case):
     return receiver["snapshot_covered"] == receiver["retransmission_requests"] == 0
 
 
-def run(binary, window, case, rate, batch, out, sender_cpu=None, receiver_cpu=None):
+def run(binary, window, case, rate, batch, out, sender_cpu=None, receiver_cpu=None, read_batch=1):
     out.mkdir()
     timings = out / "observations.bin"
     with (window / "initial.snapshot").open("rb") as stream:
@@ -73,7 +73,7 @@ def run(binary, window, case, rate, batch, out, sender_cpu=None, receiver_cpu=No
         raise ValueError("invalid study window")
     seconds = math.ceil((end - through) / rate) + 8
     receiver = [str(binary), "receive", str(window), case,
-                "8" if case == "overflow" else "32768", str(seconds * 1000), str(timings)]
+                "8" if case == "overflow" else "32768", str(seconds * 1000), str(timings), str(read_batch)]
     if receiver_cpu is not None:
         receiver = ["taskset", "-c", str(receiver_cpu), *receiver]
     with (out / "receiver.stderr").open("w") as log:
@@ -105,14 +105,15 @@ def run(binary, window, case, rate, batch, out, sender_cpu=None, receiver_cpu=No
         raise ValueError("timing ledger disagrees with immediate publication count")
     for step in receiver_stats["timeline"]:
         step["elapsed_ns"] = step.pop("time_ns") - start_ns
-    return {"case": case, "batch": batch, "verified": evaluate(sender_stats, receiver_stats, case),
+    return {"case": case, "batch": batch, "read_batch": read_batch,
+            "verified": evaluate(sender_stats, receiver_stats, case),
             "sender": sender_stats, "receiver": receiver_stats, "timing": stats}
 
 
 def summarize(rows):
     treatments = {}
-    for case, batch in sorted({(row["case"], row["batch"]) for row in rows}):
-        matching = [row for row in rows if (row["case"], row["batch"]) == (case, batch)]
+    for case, batch, read_batch in sorted({(row["case"], row["batch"], row["read_batch"]) for row in rows}):
+        matching = [row for row in rows if (row["case"], row["batch"], row["read_batch"]) == (case, batch, read_batch)]
         if not all(row["verified"] for row in matching):
             continue
         measures = {}
@@ -123,7 +124,8 @@ def summarize(rows):
         for process in ("sender", "receiver"):
             measures[process + "_cpu_ns"] = median(row[process]["process"]["cpu_ns"] for row in matching)
         measures["recovery_ns"] = median(row["receiver"]["recovery_ns"] for row in matching)
-        treatments[f"{case}/batch-{batch}"] = measures
+        measures["nonempty_reads"] = median(row["receiver"]["nonempty_reads"] for row in matching)
+        treatments[f"{case}/packet-{batch}/read-{read_batch}"] = measures
     return treatments
 
 
@@ -136,6 +138,7 @@ def main():
     parser.add_argument("--rate", type=int, default=50000)
     parser.add_argument("--batch", type=int, default=8, choices=(1, 2, 4, 8))
     parser.add_argument("--pair-batch", type=int, choices=(1, 2, 4, 8))
+    parser.add_argument("--compare-receive-batching", action="store_true")
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--sender-cpu", type=int)
     parser.add_argument("--receiver-cpu", type=int)
@@ -145,6 +148,8 @@ def main():
         parser.error("rate must be 1000..5000000 and repeat 1..20")
     if args.pair_batch == args.batch:
         parser.error("--pair-batch must differ from --batch")
+    if args.compare_receive_batching and (platform.system() != "Linux" or args.pair_batch is not None):
+        parser.error("compare receive batching on Linux with a fixed packet batch size")
     args.output.mkdir(parents=True)
     binary, window = args.binary.resolve(strict=True), args.window.resolve(strict=True)
     rows = []
@@ -159,16 +164,18 @@ def main():
         "sender_cpu": args.sender_cpu, "receiver_cpu": args.receiver_cpu, "runs": rows,
     }
     for repetition in range(args.repeat):
-        batches = (args.batch,) if args.pair_batch is None else (args.batch, args.pair_batch)
+        packets = (args.batch,) if args.pair_batch is None else (args.batch, args.pair_batch)
+        reads = (1, 16) if args.compare_receive_batching else (1,)
+        batches = [(packet, read) for packet in packets for read in reads]
         if repetition % 2:
             batches = batches[::-1]
         for case in args.case or CASES:
-            for batch in batches:
+            for batch, read_batch in batches:
                 row = run(binary, window, case, args.rate, batch,
-                          args.output / f"{repetition + 1:02}-{case}-batch-{batch}",
-                          args.sender_cpu, args.receiver_cpu)
+                          args.output / f"{repetition + 1:02}-{case}-packet-{batch}-read-{read_batch}",
+                          args.sender_cpu, args.receiver_cpu, read_batch)
                 rows.append(row)
-                print(f"{case} batch {batch} repeat {repetition + 1}: verified={row['verified']}", flush=True)
+                print(f"{case} packet {batch} read {read_batch} repeat {repetition + 1}: verified={row['verified']}", flush=True)
                 report["summary"] = summarize(rows)
                 (args.output / "study.json").write_text(json.dumps(report, indent=2) + "\n")
     return 0 if all(row["verified"] for row in rows) else 1

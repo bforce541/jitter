@@ -1,0 +1,65 @@
+name: ITCH Linux evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  historical-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record host and build
+        shell: bash
+        run: |
+          mkdir -p evidence
+          {
+            echo "GitHub-hosted Linux x86-64 VM"
+            uname -smr
+            lscpu
+            c++ --version
+            cmake --version
+            python3 --version
+            taskset -pc $$
+            git rev-parse HEAD
+          } > evidence/host.txt
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake --build build --target jitter_itch jitter_mold --parallel 4
+          cp build/compile_commands.json evidence/
+          ctest --test-dir build --output-on-failure -R itch
+      - name: Fetch and validate complete historical session
+        shell: bash
+        run: |
+          python3 tools/fetch_itch_sample.py "$RUNNER_TEMP/itch.gz"
+          gzip -cd "$RUNNER_TEMP/itch.gz" | build/jitter_itch --verify --capture "$RUNNER_TEMP/windows" > evidence/full-session.json
+          python3 -c 'import json; d=json.load(open("evidence/full-session.json")); assert d["complete_session"] and d["reference_quote_checks"] == d["book_updates"]'
+      - name: Profile baseline separately from timing
+        shell: bash
+        run: |
+          if command -v perf >/dev/null; then
+            perf stat -x , -e cycles,instructions,cache-references,cache-misses,context-switches,cpu-migrations               -- python3 tools/itch_study.py --binary build/jitter_mold --window "$RUNNER_TEMP/windows/open"               --output "$RUNNER_TEMP/perf-stat" --case clean --rate 100000 --repeat 1               > evidence/perf-stat.stdout 2> evidence/perf-stat.txt || true
+            if perf record -o "$RUNNER_TEMP/perf.data" -e cpu-clock -F 199               -- python3 tools/itch_study.py --binary build/jitter_mold --window "$RUNNER_TEMP/windows/open"               --output "$RUNNER_TEMP/perf-record" --case clean --rate 100000 --repeat 1               > evidence/perf-record.stdout 2> evidence/perf-record.txt; then
+              perf report --stdio -i "$RUNNER_TEMP/perf.data" > evidence/perf-report.txt
+            fi
+          else
+            echo "perf executable unavailable in the runner image" > evidence/perf-status.txt
+          fi
+          python3 tools/itch_study.py --binary build/jitter_mold --window "$RUNNER_TEMP/windows/open"             --output evidence/diagnostic --case clean --rate 100000 --repeat 1 --environment github-hosted-vm
+      - name: Measure matched transport trials and failure recovery
+        shell: bash
+        run: |
+          read -r sender_core receiver_core < <(python3 -c 'import os; print(*sorted(os.sched_getaffinity(0))[:2])')
+          for window in open quiet; do
+            python3 tools/itch_study.py --binary build/jitter_mold --window "$RUNNER_TEMP/windows/$window"               --output "evidence/$window" --case clean --compare-receive-batching --rate 50000 --repeat 5               --sender-cpu "$sender_core" --receiver-cpu "$receiver_core" --environment github-hosted-vm
+          done
+          python3 tools/itch_study.py --binary build/jitter_mold --window "$RUNNER_TEMP/windows/open"             --output evidence/faults --case a-only --case re-request --case snapshot --case overflow             --rate 30000 --repeat 1 --sender-cpu "$sender_core" --receiver-cpu "$receiver_core"             --environment github-hosted-vm
+      - name: Retain measurements and profiling status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: itch-linux-evidence
+          path: evidence/
+          retention-days: 21

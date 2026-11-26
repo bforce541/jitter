@@ -6,6 +6,7 @@
 #include <poll.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -33,6 +34,7 @@ constexpr std::array<std::uint8_t, 10> session{'J', 'I', 'T', 'T', 'E', 'R', '0'
 constexpr std::size_t header_size = 20, max_datagram = 1400;
 constexpr unsigned end_count = 65535, max_request = 16;
 constexpr Sequence small_start = 32, small_stop = 40, large_start = 64;
+constexpr unsigned max_receive_batch = 16;
 
 std::uint64_t ns(Clock::time_point time) {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(time.time_since_epoch()).count();
@@ -109,6 +111,39 @@ public:
 private:
     int fd_;
 };
+
+struct Datagram {
+    std::array<std::uint8_t, max_datagram + 1> bytes{};
+    sockaddr_in peer{};
+};
+
+#ifdef __linux__
+class BatchReader {
+public:
+    BatchReader() {
+        for (unsigned i = 0; i < max_receive_batch; ++i) {
+            vectors_[i] = {data[i].bytes.data(), data[i].bytes.size()};
+            headers[i].msg_hdr.msg_name = &data[i].peer;
+            headers[i].msg_hdr.msg_iov = &vectors_[i];
+            headers[i].msg_hdr.msg_iovlen = 1;
+        }
+    }
+    unsigned read(Socket& socket, unsigned limit) {
+        for (unsigned i = 0; i < limit; ++i) {
+            headers[i].msg_hdr.msg_namelen = sizeof(sockaddr_in);
+            headers[i].msg_hdr.msg_flags = 0;
+        }
+        const auto received = recvmmsg(socket.fd(), headers.data(), limit, MSG_DONTWAIT, nullptr);
+        if (received >= 0) return received;
+        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) return 0;
+        return checked(-1, "recvmmsg");
+    }
+    std::array<Datagram, max_receive_batch> data;
+    std::array<mmsghdr, max_receive_batch> headers{};
+private:
+    std::array<iovec, max_receive_batch> vectors_{};
+};
+#endif
 
 Wire header(Sequence first, unsigned count) {
     Wire result(session.begin(), session.end());
@@ -431,12 +466,16 @@ private:
 struct Repair { Sequence sequence; Book book; };
 
 json receive_replay(std::span<char*> args) {
-    if (args.size() != 5) throw std::runtime_error("receive WINDOW SCENARIO CAPACITY TIMEOUT_MS TIMINGS");
+    if (args.size() != 6) throw std::runtime_error("receive WINDOW SCENARIO CAPACITY TIMEOUT_MS TIMINGS READ_BATCH");
     const std::filesystem::path window = args[0];
     const auto fault = scenario(args[1]);
-    const auto capacity = number(args[2]), timeout_ms = number(args[3]);
-    if (!capacity || capacity > 1000000 || timeout_ms < 100 || timeout_ms > 1200000)
+    const auto capacity = number(args[2]), timeout_ms = number(args[3]), read_batch = number(args[5]);
+    if (!capacity || capacity > 1000000 || timeout_ms < 100 || timeout_ms > 1200000 ||
+        !read_batch || read_batch > max_receive_batch)
         throw std::runtime_error("invalid receiver arguments");
+#ifndef __linux__
+    if (read_batch != 1) throw std::runtime_error("receive batching requires Linux recvmmsg");
+#endif
     const auto initial = read_snapshot(window / "initial.snapshot");
     const auto expected = read_snapshot(window / "final.snapshot");
     if (expected.through <= initial.through || expected.through - initial.through > 1000000 ||
@@ -448,26 +487,47 @@ json receive_replay(std::span<char*> args) {
     const auto before = resources();
     const auto start = Clock::now();
     std::optional<Clock::time_point> end;
-    std::array<std::uint8_t, max_datagram + 1> bytes{};
+    Datagram single;
+#ifdef __linux__
+    BatchReader batch;
+#endif
     std::future<Repair> reading;
     std::optional<Repair> repair;
     bool started_snapshot = false;
     std::uint64_t datagrams[2]{};
+    std::uint64_t read_calls = 0, nonempty_reads = 0;
+    const auto accept = [&](Bytes bytes, const sockaddr_in& peer, unsigned feed, Clock::time_point received) {
+        ++datagrams[feed];
+        const auto data = unpack(bytes);
+        receiver.ingest(data, received, feed);
+        if (data.count == end_count && !end) end = received;
+        if (receiver.can_request(received)) channels[feed].send(receiver.request(), peer);
+    };
     while (!receiver.done() && Clock::now() - start < std::chrono::milliseconds(timeout_ms)) {
         pollfd waiters[]{ {channels[0].fd(), POLLIN, 0}, {channels[1].fd(), POLLIN, 0} };
         if (poll(waiters, 2, 1) < 0 && errno != EINTR) checked(-1, "poll");
         for (unsigned feed = 0; feed < 2; ++feed) {
-            sockaddr_in peer{};
-            for (int i = 0; i < 32; ++i) {
-                const auto count = channels[feed].read(bytes, peer);
+            for (unsigned remaining = 32; remaining > 0;) {
+                ++read_calls;
+#ifdef __linux__
+                if (read_batch > 1) {
+                    const auto count = batch.read(channels[feed], std::min<unsigned>(read_batch, remaining));
+                    if (!count) break;
+                    const auto received = Clock::now();
+                    ++nonempty_reads;
+                    for (unsigned i = 0; i < count; ++i) {
+                        const auto& item = batch.data[i];
+                        accept(Bytes(item.bytes).first(batch.headers[i].msg_len), item.peer, feed, received);
+                    }
+                    remaining -= count;
+                    continue;
+                }
+#endif
+                const auto count = channels[feed].read(single.bytes, single.peer);
                 if (!count) break;
-                const auto received = Clock::now();
-                ++datagrams[feed];
-                const auto data = unpack(Bytes(bytes).first(count));
-                receiver.ingest(data, received, feed);
-                if (data.count == end_count && !end) end = received;
-                if (receiver.can_request(received))
-                    channels[feed].send(receiver.request(), peer);
+                ++nonempty_reads;
+                accept(Bytes(single.bytes).first(count), single.peer, feed, Clock::now());
+                --remaining;
             }
         }
         if (fault == Scenario::snapshot && receiver.needs_snapshot() && !started_snapshot) {
@@ -512,6 +572,7 @@ json receive_replay(std::span<char*> args) {
             {"conflicts", receiver.conflicts}, {"discarded", receiver.discarded}, {"peak_buffered", receiver.peak_pending},
             {"recovery_ns", receiver.recovery_ns}, {"elapsed_ns", ns(finish) - ns(start)},
             {"datagrams_a", datagrams[0]}, {"datagrams_b", datagrams[1]}, {"process", after},
+            {"read_batch", read_batch}, {"read_calls", read_calls}, {"nonempty_reads", nonempty_reads},
             {"timeline", receiver.timeline}};
 }
 }
