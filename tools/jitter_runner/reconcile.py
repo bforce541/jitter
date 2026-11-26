@@ -2,10 +2,11 @@
 
 import csv
 from collections import defaultdict
-import hashlib
 import json
+from pathlib import Path
 import re
 import sqlite3
+import tempfile
 
 
 FIELDS = ("source", "record_id", "session", "execution_id", "revision", "instrument",
@@ -70,19 +71,23 @@ def _signed(row):
 
 def _observations(db, as_of, grace):
     grouped = defaultdict(lambda: {"desk": [], "venue": []})
+    first_observed = {}
     positions = defaultdict(lambda: {"desk": 0, "venue": 0})
     for row in db.execute("""
         WITH ranked AS (
           SELECT *, dense_rank() OVER (PARTITION BY session,execution_id,source
-                                      ORDER BY revision DESC) AS revision_rank
+                                      ORDER BY revision DESC) AS revision_rank,
+                 min(observed_ns) OVER (PARTITION BY session,execution_id) AS first_observed_ns
           FROM fills
         )
         SELECT source,record_id,session,execution_id,revision,instrument,side,quantity,
-               price_ticks,executed_ns,observed_ns FROM ranked
+               price_ticks,executed_ns,observed_ns,first_observed_ns FROM ranked
         WHERE revision_rank=1 ORDER BY session,execution_id,source,record_id
     """):
         record = dict(row)
-        grouped[row["session"], row["execution_id"]][row["source"]].append(record)
+        identity = row["session"], row["execution_id"]
+        first_observed[identity] = record.pop("first_observed_ns")
+        grouped[identity][row["source"]].append(record)
         positions[row["instrument"]][row["source"]] += _signed(row)
     for (session, execution), sources in sorted(grouped.items()):
         desk, venue = sources["desk"], sources["venue"]
@@ -99,7 +104,7 @@ def _observations(db, as_of, grace):
             for key in ("instrument", "side", "quantity", "price_ticks"):
                 if desk[0][key] != venue[0][key]:
                     reasons.append("mismatched-" + key)
-        first = min(record["observed_ns"] for record in desk + venue)
+        first = first_observed[session, execution]
         discrepancy = ",".join(reasons)
         if not reasons:
             state = "resolved"
@@ -168,18 +173,24 @@ def reconcile(database, records, *, as_of_ns, grace_ns):
 def export_csv(path, report):
     fields = ("session", "execution_id", "instrument", "discrepancy", "desk_minus_venue_quantity",
               "status", "as_of_ns", "desk_record_ids", "venue_record_ids", "previous_discrepancy")
-    with path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
-        writer.writeheader()
-        prior = {}
-        for transition in report["history"]:
-            details = transition["evidence"]
-            identity = (transition["session"], transition["execution_id"])
-            for instrument, impact in details["position_impact"].items():
-                writer.writerow({"session": identity[0], "execution_id": identity[1], "instrument": instrument,
-                                 "discrepancy": transition["discrepancy"], "desk_minus_venue_quantity": impact,
-                                 "status": transition["state"], "as_of_ns": transition["as_of_ns"],
-                                 "desk_record_ids": "|".join(r["record_id"] for r in details["records"]["desk"]),
-                                 "venue_record_ids": "|".join(r["record_id"] for r in details["records"]["venue"]),
-                                 "previous_discrepancy": prior.get(identity, "")})
-            prior[identity] = transition["discrepancy"]
+    temporary = tempfile.NamedTemporaryFile(mode="w", dir=path.parent, newline="", encoding="utf-8", delete=False)
+    staged = Path(temporary.name)
+    try:
+        with temporary as stream:
+            writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
+            writer.writeheader()
+            prior = {}
+            for transition in report["history"]:
+                details = transition["evidence"]
+                identity = (transition["session"], transition["execution_id"])
+                for instrument, impact in details["position_impact"].items():
+                    writer.writerow({"session": identity[0], "execution_id": identity[1], "instrument": instrument,
+                                     "discrepancy": transition["discrepancy"], "desk_minus_venue_quantity": impact,
+                                     "status": transition["state"], "as_of_ns": transition["as_of_ns"],
+                                     "desk_record_ids": "|".join(r["record_id"] for r in details["records"]["desk"]),
+                                     "venue_record_ids": "|".join(r["record_id"] for r in details["records"]["venue"]),
+                                     "previous_discrepancy": prior.get(identity, "")})
+                prior[identity] = transition["discrepancy"]
+        staged.replace(path)
+    finally:
+        staged.unlink(missing_ok=True)

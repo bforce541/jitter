@@ -2,6 +2,7 @@
 
 import csv
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -35,11 +36,25 @@ with TemporaryDirectory() as root:
 
     fresh = Path(root) / "rebuilt.sqlite"
     reconcile = [sys.executable, str(tools / "desk_reconcile.py"), "--database", str(fresh),
-                 "--grace-ns", "50000000", "--csv", str(Path(root) / "rebuilt.csv")]
+                 "--grace-ns", "50000000"]
     def apply(now, *names):
         args = [item for name in names for item in ("--input", str(output / name))]
-        return json.loads(subprocess.check_output([*reconcile, "--as-of-ns", str(now), *args]))
+        return json.loads(subprocess.check_output([*reconcile, "--csv", str(Path(root) / "rebuilt.csv"),
+                                                   "--as-of-ns", str(now), *args]))
     apply(40_000_000, "desk-bookings.csv", "venue-initial.csv")
     apply(80_000_000)
     result = apply(120_000_000, "venue-late.csv")
     assert result == desk["result"]
+
+    initial = output / "desk-bookings.csv"
+    raw_csv = initial.read_bytes()
+    alias = Path(root) / "ledger-alias"
+    os.link(fresh, alias)
+    blocked = [fresh, fresh.with_name(fresh.name + "-wal"), alias, initial]
+    for target in blocked:
+        command = [*reconcile, "--csv", str(target), "--as-of-ns", "130000000",
+                   "--input", str(initial)]
+        rejected = subprocess.run(command, capture_output=True, text=True)
+        assert rejected.returncode == 1 and "would overwrite" in rejected.stderr
+    assert initial.read_bytes() == raw_csv
+    assert apply(120_000_000) == result

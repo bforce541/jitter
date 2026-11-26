@@ -55,6 +55,26 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(restored["records"], 5)
         self.assertEqual(restored["positions"]["ABC"]["desk_minus_venue"], 0)
 
+    def test_correction_keeps_first_observation_and_grace_deadline(self):
+        self.run_batch([row("desk", "booking")], 2)
+        confirmed = self.run_batch([], 12)
+        self.assertEqual(confirmed["open"][0]["state"], "confirmed")
+        correction = row("desk", "correction", revision=2, observed_ns=13, quantity=31)
+        updated = self.run_batch([correction], 13)
+        self.assertEqual([entry["state"] for entry in updated["history"]], ["pending", "confirmed", "confirmed"])
+        self.assertEqual(updated["open"][0]["evidence"]["first_observed_ns"], 2)
+        self.assertEqual(updated["positions"]["ABC"]["desk_minus_venue"], -31)
+
+    def test_failed_csv_export_preserves_previous_report(self):
+        path = self.path / "operator.csv"
+        saved = self.run_batch([row("desk", "booking")], 2)
+        export_csv(path, saved)
+        previous = path.read_bytes()
+        with self.assertRaises(KeyError):
+            export_csv(path, {"history": [*saved["history"], {}]})
+        self.assertEqual(path.read_bytes(), previous)
+        self.assertCountEqual(self.path.iterdir(), [self.db, path])
+
     def test_identity_conflict_rolls_back_batch_and_clock(self):
         desk = row("desk", "booking")
         original = self.run_batch([desk], 2)

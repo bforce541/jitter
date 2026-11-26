@@ -1,110 +1,86 @@
-# Jitter | C++20 Market-Data Replay & Order-Book Engine
+# Jitter
 
-Jitter replays a simulated trading-desk incident. A C++20 receiver reconstructs and recovers a market-data book over redundant UDP. A SQLite audit matches the desk's booked fills against a simulated venue drop copy.
+A C++20 market-data replay lab and a toolkit for reproducible tail-latency investigations. Jitter replays a synthetic order stream, checks the reconstructed book against a sparse reference, and records the evidence behind recovery and performance decisions. It runs locally on Linux and macOS.
 
-## Run the desk incident
+| Workflow | What you get |
+| --- | --- |
+| [Trading-desk incident](#replay-the-desk-incident) | Redundant loopback UDP, verified snapshot recovery, and a SQLite audit of a delayed simulated fill |
+| [Market replay](#benchmark-the-order-book) | A dense order book, a sparse reference, and open-loop benchmarks for sleeping mutex and polling SPSC queues |
+| [Latency investigation](#investigate-tail-latency) | Paired experiments, request-level traces, fresh confirmation, and a read-only evidence dashboard |
+
+## Replay the desk incident
+
+From the repository root, run this with Python 3.9+, CMake 3.20+, and C and C++20 compilers. The command builds the incident executable and writes everything to a new directory.
 
 ```sh
 python3 tools/desk_incident.py --output results/desk-incident
 ```
 
-Open `results/desk-incident/report.html`. It shows a lost packet repaired by the second feed, a dual-feed gap and verified snapshot recovery, and a missing fill that affects a position until the delayed report arrives. The report links the source records, state proof and operator CSV. [Runbook and reproduction](docs/desk-incident.md) · [Receiver measurements](docs/desk-results.md)
+Open `results/desk-incident/report.html`. Feed B supplies sequence **2** when A omits it. When both feeds omit sequence **5**, the book goes stale. Recovery verifies a snapshot through 5 and the buffered deltas through 7 against the sparse reference, then finishes at sequence 12. In a separate execution audit, a delayed drop copy takes the simulated ABC position difference from **−30 to 0**.
 
-On the native M4 Pro, dual-feed steady replay at 100K events/s published every event across five runs with median receiver p99 **0.084 µs** and scheduled-to-publication p99 **16.125 µs**. The receiver clock begins after the local receive system call. In the separate burst stress test, bounded drains reduced local send-to-receipt p99 **18.554 → 0.147 ms**. [Raw paired runs](docs/evidence/desk/udp-confirmation-arm64.json)
+| Artifact | What to inspect |
+| --- | --- |
+| `report.html` | Feed and book timeline, recovery proof, execution discrepancy, and final positions |
+| `market.json` and `incident.json` | Publication sequences, source feeds, book fingerprints, and timing boundaries |
+| `executions.sqlite` and the input CSVs | Original bookings and venue records retained across retries |
+| `discrepancies.csv` | Pending, confirmed, and resolved transitions with source record IDs |
 
-## In-process market replay
+Use `--single-feed` to run the A-only scenario or `--binary build/jitter_incident` to reuse an existing build. The snapshot is supplied in process, and all traffic and executions are simulated locally. The runbook includes the commands to reconstruct the audit in a fresh database. [Desk runbook](docs/desk-incident.md) · [Receiver measurements](docs/desk-results.md)
 
-The original deterministic book engine and benchmarks isolate book work and measure open-loop queue handoff. These controlled results use different timing boundaries from the UDP lab.
+## Build and test
 
-| Experiment on native M4 Pro | Baseline → candidate | Evidence |
-| --- | ---: | --- |
-| Direct replay, sparse reference → dense book | **14.51M → 36.83M events/s** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
-| 500K steady feed, same mutex queue, reference → dense book | **27.333 → 17.771 µs scheduled p99** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
-| 500K steady feed, same dense book, sleeping mutex → polling SPSC | **10.313 → 0.542 µs scheduled p99** | [Eight queue confirmation pairs](docs/evidence/market/queue-confirmation-arm64.json) |
-| Process CPU in that queue comparison | **1.36 → 2.00 approximate cores** | [Queue study](docs/market-queue.md) |
-
-Values are medians of per-run measurements. The dense-book and queue studies used separate paired runs. Their median paired p99 reductions were **38.4%** and **94.8%**, respectively, with every measured event published. Scheduled p99 starts at the prescribed release and ends when the consumer writes its in-process update. These are synthetic replay measurements.
-
-The dense book uses fixed order-ID and tick arrays with a bitmap per side. The feed supports partial fills, duplicate suppression and sequence-gap detection. A gap suppresses further delta publication until a validated authoritative snapshot covers the discarded sequences. Differential replay tests compare its published updates and recovered state with the sparse reference. [Architecture and correctness](docs/market-replay.md).
+The full suite requires Git, Python 3.9+, CMake 3.20+, and C and C++20 compilers on Linux or macOS. SQLite and nlohmann/json are pinned and vendored. The build uses a single-configuration CMake generator.
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-# On Apple Silicon, add -DCMAKE_OSX_ARCHITECTURES=arm64 to configure.
 cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
+```
+
+For native Apple Silicon measurements, configure with `-DCMAKE_OSX_ARCHITECTURES=arm64`. The tests cover book replay and recovery, queue FIFO behavior, one- and two-feed UDP, execution reconciliation, and the Python evidence pipeline. The [CI workflow](.github/workflows/build.yml) also runs sanitizer and end-to-end CLI checks.
+
+## Benchmark the order book
+
+Direct mode measures book mutation and top-of-book publication. Feed mode adds a paced producer and a bounded queue. The dense book uses fixed order and price-level arrays with bitmaps for best-quote lookup. Feed runs expose queue drops, stale outputs, and publication coverage alongside their percentiles. The sleeping mutex is the default, and the polling SPSC ring trades CPU for lower handoff latency in the measured steady case. [Book design and verification](docs/market-replay.md) · [Queue tradeoffs](docs/market-queue.md)
+
+```sh
 build/jitter_market --mode direct --book dense --events 100000 --warmup 20000 --seed 17
-build/jitter_market --mode feed --book dense --queue spsc --events 400000 --warmup 20000 --seed 1001 --rate 500000
+build/jitter_market --mode feed --book dense --queue spsc \
+  --events 400000 --warmup 20000 --seed 1001 --rate 500000
 ```
 
-The sleeping mutex is the default. The original sweep's passing tested prefix ended at 500K events/s for the mutex and 2M for polling. Polling passed p99 and failed p99.9 at 4M. In a later trace, startup release lateness dominated the 4M tail. The matching uninstrumented reruns showed that the failing percentile varies across runs. [Load envelope](docs/market-queue.md#load-envelope) · [4M investigation and Linux reproduction](docs/market-tail.md).
+### Recorded results on a native Apple M4 Pro
 
-## Performance investigation toolkit
+| Controlled experiment | Observed median | Evidence |
+| --- | ---: | --- |
+| Direct replay throughput, sparse reference → dense book | **14.51M → 36.83M events/s** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
+| Steady 500K/s in-process feed, reference → dense with the same mutex queue | **27.333 → 17.771 µs scheduled p99** | [Eight book pairs](docs/evidence/market/paired-arm64.json) |
+| Steady 500K/s dense feed, sleeping mutex → polling SPSC | **10.313 → 0.542 µs scheduled p99** and **1.36 → 2.00 approximate CPU cores** | [Eight queue confirmation pairs](docs/evidence/market/queue-confirmation-arm64.json) |
+| Steady 100K/s redundant UDP, full publication in five runs | **0.084 µs receiver p99** and **16.125 µs scheduled p99** | [UDP confirmation](docs/evidence/desk/udp-confirmation-arm64.json) |
+| Redundant UDP bursts of 4,096, drain at end → drain every 32 events | **18.554 → 0.147 ms local send-to-receipt p99** | [UDP confirmation](docs/evidence/desk/udp-confirmation-arm64.json) |
 
-The original `jitter` CLI investigates C++ tail latency using dependency evidence, adaptive experiments, correctness checks and fresh confirmation. It supports the shared-index service, pinned nlohmann/json parsing and pinned SQLite aggregation. An offline dashboard opens the resulting evidence. Market replay emits a separate JSON schema.
+Each latency value is a median of per-run percentiles. Scheduled latency starts at the prescribed release and ends at publication. UDP receiver latency starts when the receive call returns. Book and queue comparisons used separate paired runs, and the bounded-drain result applies to local delivery under the tested burst shape. At 4M events/s, the original SPSC sweep breached the p99.9 budget, reruns showed variable tails, and a first-deadline pacing candidate was rejected after losing publication coverage. Dedicated Linux x86-64 performance remains unmeasured. [Load envelope](docs/market-queue.md#load-envelope) · [4M tail investigation](docs/market-tail.md) · [UDP timing definitions](docs/desk-incident.md#measure-and-reproduce)
 
-## Install and check
+## Investigate tail latency
 
-Requires Linux or macOS, Python 3.9+, Git, CMake 3.20+, a C compiler and a C++20 compiler. Upstream sources are vendored; building the application requires no dependency download. The optional editable CLI installation downloads its Python build tooling.
+Use the Python controller with the compiled `build/jitter` engine. It varies registered controls for a shared-index service, nlohmann/json projection, and SQLite aggregation. It checks response correctness, throughput, resource limits, and tail sample counts before accepting a candidate in a fresh confirmation block. Reports retain failed and inconclusive outcomes.
 
 ```sh
-git clone https://github.com/bforce541/jitter.git
-cd jitter
-python3 -m venv jitter-env
-. jitter-env/bin/activate
-python3 -m pip install --no-deps -e .
-jitter doctor
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel 2
-ctest --test-dir build --output-on-failure
+python3 tools/jitter.py investigate examples/investigation.json --dry-run
+python3 tools/jitter.py investigate examples/investigation.json \
+  --binary build/jitter --output results/investigation
+python3 tools/jitter.py verify results/investigation
+python3 tools/jitter.py ui results/investigation
 ```
 
-Keep the source checkout with an editable installation. A standalone Python wheel without the C/C++ source tree is not the supported distribution. Without installation, run the same commands as `python3 tools/jitter.py ...`.
+Read `results/investigation/report.md` for the decision and `report.json` for structured evidence. The localhost dashboard shows measured runs, search decisions, confirmation, provenance, and request dependencies when a trace is available. The market benchmark and desk lab write their own evidence formats. [Dashboard guide](docs/dashboard.md) · [JSON example](examples/json-investigation.json) · [SQLite example](examples/sqlite-investigation.json)
 
-## Run an investigation
+Omit `--binary` to let an investigation build isolated implementation variants. The optional `python3 -m pip install --no-deps -e .` installs the `jitter` command and uses the source checkout. The tools run from source without the editable install.
 
 ```sh
-jitter run examples/baseline.json --output results/baseline
-jitter investigate examples/investigation.json --dry-run
-jitter investigate examples/investigation.json --output results/investigation
-jitter report results/investigation
-jitter verify results/investigation
-jitter reproduce results/investigation --output results/replay
+python3 tools/jitter.py reproduce results/investigation --output results/replay
+python3 tools/jitter.py pack results/investigation --output results/evidence.tar.gz
+python3 tools/jitter.py unpack results/evidence.tar.gz --output results/restored
 ```
 
-The default investigation builds isolated implementation engines. To reuse the engine already built above, add `--binary build/jitter`. `examples/json-investigation.json` and `examples/sqlite-investigation.json` exercise the upstream integrations.
-
-Read `report.md` for the outcome and `report.json` for the full structured evidence. A recommendation needs zero lost work, passing resource/throughput constraints, adequate tail samples and a fresh fixed confirmation block. Inconclusive results and budget stops are legitimate outcomes. Timings and selections may change on reproduction.
-
-## Inspect and preserve evidence
-
-```sh
-jitter run examples/contention.json --output results/observation
-jitter diagnose results/observation --run 1
-jitter overhead examples/contention.json --output results/overhead
-jitter pack results/investigation --output results/evidence.tar.gz
-jitter unpack results/evidence.tar.gz --output results/restored
-```
-
-All output paths must be new. Generated local results are excluded from Git. Portable archives preserve raw inputs, responses, traces, source, executables and manifests while deduplicating repeated content.
-
-## Local visual inspection
-
-```sh
-jitter ui results
-```
-
-Opens a polished, read-only localhost dashboard for real investigations, search decisions, fresh confirmation, dependency paths, metrics, uncertainty, budgets, process logs and instrumentation overhead. It works offline after installation and has no accounts, API keys or per-use API cost. The CLI remains primary. [Dashboard guide](docs/dashboard.md).
-
-## Evaluate
-
-```sh
-jitter evaluate examples/evaluation.json --binary build/jitter --output results/evaluation
-jitter calibrate --trials 1000 --output results/calibration
-python3 tools/evaluate_diagnostics.py --output results/diagnostic-controls
-```
-
-The full evaluation is substantially longer than a smoke test. It compares guided, random, grid and local search, plus the hypothesis-disabled ablation, under identical declared per-scenario budgets. It preserves negative, failed and inconclusive cases. Shared CI runners validate behavior; they do not provide performance gates.
-
-[Evaluation report](docs/evaluation-report.md) · [Controller and statistics](docs/phase3.md) · [Variants and CLI](docs/phase4.md) · [Architecture](docs/architecture.md) · [Troubleshooting](docs/troubleshooting.md)
-
-[Baseline contracts](docs/phase1.md) · [Observation contracts](docs/phase2.md) · [JSON integration](docs/json-contract.md) · [SQLite integration](docs/sqlite-contract.md) · [Roadmap](docs/roadmap.md)
+Use new output paths for each run. Portable archives preserve raw inputs, responses, traces, source snapshots, executables, and integrity manifests. Reproduction reruns the saved workload and may reach a different performance decision. [Architecture](docs/architecture.md) · [Evaluation and negative results](docs/evaluation-report.md) · [Release validation](docs/release-validation.md) · [Troubleshooting](docs/troubleshooting.md)

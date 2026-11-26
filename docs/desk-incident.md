@@ -28,7 +28,7 @@ Inspect `market.json` for publication source, quote, state, and replay proof. Th
 
 The matching key is `(session, execution_id)`. An immutable raw record is identified by `(source, record_id)`. A conflicting reuse rejects the whole import transaction. Exact retries leave the raw count and audit unchanged. The highest revision on each source is effective. Multiple distinct records at the highest revision remain visible as duplicates and their signed quantities contribute to that source's reported position. Superseded records remain in the raw ledger. Match instrument, side, quantity and price ticks exactly. Quantity is an integer number of units, BUY is positive and SELL is negative. A price tick is 0.01 simulated quote units for both instruments.
 
-`executed_ns` is the source's simulated execution timestamp. `observed_ns` is its immutable first-observation timestamp. The operator supplies `--as-of-ns`; the database watermark cannot run backwards. A sole missing side is pending until the grace period from the first observation expires. Mismatches and duplicates are confirmed immediately. Higher-revision reports can resolve discrepancies through later imports. Neither incoming source is silently amended. Position impact is desk minus venue per instrument, including disagreements that move quantity between instruments.
+`executed_ns` is the source's simulated execution timestamp. `observed_ns` is its immutable first-observation timestamp. The operator supplies `--as-of-ns` and the database watermark cannot run backwards. A sole missing side is pending until the grace period from the execution's earliest recorded observation expires. Corrections can change the effective fill while the grace clock continues from that first observation. Mismatches and duplicates are confirmed immediately. Higher-revision reports can resolve discrepancies through later imports. Position impact is desk minus venue per instrument, including disagreements that move quantity between instruments.
 
 To rebuild the audit in a fresh SQLite database from a completed demo:
 
@@ -42,6 +42,8 @@ python3 tools/desk_reconcile.py --database "$out/rebuilt.sqlite" --csv "$out/reb
 python3 tools/desk_reconcile.py --database "$out/rebuilt.sqlite" --csv "$out/rebuilt.csv" \
   --grace-ns 50000000 --as-of-ns 120000000 --input "$out/venue-late.csv"
 ```
+
+The CLI rejects a CSV destination that aliases the SQLite ledger, a SQLite sidecar, or a supplied input. Each successful export atomically replaces the previous CSV. If export fails after the ledger commits, rerun the same import with a writable CSV destination to regenerate the report.
 
 ## Measure and reproduce
 
