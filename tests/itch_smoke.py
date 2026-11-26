@@ -54,6 +54,16 @@ def run(binary, tape, *args):
     return subprocess.run([binary, *args], input=tape, capture_output=True, timeout=15)
 
 
+def book_fingerprint(orders):
+    """Canonical row bytes specified independently of the C++ decoder."""
+    result = 14695981039346656037
+    for order_id, locate, side, price, size in sorted(orders):
+        for value, width in ((order_id, 8), (locate, 2), (side, 1), (price, 4), (size, 4)):
+            for byte in value.to_bytes(width, "little"):
+                result = ((result ^ byte) * 1099511628211) % (1 << 64)
+    return f"{result:016x}"
+
+
 def main(binary):
     entries = session()
     tape = b"".join(map(frame, entries))
@@ -63,13 +73,15 @@ def main(binary):
     assert result["directory_symbols"] == result["updated_symbols"] == 2
     assert result["book_updates"] == result["reference_quote_checks"] == 7
     assert [row["active_orders"] for row in result["checkpoints"]] == [2, 2, 1]
-    # FNV-1a over the one surviving canonical order, fixed independently below.
-    data = ((1 << 44) + 3).to_bytes(8, "little") + (76).to_bytes(2, "little") + b"\0"
-    data += (1200035).to_bytes(4, "little") + (30).to_bytes(4, "little")
-    fingerprint = 14695981039346656037
-    for byte in data:
-        fingerprint = ((fingerprint ^ byte) * 1099511628211) % (1 << 64)
-    assert result["checkpoints"][-1]["book_fingerprint"] == f"{fingerprint:016x}"
+    ident = (1 << 44) + 1
+    assert result["checkpoints"][-1]["book_fingerprint"] == book_fingerprint([
+        (ident + 2, 76, 0, 1200035, 30)])
+    # C carries a different execution price. The resting ask keeps its price
+    # and loses only the executed shares. E and X remove shares on the bid.
+    partial = json.loads(run(binary, tape, "--verify", "--limit", "10").stdout)
+    assert not partial["complete_session"]
+    assert partial["checkpoints"][-1]["book_fingerprint"] == book_fingerprint([
+        (ident, 76, 0, 1200040, 60), (ident + 1, 9000, 1, 900020, 183)])
     filtered = json.loads(run(binary, tape, "--verify", "--symbol", "FIRST").stdout)
     assert filtered["updated_symbols"] == 1 and filtered["reference_quote_checks"] == 4
     assert filtered["checkpoints"][-1]["book_fingerprint"] == result["checkpoints"][-1]["book_fingerprint"]

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f6">
+  <meta name="description" content="Follow the same Nasdaq ITCH replay with and without a dual-feed outage, then compare the reconstructed books.">
+  <title>Nasdaq replay — Jitter</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/replay/itch/itch.css">
+  <script src="/replay/itch/itch.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="shell topbar">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
+    <nav aria-label="Main navigation">
+      <a href="/">Overview</a>
+      <a href="/replay/itch/" aria-current="page">Nasdaq replay</a>
+      <a href="/replay/">Desk demo</a>
+    </nav>
+    <a class="nav-source" href="https://github.com/bforce541/jitter">GitHub</a>
+  </header>
+
+  <main id="main" class="shell">
+    <header class="page-intro">
+      <p class="kicker">TotalView-ITCH 5.0 &middot; MoldUDP64</p>
+      <h1>Nasdaq replay</h1>
+      <p class="lede">The same historical opening window, replayed twice. The second receiver loses packets from both feeds while the stream keeps moving.</p>
+    </header>
+
+    <section class="console comparison" aria-labelledby="compare-title">
+      <header class="console-bar">
+        <h2 id="compare-title">Compare the receivers</h2>
+        <span id="tape-window">Recorded historical replay</span>
+      </header>
+      <div class="chapters" id="steps" role="group" aria-label="Recovery steps"></div>
+      <div class="console-body">
+        <div class="side-by-side">
+          <section class="book-pane" aria-labelledby="left-title">
+            <h3 id="left-title">Uninterrupted</h3>
+            <p class="pane-meta">Clean reference run</p>
+            <strong class="state" data-state="current">Current</strong>
+            <dl class="pane-facts">
+              <div><dt>Sequence</dt><dd id="reference-sequence">—</dd></div>
+              <div><dt>Final fingerprint</dt><dd id="reference-hash">—</dd></div>
+            </dl>
+          </section>
+          <section class="book-pane" aria-labelledby="right-title">
+            <h3 id="right-title">Dual-feed outage</h3>
+            <p class="pane-meta">Fault injected into A and B</p>
+            <strong class="state" id="fault-state">Loading</strong>
+            <dl class="pane-facts">
+              <div><dt>Book sequence</dt><dd id="fault-sequence">—</dd></div>
+              <div><dt>Buffered updates</dt><dd id="buffered">—</dd></div>
+              <div><dt>Final fingerprint</dt><dd id="fault-hash">—</dd></div>
+            </dl>
+          </section>
+        </div>
+        <p class="event" id="note" role="status">Loading the recorded comparison.</p>
+        <div class="controls">
+          <button class="button primary" type="button" id="play" disabled>Play from start</button>
+          <div class="step-controls">
+            <button class="button secondary" type="button" id="previous" disabled>Previous</button>
+            <button class="button secondary" type="button" id="next" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+      <noscript><p class="static-note"><a class="text-link" href="/itch-evidence.json">Read the comparison evidence.</a></p></noscript>
+    </section>
+
+    <section class="section history" aria-labelledby="session-title">
+      <header class="section-head">
+        <h2 id="session-title">The full session</h2>
+        <p>Jitter compares displayed price and size at the best bid and ask against a separate book implementation.</p>
+      </header>
+      <dl class="metrics session-metrics">
+        <div><dt>Messages decoded</dt><dd id="messages">—</dd></div>
+        <div><dt>Directory symbols</dt><dd id="symbols">—</dd></div>
+        <div><dt>Updates cross-checked</dt><dd id="checks">—</dd></div>
+      </dl>
+      <p class="history-note" id="scope"></p>
+      <div class="evidence-links">
+        <a class="text-link" href="/itch-evidence.json">Comparison evidence (JSON)</a>
+        <a class="text-link" href="https://github.com/bforce541/jitter/blob/main/docs/itch-replay.md">Methodology and reproduction</a>
+      </div>
+    </section>
+  </main>
+  <footer class="shell footer">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>
+    <a href="/replay/">Synthetic desk demo</a>
+  </footer>
+</body>
+</html>

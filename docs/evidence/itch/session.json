@@ -1,0 +1,88 @@
+{
+  "book_updates": 263241937,
+  "checkpoints": [
+    {
+      "active_orders": 414433,
+      "book_fingerprint": "195c55ea041e9606",
+      "event": "Q",
+      "market_ns": 34200000075566,
+      "sequence": 6696722
+    },
+    {
+      "active_orders": 1758807,
+      "book_fingerprint": "8ab50f10cb6a26b7",
+      "event": "M",
+      "market_ns": 57600000071785,
+      "sequence": 265920782
+    },
+    {
+      "active_orders": 0,
+      "book_fingerprint": "cbf29ce484222325",
+      "event": "C",
+      "market_ns": 72300000040070,
+      "sequence": 268744780
+    }
+  ],
+  "complete_session": true,
+  "directory_symbols": 8906,
+  "format": "nasdaq-totalview-itch-5.0",
+  "message_types": {
+    "A": 117145568,
+    "C": 99917,
+    "D": 114360997,
+    "E": 5722824,
+    "F": 1485888,
+    "H": 8966,
+    "I": 4024315,
+    "J": 34,
+    "K": 3,
+    "L": 215161,
+    "P": 1218602,
+    "Q": 17836,
+    "R": 8906,
+    "S": 6,
+    "U": 21639067,
+    "V": 1,
+    "X": 2787676,
+    "Y": 9013
+  },
+  "messages": 268744780,
+  "messages_per_second": 969701.7654061214,
+  "peak_active_orders": 1924078,
+  "peak_rss_bytes": 566255616,
+  "reference_quote_checks": 263241937,
+  "reference_state_checked": true,
+  "schema": 1,
+  "scope": "all-symbols",
+  "system_events": "OSQMEC",
+  "updated_symbols": 8892,
+  "wall_seconds": 277.14168375,
+  "windows": {
+    "open": {
+      "first_market_ns": 34200000000230,
+      "first_sequence": 6696720,
+      "last_market_ns": 34200087549243,
+      "messages": 40000
+    },
+    "quiet": {
+      "first_market_ns": 43200000075462,
+      "first_sequence": 134508461,
+      "last_market_ns": 43202967680509,
+      "messages": 40000
+    }
+  },
+  "source": {
+    "name": "12302019.NASDAQ_ITCH50.gz",
+    "date": "2019-12-30",
+    "url": "https://emi.nasdaq.com/ITCH/Nasdaq%20ITCH/12302019.NASDAQ_ITCH50.gz",
+    "bytes": 3524013057,
+    "sha256": "ef03df46a27e6bda4dead017f84c2e3979df7211f02c7868b51d53fceb99c689",
+    "gzip_integrity_verified": true
+  },
+  "environment": {
+    "system": "macOS ARM64",
+    "cpu": "Apple M4 Pro",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.4.1.1)",
+    "replay_revision": "c8c26fbf5b7064bb41c0cf2c0a31b546c475a05d"
+  }
+}

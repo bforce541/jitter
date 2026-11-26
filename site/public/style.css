@@ -193,3 +193,9 @@ th:last-child, td:last-child { text-align: right; }
   .chapters button { font-size: .77rem; }
   .controls .button { padding-inline: .55rem; font-size: .81rem; }
 }
+
+@media (max-width: 540px) {
+  .topbar { grid-template-columns: 1fr; gap: .25rem; padding-block: .65rem; }
+  .nav-source { display: none; }
+  nav { flex-wrap: wrap; }
+}

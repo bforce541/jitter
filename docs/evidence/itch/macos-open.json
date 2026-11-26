@@ -1,0 +1,955 @@
+{
+  "schema": 1,
+  "environment": "macos-arm64",
+  "system": "Darwin",
+  "machine": "arm64",
+  "kernel": "25.6.0",
+  "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+  "binary_sha256": "ad78767830ed39f19ed79e79387467a2e5114306c29a690493ab83c622e5eb3c",
+  "window": "open",
+  "window_files": {
+    "messages.itch": "6de7b834de07b7eb877bc2cda39ee50efca031283db40c036af47ef1390fa75e",
+    "initial.snapshot": "afe08faec3d1ab273d4e81695ea1935322a73fd1bc7cec625c09e14146aef78f",
+    "repair.snapshot": "42dcaf5fa88733fc41b34cca4398c76c5f6415cddb80dd3b035978a9adea7c75",
+    "final.snapshot": "76999cf52651dbe4fe7974e9e64810fbda76381326f5252f80c9773c06fe4f6c"
+  },
+  "sender_cpu": null,
+  "receiver_cpu": null,
+  "runs": [
+    {
+      "case": "clean",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799847250,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 0,
+        "omitted_datagrams_b": 0,
+        "process": {
+          "cpu_ns": 262135000,
+          "involuntary_switches": 6414,
+          "peak_rss_bytes": 10264576,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 40000,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 5001,
+        "datagrams_b": 5001,
+        "discarded": 0,
+        "duplicates": 40000,
+        "elapsed_ns": 826942042,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 10002,
+        "peak_buffered": 0,
+        "process": {
+          "cpu_ns": 74993000,
+          "involuntary_switches": 5228,
+          "peak_rss_bytes": 86183936,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 40000,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 20110,
+        "recovery_ns": 0,
+        "replayed": 0,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 0,
+        "snapshot_covered": 0,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -27224500
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 40000,
+          "p50": 18250,
+          "p99": 52417,
+          "p999": 4255084
+        },
+        "receipt_to_publication_ns": {
+          "samples": 40000,
+          "p50": 3667,
+          "p99": 17041,
+          "p999": 30208
+        }
+      }
+    },
+    {
+      "case": "snapshot",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799845542,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 4,
+        "omitted_datagrams_b": 4,
+        "process": {
+          "cpu_ns": 269162000,
+          "involuntary_switches": 6811,
+          "peak_rss_bytes": 10612736,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 39968,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 4997,
+        "datagrams_b": 4997,
+        "discarded": 0,
+        "duplicates": 39968,
+        "elapsed_ns": 828621417,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 9994,
+        "peak_buffered": 7080,
+        "process": {
+          "cpu_ns": 274366000,
+          "involuntary_switches": 5170,
+          "peak_rss_bytes": 133283840,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 32888,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 19260,
+        "recovery_ns": 208688834,
+        "replayed": 7080,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 7080,
+        "snapshot_covered": 32,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -28910625
+          },
+          {
+            "buffered": 0,
+            "event": "gap",
+            "received_through": 6696816,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 5108292
+          },
+          {
+            "buffered": 168,
+            "event": "snapshot-requested",
+            "received_through": 6696983,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 5197209
+          },
+          {
+            "buffered": 0,
+            "event": "snapshot-applied",
+            "received_through": 6703895,
+            "sequence": 6703895,
+            "stale": false,
+            "elapsed_ns": 213799917
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 32888,
+          "p50": 19834,
+          "p99": 64077084,
+          "p999": 69716000
+        },
+        "receipt_to_publication_ns": {
+          "samples": 32888,
+          "p50": 3417,
+          "p99": 12792,
+          "p999": 22750
+        }
+      }
+    },
+    {
+      "case": "clean",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799845125,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 0,
+        "omitted_datagrams_b": 0,
+        "process": {
+          "cpu_ns": 255549000,
+          "involuntary_switches": 5591,
+          "peak_rss_bytes": 10244096,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 40000,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 5001,
+        "datagrams_b": 5001,
+        "discarded": 0,
+        "duplicates": 40000,
+        "elapsed_ns": 826975541,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 10002,
+        "peak_buffered": 0,
+        "process": {
+          "cpu_ns": 60526000,
+          "involuntary_switches": 5122,
+          "peak_rss_bytes": 85819392,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 40000,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 20068,
+        "recovery_ns": 0,
+        "replayed": 0,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 0,
+        "snapshot_covered": 0,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -27247667
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 40000,
+          "p50": 17541,
+          "p99": 68583,
+          "p999": 4201833
+        },
+        "receipt_to_publication_ns": {
+          "samples": 40000,
+          "p50": 2750,
+          "p99": 9625,
+          "p999": 33167
+        }
+      }
+    },
+    {
+      "case": "snapshot",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799848541,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 4,
+        "omitted_datagrams_b": 4,
+        "process": {
+          "cpu_ns": 260559000,
+          "involuntary_switches": 5657,
+          "peak_rss_bytes": 10452992,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 39968,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 4997,
+        "datagrams_b": 4997,
+        "discarded": 0,
+        "duplicates": 39968,
+        "elapsed_ns": 827225584,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 9994,
+        "peak_buffered": 5256,
+        "process": {
+          "cpu_ns": 223670000,
+          "involuntary_switches": 4847,
+          "peak_rss_bytes": 128811008,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 34712,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 19340,
+        "recovery_ns": 162675750,
+        "replayed": 5256,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 5256,
+        "snapshot_covered": 32,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -27493084
+          },
+          {
+            "buffered": 0,
+            "event": "gap",
+            "received_through": 6696816,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 2369250
+          },
+          {
+            "buffered": 24,
+            "event": "snapshot-requested",
+            "received_through": 6696839,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 2396250
+          },
+          {
+            "buffered": 0,
+            "event": "snapshot-applied",
+            "received_through": 6702071,
+            "sequence": 6702071,
+            "stale": false,
+            "elapsed_ns": 165045708
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 34712,
+          "p50": 20458,
+          "p99": 51498666,
+          "p999": 57424916
+        },
+        "receipt_to_publication_ns": {
+          "samples": 34712,
+          "p50": 2917,
+          "p99": 8791,
+          "p999": 23042
+        }
+      }
+    },
+    {
+      "case": "clean",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799849334,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 0,
+        "omitted_datagrams_b": 0,
+        "process": {
+          "cpu_ns": 264249000,
+          "involuntary_switches": 5946,
+          "peak_rss_bytes": 10231808,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 40000,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 5001,
+        "datagrams_b": 5001,
+        "discarded": 0,
+        "duplicates": 40000,
+        "elapsed_ns": 827410292,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 10002,
+        "peak_buffered": 0,
+        "process": {
+          "cpu_ns": 70766000,
+          "involuntary_switches": 5213,
+          "peak_rss_bytes": 84889600,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 39992,
+        "published_immediately_b": 8,
+        "read_batch": 1,
+        "read_calls": 20114,
+        "recovery_ns": 0,
+        "replayed": 0,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 0,
+        "snapshot_covered": 0,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -27695583
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 40000,
+          "p50": 20625,
+          "p99": 80000,
+          "p999": 3204125
+        },
+        "receipt_to_publication_ns": {
+          "samples": 40000,
+          "p50": 3208,
+          "p99": 12459,
+          "p999": 32250
+        }
+      }
+    },
+    {
+      "case": "snapshot",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799848208,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 4,
+        "omitted_datagrams_b": 4,
+        "process": {
+          "cpu_ns": 264515000,
+          "involuntary_switches": 5881,
+          "peak_rss_bytes": 10264576,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 39968,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 4998,
+        "datagrams_b": 4998,
+        "discarded": 0,
+        "duplicates": 39968,
+        "elapsed_ns": 828967333,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 9996,
+        "peak_buffered": 6000,
+        "process": {
+          "cpu_ns": 240659000,
+          "involuntary_switches": 4909,
+          "peak_rss_bytes": 133074944,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 33968,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 19326,
+        "recovery_ns": 176659292,
+        "replayed": 6000,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 6000,
+        "snapshot_covered": 32,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -29194417
+          },
+          {
+            "buffered": 0,
+            "event": "gap",
+            "received_through": 6696816,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 5094917
+          },
+          {
+            "buffered": 168,
+            "event": "snapshot-requested",
+            "received_through": 6696983,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 5207250
+          },
+          {
+            "buffered": 0,
+            "event": "snapshot-applied",
+            "received_through": 6702815,
+            "sequence": 6702815,
+            "stale": false,
+            "elapsed_ns": 181757250
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 33968,
+          "p50": 20875,
+          "p99": 53485167,
+          "p999": 59263125
+        },
+        "receipt_to_publication_ns": {
+          "samples": 33968,
+          "p50": 3084,
+          "p99": 10667,
+          "p999": 28500
+        }
+      }
+    },
+    {
+      "case": "clean",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799846500,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 0,
+        "omitted_datagrams_b": 0,
+        "process": {
+          "cpu_ns": 259169000,
+          "involuntary_switches": 5559,
+          "peak_rss_bytes": 10559488,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 40000,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 5002,
+        "datagrams_b": 5002,
+        "discarded": 0,
+        "duplicates": 40000,
+        "elapsed_ns": 828398459,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 10004,
+        "peak_buffered": 0,
+        "process": {
+          "cpu_ns": 67428000,
+          "involuntary_switches": 5121,
+          "peak_rss_bytes": 85811200,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 40000,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 20078,
+        "recovery_ns": 0,
+        "replayed": 0,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 0,
+        "snapshot_covered": 0,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -28686125
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 40000,
+          "p50": 20166,
+          "p99": 49041,
+          "p999": 1471041
+        },
+        "receipt_to_publication_ns": {
+          "samples": 40000,
+          "p50": 2959,
+          "p99": 10833,
+          "p999": 30417
+        }
+      }
+    },
+    {
+      "case": "snapshot",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799847083,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 4,
+        "omitted_datagrams_b": 4,
+        "process": {
+          "cpu_ns": 256125000,
+          "involuntary_switches": 5534,
+          "peak_rss_bytes": 10231808,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 39968,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 4997,
+        "datagrams_b": 4997,
+        "discarded": 0,
+        "duplicates": 39968,
+        "elapsed_ns": 827839666,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 9994,
+        "peak_buffered": 5512,
+        "process": {
+          "cpu_ns": 227927000,
+          "involuntary_switches": 4763,
+          "peak_rss_bytes": 131297280,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 34456,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 19314,
+        "recovery_ns": 168384333,
+        "replayed": 5512,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 5512,
+        "snapshot_covered": 32,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -28098084
+          },
+          {
+            "buffered": 0,
+            "event": "gap",
+            "received_through": 6696816,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 1963708
+          },
+          {
+            "buffered": 8,
+            "event": "snapshot-requested",
+            "received_through": 6696823,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 1972083
+          },
+          {
+            "buffered": 0,
+            "event": "snapshot-applied",
+            "received_through": 6702327,
+            "sequence": 6702327,
+            "stale": false,
+            "elapsed_ns": 170348333
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 34456,
+          "p50": 19541,
+          "p99": 51736000,
+          "p999": 57642541
+        },
+        "receipt_to_publication_ns": {
+          "samples": 34456,
+          "p50": 3000,
+          "p99": 9083,
+          "p999": 19250
+        }
+      }
+    },
+    {
+      "case": "clean",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799852125,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 0,
+        "omitted_datagrams_b": 0,
+        "process": {
+          "cpu_ns": 269107000,
+          "involuntary_switches": 6184,
+          "peak_rss_bytes": 10465280,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 40000,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 5002,
+        "datagrams_b": 5002,
+        "discarded": 0,
+        "duplicates": 40000,
+        "elapsed_ns": 826669250,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 10004,
+        "peak_buffered": 0,
+        "process": {
+          "cpu_ns": 72998000,
+          "involuntary_switches": 5332,
+          "peak_rss_bytes": 85938176,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 39976,
+        "published_immediately_b": 24,
+        "read_batch": 1,
+        "read_calls": 20192,
+        "recovery_ns": 0,
+        "replayed": 0,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 0,
+        "snapshot_covered": 0,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -26953458
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 40000,
+          "p50": 20333,
+          "p99": 80667,
+          "p999": 381083
+        },
+        "receipt_to_publication_ns": {
+          "samples": 40000,
+          "p50": 3334,
+          "p99": 15333,
+          "p999": 44500
+        }
+      }
+    },
+    {
+      "case": "snapshot",
+      "batch": 8,
+      "read_batch": 1,
+      "verified": true,
+      "sender": {
+        "active_ns": 799846417,
+        "batch": 8,
+        "first": 6696720,
+        "messages": 40000,
+        "omitted_datagrams_a": 4,
+        "omitted_datagrams_b": 4,
+        "process": {
+          "cpu_ns": 256763000,
+          "involuntary_switches": 5385,
+          "peak_rss_bytes": 10235904,
+          "voluntary_switches": 0
+        },
+        "rate": 50000,
+        "retransmission_responses": 0
+      },
+      "receiver": {
+        "applied": 39968,
+        "book_fingerprint": "510ec8edef3b157a",
+        "conflicts": 0,
+        "datagrams_a": 4997,
+        "datagrams_b": 4997,
+        "discarded": 0,
+        "duplicates": 39968,
+        "elapsed_ns": 826792458,
+        "expected_fingerprint": "510ec8edef3b157a",
+        "expected_through": 6736719,
+        "nonempty_reads": 9994,
+        "peak_buffered": 5768,
+        "process": {
+          "cpu_ns": 233128000,
+          "involuntary_switches": 4659,
+          "peak_rss_bytes": 132923392,
+          "voluntary_switches": 0
+        },
+        "published_immediately_a": 34200,
+        "published_immediately_b": 0,
+        "read_batch": 1,
+        "read_calls": 19196,
+        "recovery_ns": 175723958,
+        "replayed": 5768,
+        "retransmission_requests": 0,
+        "snapshot_buffered_suffix": 5768,
+        "snapshot_covered": 32,
+        "stale": false,
+        "through": 6736719,
+        "timeline": [
+          {
+            "buffered": 0,
+            "event": "initial",
+            "received_through": 6696719,
+            "sequence": 6696719,
+            "stale": false,
+            "elapsed_ns": -27065750
+          },
+          {
+            "buffered": 0,
+            "event": "gap",
+            "received_through": 6696816,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 4065500
+          },
+          {
+            "buffered": 112,
+            "event": "snapshot-requested",
+            "received_through": 6696927,
+            "sequence": 6696783,
+            "stale": true,
+            "elapsed_ns": 4131209
+          },
+          {
+            "buffered": 0,
+            "event": "snapshot-applied",
+            "received_through": 6702583,
+            "sequence": 6702583,
+            "stale": false,
+            "elapsed_ns": 179792000
+          }
+        ],
+        "verified": true
+      },
+      "timing": {
+        "scheduled_to_publication_ns": {
+          "samples": 34200,
+          "p50": 19875,
+          "p99": 56174875,
+          "p999": 61931584
+        },
+        "receipt_to_publication_ns": {
+          "samples": 34200,
+          "p50": 2750,
+          "p99": 9167,
+          "p999": 12000
+        }
+      }
+    }
+  ],
+  "summary": {
+    "clean/packet-8/read-1": {
+      "scheduled_to_publication_ns": {
+        "p50": 20166,
+        "p99": 68583,
+        "p999": 3204125
+      },
+      "receipt_to_publication_ns": {
+        "p50": 3208,
+        "p99": 12459,
+        "p999": 32250
+      },
+      "sender_cpu_ns": 262135000,
+      "receiver_cpu_ns": 70766000,
+      "recovery_ns": 0,
+      "nonempty_reads": 10002
+    },
+    "snapshot/packet-8/read-1": {
+      "scheduled_to_publication_ns": {
+        "p50": 19875,
+        "p99": 53485167,
+        "p999": 59263125
+      },
+      "receipt_to_publication_ns": {
+        "p50": 3000,
+        "p99": 9167,
+        "p999": 22750
+      },
+      "sender_cpu_ns": 260559000,
+      "receiver_cpu_ns": 233128000,
+      "recovery_ns": 175723958,
+      "nonempty_reads": 9994
+    }
+  },
+  "cpu": "Apple M4 Pro"
+}

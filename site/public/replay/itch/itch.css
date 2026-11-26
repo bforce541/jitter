@@ -1,0 +1,22 @@
+.side-by-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.book-pane { min-width: 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 10px; background: #fafafa; }
+.book-pane h3 { font-size: 1.12rem; letter-spacing: -.025em; }
+.pane-meta { margin: .16rem 0 .8rem; color: var(--muted); font-size: .875rem; }
+.pane-facts { display: grid; grid-template-columns: 1fr; gap: .45rem; margin-top: .9rem; font-variant-numeric: tabular-nums; }
+.pane-facts div { display: flex; justify-content: space-between; gap: .3rem .7rem; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: .4rem; }
+.pane-facts dt, .session-metrics dt { color: var(--muted); font-size: .88rem; }
+.pane-facts dd { font-weight: 650; white-space: nowrap; }
+.comparison .event { min-height: 4rem; }
+.session-metrics > div { border-top: 1px solid var(--line); padding-top: .8rem; }
+.session-metrics dd { font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -.045em; font-weight: 650; font-variant-numeric: tabular-nums; }
+.history-note { margin-top: 1.1rem; color: var(--muted); font-size: .9rem; }
+.evidence-links { display: flex; flex-wrap: wrap; gap: .2rem 1rem; }
+@media (max-width: 680px) {
+  .side-by-side { gap: .55rem; }
+  .book-pane { padding: .7rem .65rem; }
+  .book-pane h3 { font-size: .98rem; }
+  .pane-facts div { display: block; }
+  .pane-facts dd { overflow-wrap: anywhere; white-space: normal; }
+  .pane-meta { min-height: 2.6em; }
+  .comparison .chapters button { font-size: .75rem; }
+}

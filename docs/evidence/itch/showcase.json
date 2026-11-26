@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "tape": {
+    "name": "12302019.NASDAQ_ITCH50.gz",
+    "date": "2019-12-30",
+    "source": "https://emi.nasdaq.com/ITCH/Nasdaq%20ITCH/12302019.NASDAQ_ITCH50.gz",
+    "sha256": "ef03df46a27e6bda4dead017f84c2e3979df7211f02c7868b51d53fceb99c689",
+    "bytes": 3524013057
+  },
+  "session": {
+    "messages": 268744780,
+    "directory_symbols": 8906,
+    "updated_symbols": 8892,
+    "book_updates": 263241937,
+    "reference_quote_checks": 263241937,
+    "peak_active_orders": 1924078,
+    "checkpoints": [
+      {
+        "active_orders": 414433,
+        "book_fingerprint": "195c55ea041e9606",
+        "event": "Q",
+        "market_ns": 34200000075566,
+        "sequence": 6696722
+      },
+      {
+        "active_orders": 1758807,
+        "book_fingerprint": "8ab50f10cb6a26b7",
+        "event": "M",
+        "market_ns": 57600000071785,
+        "sequence": 265920782
+      },
+      {
+        "active_orders": 0,
+        "book_fingerprint": "cbf29ce484222325",
+        "event": "C",
+        "market_ns": 72300000040070,
+        "sequence": 268744780
+      }
+    ]
+  },
+  "window": {
+    "first_market_ns": 34200000000230,
+    "first_sequence": 6696720,
+    "last_market_ns": 34200087549243,
+    "messages": 40000
+  },
+  "transport": {
+    "environment": "macos-arm64",
+    "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+    "offered_messages_per_second": 50000,
+    "messages_per_packet": 8,
+    "dropped_datagrams_a": 4,
+    "dropped_datagrams_b": 4,
+    "snapshot_covered": 32,
+    "snapshot_buffered_suffix": 7080,
+    "peak_buffered": 7080,
+    "recovery_ns": 208688834,
+    "snapshot_through": 6696815,
+    "recovered_through": 6703895,
+    "final_sequence": 6736719,
+    "uninterrupted_fingerprint": "510ec8edef3b157a",
+    "recovered_fingerprint": "510ec8edef3b157a",
+    "timeline": [
+      {
+        "buffered": 0,
+        "event": "initial",
+        "received_through": 6696719,
+        "sequence": 6696719,
+        "stale": false,
+        "elapsed_ns": -28910625
+      },
+      {
+        "buffered": 0,
+        "event": "gap",
+        "received_through": 6696816,
+        "sequence": 6696783,
+        "stale": true,
+        "elapsed_ns": 5108292
+      },
+      {
+        "buffered": 168,
+        "event": "snapshot-requested",
+        "received_through": 6696983,
+        "sequence": 6696783,
+        "stale": true,
+        "elapsed_ns": 5197209
+      },
+      {
+        "buffered": 0,
+        "event": "snapshot-applied",
+        "received_through": 6703895,
+        "sequence": 6703895,
+        "stale": false,
+        "elapsed_ns": 213799917
+      }
+    ]
+  }
+}

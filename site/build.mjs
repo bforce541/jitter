@@ -26,3 +26,4 @@ const replay = {
 await mkdir(output, { recursive: true });
 await cp(new URL('./public/', import.meta.url), output, { recursive: true });
 await writeFile(new URL('replay.json', output), JSON.stringify(replay, null, 2) + '\n');
+await cp(new URL('../docs/evidence/itch/showcase.json', import.meta.url), new URL('itch-evidence.json', output));

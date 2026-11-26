@@ -1,12 +1,19 @@
 # Jitter
 
-A C++20 market-data replay lab and a toolkit for reproducible tail-latency investigations. Jitter replays a synthetic order stream, checks the reconstructed book against a sparse reference, and records the evidence behind recovery and performance decisions. It runs locally on Linux and macOS.
+A C++20 market-data replay lab and a toolkit for reproducible tail-latency investigations. Jitter reconstructs a full historical Nasdaq session, checks the books against an independent reference, and measures simulated dual-feed recovery over MoldUDP64. It runs locally on Linux and macOS.
 
 | Workflow | What you get |
 | --- | --- |
+| [Historical Nasdaq replay](#replay-a-full-nasdaq-session) | Full-session binary ITCH decoding, multi-symbol reconstruction, and paired two-process MoldUDP64 replay |
 | [Trading-desk incident](#replay-the-desk-incident) | Redundant loopback UDP, verified snapshot recovery, and a SQLite audit of a delayed simulated fill |
 | [Market replay](#benchmark-the-order-book) | A dense order book, a sparse reference, and open-loop benchmarks for sleeping mutex and polling SPSC queues |
 | [Latency investigation](#investigate-tail-latency) | Paired experiments, request-level traces, fresh confirmation, and a read-only evidence dashboard |
+
+## Replay a full Nasdaq session
+
+On the official December 30, 2019 ITCH 5.0 sample, Jitter decoded **268,744,780 messages** for **8,906 directory symbols**, cross-checked **263,241,937** displayed order updates, and compared the complete canonical state at the open, close, and end of session. It held up to **1,924,078** live orders. [Full-session record](docs/evidence/itch/session.json)
+
+The public replay shows the same historical opening window under clean delivery and a dual-feed outage. Both runs finish with the same independently verified order book. The recorded JSON includes the stale transition, snapshot coverage, and buffered suffix. [Interactive comparison](https://jitter-sandy.vercel.app/replay/itch/) · [Reproduction guide](docs/itch-replay.md)
 
 ## Replay the desk incident
 
