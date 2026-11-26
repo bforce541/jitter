@@ -15,6 +15,8 @@ On the official December 30, 2019 ITCH 5.0 sample, Jitter decoded **268,744,780 
 
 The public replay shows the same historical opening window under clean delivery and a dual-feed outage. Both runs finish with the same independently verified order book. The recorded JSON includes the stale transition, snapshot coverage, and buffered suffix. [Interactive comparison](https://jitter-sandy.vercel.app/replay/itch/) · [Reproduction guide](docs/itch-replay.md)
 
+An Ubuntu x86-64 VM reproduced the session counts and checkpoint fingerprints. All 20 matched transport runs verified their final books. Receive batching barely reduced syscall count at the tested rate and produced higher median scheduled p99.9, so single receive remains the default. [Linux study and profiling limits](docs/itch-replay.md#recorded-linux-x86-64-vm-result)
+
 ## Replay the desk incident
 
 From the repository root, run this with Python 3.9+, CMake 3.20+, and C and C++20 compilers. The command builds the incident executable and writes everything to a new directory.

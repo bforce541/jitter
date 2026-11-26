@@ -3,7 +3,7 @@ const format = new Intl.NumberFormat('en-US');
 const milliseconds = (nanoseconds) => (nanoseconds / 1e6).toFixed(2);
 
 function initialize(evidence) {
-  const { session, tape, transport, window } = evidence;
+  const { session, tape, transport, window, linux } = evidence;
   const [initial, gap, request, recovery] = transport.timeline;
   const { final_sequence: final, snapshot_through: snapshot } = transport;
   const steps = [
@@ -25,6 +25,21 @@ function initialize(evidence) {
   get('checks').textContent = format.format(session.reference_quote_checks);
   const environment = transport.environment === 'macos-arm64' ? 'macOS ARM64 loopback' : transport.environment;
   get('scope').textContent = `Recorded on ${environment}. The stale-to-recovery interval was ${milliseconds(transport.recovery_ns)} ms in this run. The left sequence aligns with the faulted run’s received-through position.`;
+  get('linux-environment').textContent = `${linux.environment} · ${format.format(linux.offeredRate)} offered messages/s`;
+  get('linux-run').href = linux.run;
+  for (const row of linux.windows) {
+    const tableRow = document.createElement('tr');
+    const label = document.createElement('th');
+    label.scope = 'row';
+    label.textContent = row.window === 'open' ? 'Market open' : 'Midday';
+    tableRow.append(label);
+    for (const value of [row.baseline, row.batched]) {
+      const cell = document.createElement('td');
+      cell.textContent = `${(value / 1000).toFixed(1)} µs`;
+      tableRow.append(cell);
+    }
+    get('linux-results').append(tableRow);
+  }
 
   let active = 1;
   let timer;

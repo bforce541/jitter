@@ -42,6 +42,8 @@ The fault report accounts for every input message as applied or covered by the s
 
 Five clean and five snapshot runs per window verified on the Apple Silicon host at 50,000 offered messages/s. The median stale-to-recovered interval was **175.7 ms** for the opening window and **903.0 ms** for midday. The midday initial snapshot held about four times as many orders. In both windows, every run ended with the correct final book. These timings describe that host and workload. [Opening runs](evidence/itch/macos-open.json) · [Midday runs](evidence/itch/macos-quiet.json).
 
+The 40,000 opening messages span about **88 ms** on the original tape. Five additional clean runs at a fixed **457,000 offered messages/s**, close to that window's average, applied all 40,000 messages each. Scheduled p99.9 varied from **87 µs to 4.98 ms**, with a run median of **4.69 ms**. The fixed schedule tests throughput near the historical average. Intraburst exchange pacing remains outside this experiment. [Opening stress runs](evidence/itch/macos-open-stress.json).
+
 ## Linux measurement
 
 The [dispatchable Linux workflow](../.github/workflows/itch-linux.yml) verifies the same full sample and runs the fixture tests before measuring the two captured windows. The standard runner is a GitHub-hosted Linux x86-64 VM. For a dedicated Intel or AMD Linux host, use the same commands on an otherwise idle machine, document the CPU and kernel, and select two available physical cores as appropriate.
@@ -59,3 +61,16 @@ Repeat for `windows/quiet`. The Linux comparison keeps eight messages per datagr
 Scheduled-to-publication starts at the planned release of the containing datagram. Receive-to-publication starts when the system call returns. Both end when the update advances the receiver's book and sequence. These ordinary-path distributions exclude buffered recovery work, which is counted and measured separately from stale detection through resumption. Each raw timing ledger row stores its sequence, receive time, and publication time as three big-endian 64-bit fields. Percentiles use nearest rank and require at least 40, 2,000, and 20,000 observations respectively.
 
 Profile the baseline in separate runs with `perf stat` and `perf record` when available. Keep any PMU or kernel permission errors with the evidence. Jitter uses matching order rows and complete sequence accounting as gates for interpreting timing. Virtual-machine measurements and Apple Silicon measurements have distinct provenance. Dedicated Linux bare-metal measurements remain pending.
+
+### Recorded Linux x86-64 VM result
+
+The Ubuntu 24.04 workflow reproduced every full-session message, comparison count, window, and canonical checkpoint fingerprint. The Release verification pass processed about **1.05 million messages/s** with **461 MiB peak process RSS**. That measurement includes the streamed input and independent verification.
+
+All 20 clean transport runs matched the independent final book. This table uses the median of five per-run scheduled-to-publication p99.9 values per treatment at 50,000 offered messages/s.
+
+| Historical window | Single receive | Batched receive | Median nonempty read calls, single → batched |
+| --- | ---: | ---: | ---: |
+| Market open | 33.3 µs | 577.4 µs | 10,004 → 9,984 |
+| Midday | 37.7 µs | 205.2 µs | 10,004 → 9,991 |
+
+The nonblocking batch rarely returned more than one datagram under these conditions. The batch cohort had higher observed p99.9 in both windows, and receiver CPU also rose in both medians. Single receive remains the default. VM scheduling can affect the tails. The runner denied both `perf stat` and `perf record`, so the syscall counts describe the observed batching behavior and the workflow retains the profiler errors. A dedicated host with working counters would be needed for hardware-level attribution. [Archived result](evidence/itch/linux-vm.json) · [Workflow and raw timing artifact](https://github.com/bforce541/jitter/actions/runs/45770563448).

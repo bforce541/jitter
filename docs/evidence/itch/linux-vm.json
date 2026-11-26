@@ -1,0 +1,2332 @@
+{
+  "schema": 1,
+  "environment": "GitHub-hosted Linux x86-64 VM",
+  "run": "https://github.com/bforce541/jitter/actions/runs/45770563448",
+  "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+  "tape_sha256": "ef03df46a27e6bda4dead017f84c2e3979df7211f02c7868b51d53fceb99c689",
+  "cpu": "Intel(R) Xeon(R) 6975P-C",
+  "kernel": "Linux 7.0.0-1014-aws x86_64",
+  "toolchain": [
+    "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "cmake version 3.31.6",
+    "Python 3.12.3"
+  ],
+  "full_session": {
+    "book_updates": 263241937,
+    "checkpoints": [
+      {
+        "active_orders": 414433,
+        "book_fingerprint": "195c55ea041e9606",
+        "event": "Q",
+        "market_ns": 34200000075566,
+        "sequence": 6696722
+      },
+      {
+        "active_orders": 1758807,
+        "book_fingerprint": "8ab50f10cb6a26b7",
+        "event": "M",
+        "market_ns": 57600000071785,
+        "sequence": 265920782
+      },
+      {
+        "active_orders": 0,
+        "book_fingerprint": "cbf29ce484222325",
+        "event": "C",
+        "market_ns": 72300000040070,
+        "sequence": 268744780
+      }
+    ],
+    "complete_session": true,
+    "directory_symbols": 8906,
+    "format": "nasdaq-totalview-itch-5.0",
+    "message_types": {
+      "A": 117145568,
+      "C": 99917,
+      "D": 114360997,
+      "E": 5722824,
+      "F": 1485888,
+      "H": 8966,
+      "I": 4024315,
+      "J": 34,
+      "K": 3,
+      "L": 215161,
+      "P": 1218602,
+      "Q": 17836,
+      "R": 8906,
+      "S": 6,
+      "U": 21639067,
+      "V": 1,
+      "X": 2787676,
+      "Y": 9013
+    },
+    "messages": 268744780,
+    "messages_per_second": 1049273.903972012,
+    "peak_active_orders": 1924078,
+    "peak_rss_bytes": 483733504,
+    "reference_quote_checks": 263241937,
+    "reference_state_checked": true,
+    "schema": 1,
+    "scope": "all-symbols",
+    "system_events": "OSQMEC",
+    "updated_symbols": 8892,
+    "wall_seconds": 256.124524762,
+    "windows": {
+      "open": {
+        "first_market_ns": 34200000000230,
+        "first_sequence": 6696720,
+        "last_market_ns": 34200087549243,
+        "messages": 40000
+      },
+      "quiet": {
+        "first_market_ns": 43200000075462,
+        "first_sequence": 134508461,
+        "last_market_ns": 43202967680509,
+        "messages": 40000
+      }
+    }
+  },
+  "profiling": {
+    "perf_stat": "Permission denied by runner policy",
+    "perf_record": "Permission denied by runner policy",
+    "evidence": {
+      "perf-stat.txt": "Error:\nNo supported events found.\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)",
+      "perf-record.txt": "Missing support for build id in kernel mmap events.\nDisable this warning with --no-buildid-mmap\nError:\nFailure to open event 'cpu-clock:u' on PMU 'software' which will be removed.\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\nError:\nFailure to open any events for recording."
+    }
+  },
+  "studies": {
+    "open": {
+      "schema": 1,
+      "environment": "github-hosted-vm",
+      "system": "Linux",
+      "machine": "x86_64",
+      "kernel": "7.0.0-1014-aws",
+      "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+      "binary_sha256": "575d0eeddf1c02afb676d384ce8947291bd68e5c2531fb5a6c1865bebd517e28",
+      "window": "open",
+      "window_files": {
+        "messages.itch": "6de7b834de07b7eb877bc2cda39ee50efca031283db40c036af47ef1390fa75e",
+        "initial.snapshot": "afe08faec3d1ab273d4e81695ea1935322a73fd1bc7cec625c09e14146aef78f",
+        "repair.snapshot": "42dcaf5fa88733fc41b34cca4398c76c5f6415cddb80dd3b035978a9adea7c75",
+        "final.snapshot": "76999cf52651dbe4fe7974e9e64810fbda76381326f5252f80c9773c06fe4f6c"
+      },
+      "sender_cpu": 0,
+      "receiver_cpu": 1,
+      "runs": [
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846181,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148460000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 815733700,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 78843000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82657280,
+              "voluntary_switches": 4967
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 19938,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16263399
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 17857,
+              "p99": 105833,
+              "p999": 2223106
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2792,
+              "p99": 8310,
+              "p999": 23664
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846458,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 151979000,
+              "involuntary_switches": 11,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816197853,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10002,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 79182000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82653184,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20034,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16665018
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18163,
+              "p99": 29398,
+              "p999": 34977
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2551,
+              "p99": 7248,
+              "p999": 10305
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846340,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 149699000,
+              "involuntary_switches": 2,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5407
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816032350,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10002,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 83064000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82653184,
+              "voluntary_switches": 5015
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20032,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16500814
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18041,
+              "p99": 29970,
+              "p999": 33624
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2606,
+              "p99": 8039,
+              "p999": 15423
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846330,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 154550000,
+              "involuntary_switches": 5,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5408
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816339407,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 75434000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82653184,
+              "voluntary_switches": 5017
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20040,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16805926
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 17607,
+              "p99": 23523,
+              "p999": 26775
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2754,
+              "p99": 7360,
+              "p999": 10200
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846314,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 151221000,
+              "involuntary_switches": 3,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816185224,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 78749000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82620416,
+              "voluntary_switches": 5017
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20038,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16621755
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 17599,
+              "p99": 25180,
+              "p999": 30812
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2726,
+              "p99": 11950,
+              "p999": 18480
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846240,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 146045000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816120357,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 9984,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 81927000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82653184,
+              "voluntary_switches": 5006
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 19996,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16571412
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 17986,
+              "p99": 25032,
+              "p999": 756880
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2652,
+              "p99": 10304,
+              "p999": 29856
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846196,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148117000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5406
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816128338,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 9960,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 81993000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82616320,
+              "voluntary_switches": 4994
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 19948,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16614821
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18184,
+              "p99": 31864,
+              "p999": 1341461
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2584,
+              "p99": 7759,
+              "p999": 60877
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846258,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148581000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816274440,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 77870000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82649088,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20036,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16769274
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18022,
+              "p99": 30351,
+              "p999": 33297
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2846,
+              "p99": 7580,
+              "p999": 10289
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846102,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 147755000,
+              "involuntary_switches": 4,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816113076,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 82233000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82616320,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20036,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16587998
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 17996,
+              "p99": 29940,
+              "p999": 33293
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2951,
+              "p99": 12351,
+              "p999": 15870
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846270,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 154256000,
+              "involuntary_switches": 8,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816519937,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 9957,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 81433000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82628608,
+              "voluntary_switches": 4993
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 19943,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -17005544
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18505,
+              "p99": 28899,
+              "p999": 577433
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2855,
+              "p99": 8273,
+              "p999": 26861
+            }
+          }
+        }
+      ],
+      "summary": {
+        "clean/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 17857,
+            "p99": 29940,
+            "p999": 33293
+          },
+          "receipt_to_publication_ns": {
+            "p50": 2792,
+            "p99": 8310,
+            "p999": 15870
+          },
+          "sender_cpu_ns": 148581000,
+          "receiver_cpu_ns": 78749000,
+          "recovery_ns": 0,
+          "nonempty_reads": 10004
+        },
+        "clean/packet-8/read-16": {
+          "scheduled_to_publication_ns": {
+            "p50": 18163,
+            "p99": 29398,
+            "p999": 577433
+          },
+          "receipt_to_publication_ns": {
+            "p50": 2606,
+            "p99": 8039,
+            "p999": 26861
+          },
+          "sender_cpu_ns": 149699000,
+          "receiver_cpu_ns": 81927000,
+          "recovery_ns": 0,
+          "nonempty_reads": 9984
+        }
+      }
+    },
+    "quiet": {
+      "schema": 1,
+      "environment": "github-hosted-vm",
+      "system": "Linux",
+      "machine": "x86_64",
+      "kernel": "7.0.0-1014-aws",
+      "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+      "binary_sha256": "575d0eeddf1c02afb676d384ce8947291bd68e5c2531fb5a6c1865bebd517e28",
+      "window": "quiet",
+      "window_files": {
+        "messages.itch": "e0d13d6e27d51055a51e1fbebb96e8f4576fd91bf2c618709332aeda3a294281",
+        "initial.snapshot": "437f4fbc34e086d68e87f6b900d2c170f8065160521a378644acfb563843e7ee",
+        "repair.snapshot": "593cd4e47a60926c45d3e039e3e83442445da555090d86b9613a3df5d1e029ce",
+        "final.snapshot": "f1da315eacf228ad90dd4885b5eab6cd215c08741a241bf6ef4952f1d96ac1f9"
+      },
+      "sender_cpu": 0,
+      "receiver_cpu": 1,
+      "runs": [
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846264,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 151319000,
+              "involuntary_switches": 12,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816549048,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 81536000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294264832,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20036,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17811953
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18431,
+              "p99": 29142,
+              "p999": 32845
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3224,
+              "p99": 9220,
+              "p999": 11235
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846195,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 153209000,
+              "involuntary_switches": 7,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5404
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816570630,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 9991,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 84545000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 294342656,
+              "voluntary_switches": 5010
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20011,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17734750
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18587,
+              "p99": 25835,
+              "p999": 205191
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3154,
+              "p99": 9050,
+              "p999": 16514
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846385,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148466000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5408
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816491152,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 9966,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 87333000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294334464,
+              "voluntary_switches": 4996
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 19958,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -18101301
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18496,
+              "p99": 31888,
+              "p999": 1995742
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2973,
+              "p99": 13466,
+              "p999": 95824
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846372,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148742000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5408
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816592787,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 85155000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294277120,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20036,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17806874
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18511,
+              "p99": 31153,
+              "p999": 36095
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3262,
+              "p99": 9277,
+              "p999": 11316
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846446,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 150697000,
+              "involuntary_switches": 12,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816405135,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 82249000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294313984,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20036,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17672607
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18495,
+              "p99": 33730,
+              "p999": 37735
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3278,
+              "p99": 9213,
+              "p999": 11524
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846053,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148528000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816405825,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 9986,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 90213000,
+              "involuntary_switches": 3,
+              "peak_rss_bytes": 294293504,
+              "voluntary_switches": 5008
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20002,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17633817
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18687,
+              "p99": 30116,
+              "p999": 560385
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3327,
+              "p99": 15826,
+              "p999": 32685
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846009,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 149425000,
+              "involuntary_switches": 3,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816267829,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10002,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 88701000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294285312,
+              "voluntary_switches": 5016
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20034,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17544533
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18732,
+              "p99": 32854,
+              "p999": 36979
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3056,
+              "p99": 8830,
+              "p999": 10932
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846113,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 149096000,
+              "involuntary_switches": 5,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5408
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816251053,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 88545000,
+              "involuntary_switches": 2,
+              "peak_rss_bytes": 294301696,
+              "voluntary_switches": 5018
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20040,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17452385
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18895,
+              "p99": 32795,
+              "p999": 39722
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3476,
+              "p99": 9877,
+              "p999": 12370
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846469,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 152938000,
+              "involuntary_switches": 8,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5404
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816262042,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 81051000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294342656,
+              "voluntary_switches": 5014
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20032,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17614936
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18249,
+              "p99": 25697,
+              "p999": 40689
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3224,
+              "p99": 9093,
+              "p999": 11234
+            }
+          }
+        },
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 16,
+          "verified": true,
+          "sender": {
+            "active_ns": 799846269,
+            "batch": 8,
+            "first": 134508461,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 153077000,
+              "involuntary_switches": 9,
+              "peak_rss_bytes": 52887552,
+              "voluntary_switches": 5409
+            },
+            "rate": 50000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "f5ac110462817d86",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 816316880,
+            "expected_fingerprint": "f5ac110462817d86",
+            "expected_through": 134548460,
+            "nonempty_reads": 9996,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 86137000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 294273024,
+              "voluntary_switches": 5013
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 16,
+            "read_calls": 20022,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 134548460,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 134508460,
+                "sequence": 134508460,
+                "stale": false,
+                "elapsed_ns": -17586732
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 18947,
+              "p99": 26489,
+              "p999": 33655
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3229,
+              "p99": 9349,
+              "p999": 11891
+            }
+          }
+        }
+      ],
+      "summary": {
+        "clean/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 18495,
+            "p99": 31153,
+            "p999": 37735
+          },
+          "receipt_to_publication_ns": {
+            "p50": 3262,
+            "p99": 9220,
+            "p999": 11316
+          },
+          "sender_cpu_ns": 150697000,
+          "receiver_cpu_ns": 82249000,
+          "recovery_ns": 0,
+          "nonempty_reads": 10004
+        },
+        "clean/packet-8/read-16": {
+          "scheduled_to_publication_ns": {
+            "p50": 18687,
+            "p99": 30116,
+            "p999": 205191
+          },
+          "receipt_to_publication_ns": {
+            "p50": 3154,
+            "p99": 9349,
+            "p999": 16514
+          },
+          "sender_cpu_ns": 149425000,
+          "receiver_cpu_ns": 87333000,
+          "recovery_ns": 0,
+          "nonempty_reads": 9991
+        }
+      }
+    },
+    "faults": {
+      "schema": 1,
+      "environment": "github-hosted-vm",
+      "system": "Linux",
+      "machine": "x86_64",
+      "kernel": "7.0.0-1014-aws",
+      "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+      "binary_sha256": "575d0eeddf1c02afb676d384ce8947291bd68e5c2531fb5a6c1865bebd517e28",
+      "window": "open",
+      "window_files": {
+        "messages.itch": "6de7b834de07b7eb877bc2cda39ee50efca031283db40c036af47ef1390fa75e",
+        "initial.snapshot": "afe08faec3d1ab273d4e81695ea1935322a73fd1bc7cec625c09e14146aef78f",
+        "repair.snapshot": "42dcaf5fa88733fc41b34cca4398c76c5f6415cddb80dd3b035978a9adea7c75",
+        "final.snapshot": "76999cf52651dbe4fe7974e9e64810fbda76381326f5252f80c9773c06fe4f6c"
+      },
+      "sender_cpu": 0,
+      "receiver_cpu": 1,
+      "runs": [
+        {
+          "case": "a-only",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 1333073037,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 1,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 148895000,
+              "involuntary_switches": 2,
+              "peak_rss_bytes": 35495936,
+              "voluntary_switches": 5664
+            },
+            "rate": 30000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5001,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 39992,
+            "elapsed_ns": 1349505851,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10003,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 87599000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82657280,
+              "voluntary_switches": 5012
+            },
+            "published_immediately_a": 39992,
+            "published_immediately_b": 8,
+            "read_batch": 1,
+            "read_calls": 20027,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16756793
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 19310,
+              "p99": 31920,
+              "p999": 238595
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 3129,
+              "p99": 8461,
+              "p999": 11245
+            }
+          }
+        },
+        {
+          "case": "re-request",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 1333074924,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 1,
+            "omitted_datagrams_b": 1,
+            "process": {
+              "cpu_ns": 154688000,
+              "involuntary_switches": 2,
+              "peak_rss_bytes": 35495936,
+              "voluntary_switches": 5655
+            },
+            "rate": 30000,
+            "retransmission_responses": 1
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5001,
+            "discarded": 0,
+            "duplicates": 39992,
+            "elapsed_ns": 1349398933,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10003,
+            "peak_buffered": 48,
+            "process": {
+              "cpu_ns": 88191000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82657280,
+              "voluntary_switches": 5008
+            },
+            "published_immediately_a": 39952,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20019,
+            "recovery_ns": 1193111,
+            "replayed": 48,
+            "retransmission_requests": 1,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16670247
+              },
+              {
+                "buffered": 0,
+                "event": "gap",
+                "received_through": 6696760,
+                "sequence": 6696751,
+                "stale": true,
+                "elapsed_ns": 1353730
+              },
+              {
+                "buffered": 40,
+                "event": "re-request",
+                "received_through": 6696799,
+                "sequence": 6696751,
+                "stale": true,
+                "elapsed_ns": 2419824
+              },
+              {
+                "buffered": 0,
+                "event": "gap-filled",
+                "received_through": 6696799,
+                "sequence": 6696799,
+                "stale": false,
+                "elapsed_ns": 2546158
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 39952,
+              "p50": 19104,
+              "p99": 31467,
+              "p999": 1672757
+            },
+            "receipt_to_publication_ns": {
+              "samples": 39952,
+              "p50": 3195,
+              "p99": 8514,
+              "p999": 11502
+            }
+          }
+        },
+        {
+          "case": "snapshot",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 1333072926,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 4,
+            "omitted_datagrams_b": 4,
+            "process": {
+              "cpu_ns": 142981000,
+              "involuntary_switches": 3,
+              "peak_rss_bytes": 35495936,
+              "voluntary_switches": 5662
+            },
+            "rate": 30000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 39968,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 4998,
+            "datagrams_b": 4998,
+            "discarded": 0,
+            "duplicates": 39968,
+            "elapsed_ns": 1349618595,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 9996,
+            "peak_buffered": 3976,
+            "process": {
+              "cpu_ns": 260798000,
+              "involuntary_switches": 415,
+              "peak_rss_bytes": 131866624,
+              "voluntary_switches": 4746
+            },
+            "published_immediately_a": 35992,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 19492,
+            "recovery_ns": 180728737,
+            "replayed": 3976,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 3976,
+            "snapshot_covered": 32,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16837720
+              },
+              {
+                "buffered": 0,
+                "event": "gap",
+                "received_through": 6696816,
+                "sequence": 6696783,
+                "stale": true,
+                "elapsed_ns": 3222430
+              },
+              {
+                "buffered": 8,
+                "event": "snapshot-requested",
+                "received_through": 6696823,
+                "sequence": 6696783,
+                "stale": true,
+                "elapsed_ns": 3228341
+              },
+              {
+                "buffered": 0,
+                "event": "snapshot-applied",
+                "received_through": 6700791,
+                "sequence": 6700791,
+                "stale": false,
+                "elapsed_ns": 183953919
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 35992,
+              "p50": 19743,
+              "p99": 36930408,
+              "p999": 47241535
+            },
+            "receipt_to_publication_ns": {
+              "samples": 35992,
+              "p50": 3605,
+              "p99": 9167,
+              "p999": 13430
+            }
+          }
+        },
+        {
+          "case": "overflow",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 1333073074,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 4,
+            "omitted_datagrams_b": 4,
+            "process": {
+              "cpu_ns": 156962000,
+              "involuntary_switches": 1,
+              "peak_rss_bytes": 35495936,
+              "voluntary_switches": 5661
+            },
+            "rate": 30000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 64,
+            "book_fingerprint": "1e5f911013cc8c0e",
+            "conflicts": 0,
+            "datagrams_a": 5000,
+            "datagrams_b": 5000,
+            "discarded": 79792,
+            "duplicates": 72,
+            "elapsed_ns": 1549787806,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10000,
+            "peak_buffered": 8,
+            "process": {
+              "cpu_ns": 57349000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82653184,
+              "voluntary_switches": 5199
+            },
+            "published_immediately_a": 64,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20398,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": true,
+            "through": 6696783,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -16862064
+              },
+              {
+                "buffered": 0,
+                "event": "gap",
+                "received_through": 6696816,
+                "sequence": 6696783,
+                "stale": true,
+                "elapsed_ns": 3217814
+              }
+            ],
+            "verified": false
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 64,
+              "p50": 19108,
+              "p99": null,
+              "p999": null
+            },
+            "receipt_to_publication_ns": {
+              "samples": 64,
+              "p50": 2868,
+              "p99": null,
+              "p999": null
+            }
+          }
+        }
+      ],
+      "summary": {
+        "a-only/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 19310,
+            "p99": 31920,
+            "p999": 238595
+          },
+          "receipt_to_publication_ns": {
+            "p50": 3129,
+            "p99": 8461,
+            "p999": 11245
+          },
+          "sender_cpu_ns": 148895000,
+          "receiver_cpu_ns": 87599000,
+          "recovery_ns": 0,
+          "nonempty_reads": 10003
+        },
+        "overflow/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 19108
+          },
+          "receipt_to_publication_ns": {
+            "p50": 2868
+          },
+          "sender_cpu_ns": 156962000,
+          "receiver_cpu_ns": 57349000,
+          "recovery_ns": 0,
+          "nonempty_reads": 10000
+        },
+        "re-request/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 19104,
+            "p99": 31467,
+            "p999": 1672757
+          },
+          "receipt_to_publication_ns": {
+            "p50": 3195,
+            "p99": 8514,
+            "p999": 11502
+          },
+          "sender_cpu_ns": 154688000,
+          "receiver_cpu_ns": 88191000,
+          "recovery_ns": 1193111,
+          "nonempty_reads": 10003
+        },
+        "snapshot/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 19743,
+            "p99": 36930408,
+            "p999": 47241535
+          },
+          "receipt_to_publication_ns": {
+            "p50": 3605,
+            "p99": 9167,
+            "p999": 13430
+          },
+          "sender_cpu_ns": 142981000,
+          "receiver_cpu_ns": 260798000,
+          "recovery_ns": 180728737,
+          "nonempty_reads": 9996
+        }
+      }
+    },
+    "diagnostic": {
+      "schema": 1,
+      "environment": "github-hosted-vm",
+      "system": "Linux",
+      "machine": "x86_64",
+      "kernel": "7.0.0-1014-aws",
+      "revision": "5b27bc2bcaa7b8c76aa1551a61652aa1ce9aeafe",
+      "binary_sha256": "575d0eeddf1c02afb676d384ce8947291bd68e5c2531fb5a6c1865bebd517e28",
+      "window": "open",
+      "window_files": {
+        "messages.itch": "6de7b834de07b7eb877bc2cda39ee50efca031283db40c036af47ef1390fa75e",
+        "initial.snapshot": "afe08faec3d1ab273d4e81695ea1935322a73fd1bc7cec625c09e14146aef78f",
+        "repair.snapshot": "42dcaf5fa88733fc41b34cca4398c76c5f6415cddb80dd3b035978a9adea7c75",
+        "final.snapshot": "76999cf52651dbe4fe7974e9e64810fbda76381326f5252f80c9773c06fe4f6c"
+      },
+      "sender_cpu": null,
+      "receiver_cpu": null,
+      "runs": [
+        {
+          "case": "clean",
+          "batch": 8,
+          "read_batch": 1,
+          "verified": true,
+          "sender": {
+            "active_ns": 399924960,
+            "batch": 8,
+            "first": 6696720,
+            "messages": 40000,
+            "omitted_datagrams_a": 0,
+            "omitted_datagrams_b": 0,
+            "process": {
+              "cpu_ns": 401522000,
+              "involuntary_switches": 2,
+              "peak_rss_bytes": 35401728,
+              "voluntary_switches": 217
+            },
+            "rate": 100000,
+            "retransmission_responses": 0
+          },
+          "receiver": {
+            "applied": 40000,
+            "book_fingerprint": "510ec8edef3b157a",
+            "conflicts": 0,
+            "datagrams_a": 5002,
+            "datagrams_b": 5002,
+            "discarded": 0,
+            "duplicates": 40000,
+            "elapsed_ns": 415415233,
+            "expected_fingerprint": "510ec8edef3b157a",
+            "expected_through": 6736719,
+            "nonempty_reads": 10004,
+            "peak_buffered": 0,
+            "process": {
+              "cpu_ns": 72539000,
+              "involuntary_switches": 0,
+              "peak_rss_bytes": 82649088,
+              "voluntary_switches": 5015
+            },
+            "published_immediately_a": 40000,
+            "published_immediately_b": 0,
+            "read_batch": 1,
+            "read_calls": 20034,
+            "recovery_ns": 0,
+            "replayed": 0,
+            "retransmission_requests": 0,
+            "snapshot_buffered_suffix": 0,
+            "snapshot_covered": 0,
+            "stale": false,
+            "through": 6736719,
+            "timeline": [
+              {
+                "buffered": 0,
+                "event": "initial",
+                "received_through": 6696719,
+                "sequence": 6696719,
+                "stale": false,
+                "elapsed_ns": -15783475
+              }
+            ],
+            "verified": true
+          },
+          "timing": {
+            "scheduled_to_publication_ns": {
+              "samples": 40000,
+              "p50": 16637,
+              "p99": 29342,
+              "p999": 33721
+            },
+            "receipt_to_publication_ns": {
+              "samples": 40000,
+              "p50": 2527,
+              "p99": 6690,
+              "p999": 10035
+            }
+          }
+        }
+      ],
+      "summary": {
+        "clean/packet-8/read-1": {
+          "scheduled_to_publication_ns": {
+            "p50": 16637,
+            "p99": 29342,
+            "p999": 33721
+          },
+          "receipt_to_publication_ns": {
+            "p50": 2527,
+            "p99": 6690,
+            "p999": 10035
+          },
+          "sender_cpu_ns": 401522000,
+          "receiver_cpu_ns": 72539000,
+          "recovery_ns": 0,
+          "nonempty_reads": 10004
+        }
+      }
+    }
+  }
+}

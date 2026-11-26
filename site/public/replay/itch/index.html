@@ -85,6 +85,21 @@
         <a class="text-link" href="https://github.com/bforce541/jitter/blob/main/docs/itch-replay.md">Methodology and reproduction</a>
       </div>
     </section>
+    <section class="section" aria-labelledby="linux-title">
+      <header class="section-head">
+        <h2 id="linux-title">Linux transport benchmark</h2>
+        <p id="linux-environment">Scheduled-to-publication p99.9 for two receive strategies.</p>
+      </header>
+      <div class="audit-panel linux-panel">
+        <table>
+          <caption>Median p99.9 by historical window</caption>
+          <thead><tr><th scope="col">Window</th><th scope="col">Single receive</th><th scope="col">Batched receive</th></tr></thead>
+          <tbody id="linux-results"></tbody>
+        </table>
+      </div>
+      <p class="history-note">Both paths verified every final book. The single-receive path stayed the default after the measured batch trials.</p>
+      <a class="text-link" id="linux-run" href="https://github.com/bforce541/jitter/blob/main/docs/itch-replay.md">Linux run and evidence</a>
+    </section>
   </main>
   <footer class="shell footer">
     <a class="brand" href="/"><span class="mark" aria-hidden="true"></span> Jitter</a>

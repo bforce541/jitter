@@ -26,4 +26,20 @@ const replay = {
 await mkdir(output, { recursive: true });
 await cp(new URL('./public/', import.meta.url), output, { recursive: true });
 await writeFile(new URL('replay.json', output), JSON.stringify(replay, null, 2) + '\n');
-await cp(new URL('../docs/evidence/itch/showcase.json', import.meta.url), new URL('itch-evidence.json', output));
+const itch = JSON.parse(await readFile(new URL('../docs/evidence/itch/showcase.json', import.meta.url), 'utf8'));
+const linux = JSON.parse(await readFile(new URL('../docs/evidence/itch/linux-vm.json', import.meta.url), 'utf8'));
+if (linux.tape_sha256 !== itch.tape.sha256) throw new Error('Linux evidence uses a different historical tape.');
+itch.linux = {
+  environment: linux.environment,
+  offeredRate: linux.studies.open.runs[0].sender.rate,
+  run: linux.run,
+  windows: ['open', 'quiet'].map((window) => {
+    const study = linux.studies[window];
+    if (!study.runs.every((run) => run.verified)) throw new Error(`Unverified ${window} transport trial.`);
+    const baseline = study.summary['clean/packet-8/read-1'];
+    const batched = study.summary['clean/packet-8/read-16'];
+    return { window, baseline: baseline.scheduled_to_publication_ns.p999,
+      batched: batched.scheduled_to_publication_ns.p999 };
+  }),
+};
+await writeFile(new URL('itch-evidence.json', output), JSON.stringify(itch, null, 2) + '\n');
