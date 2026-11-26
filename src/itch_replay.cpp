@@ -1,4 +1,5 @@
 #include "jitter/itch.hpp"
+#include "jitter/itch_window.hpp"
 
 #include <nlohmann/json.hpp>
 #include <sys/resource.h>
@@ -39,7 +40,7 @@ std::uint64_t rss_bytes() {
 #endif
 }
 
-json replay(bool verify, std::string_view filter, Sequence limit) {
+json replay(bool verify, std::string_view filter, Sequence limit, std::vector<Window>& windows) {
     Book book;
     Reference reference;
     TapeReader reader(stdin);
@@ -88,25 +89,27 @@ json replay(bool verify, std::string_view filter, Sequence limit) {
                 if (message.event == 'Q' || message.event == 'M' || message.event == 'C')
                     checkpoint(message.event, reader.sequence(), message.time);
             }
-            if (!message.updates_book()) continue;
-            if (name.empty()) throw std::runtime_error("book update precedes stock directory entry");
-            if (!filter.empty() && name != filter) continue;
-            if (!book.apply(message))
-                throw std::runtime_error("invalid order lifecycle for " + name + " ref " +
-                                         std::to_string(message.order) + " type " + message.type);
-            ++updates;
-            updated.set(message.locate);
-            peak_orders = std::max(peak_orders, book.size());
-            if (verify) {
-                if (!reference.apply(message))
-                    throw std::runtime_error("independent reference rejected order update for " + name);
-                const auto actual = book.top(message.locate);
-                const auto expected = reference.top(message.locate);
-                if (actual != expected)
-                    throw std::runtime_error("top of book mismatch for " + name + ": " +
-                        json{{"actual", quote_json(actual)}, {"expected", quote_json(expected)}}.dump());
-                ++quote_checks;
+            for (auto& window : windows) window.before(reader.sequence(), message, reference);
+            if (message.updates_book() && (filter.empty() || name == filter)) {
+                if (name.empty()) throw std::runtime_error("book update precedes stock directory entry");
+                if (!book.apply(message))
+                    throw std::runtime_error("invalid order lifecycle for " + name + " ref " +
+                                             std::to_string(message.order) + " type " + message.type);
+                ++updates;
+                updated.set(message.locate);
+                peak_orders = std::max(peak_orders, book.size());
+                if (verify) {
+                    if (!reference.apply(message))
+                        throw std::runtime_error("independent reference rejected order update for " + name);
+                    const auto actual = book.top(message.locate);
+                    const auto expected = reference.top(message.locate);
+                    if (actual != expected)
+                        throw std::runtime_error("top of book mismatch for " + name + ": " +
+                            json{{"actual", quote_json(actual)}, {"expected", quote_json(expected)}}.dump());
+                    ++quote_checks;
+                }
             }
+            for (auto& window : windows) window.after(reader.sequence(), message, reader.bytes(), reference);
         } catch (const std::exception& error) {
             throw std::runtime_error("sequence " + std::to_string(reader.sequence()) + ": " + error.what());
         }
@@ -119,6 +122,12 @@ json replay(bool verify, std::string_view filter, Sequence limit) {
     json type_counts = json::object();
     for (unsigned index = 0; index < types.size(); ++index)
         if (types[index]) type_counts[std::string(1, static_cast<char>(index))] = types[index];
+    json captured = json::object();
+    for (const auto& window : windows) {
+        if (!window.complete()) throw std::runtime_error("incomplete capture: " + window.name);
+        captured[window.name] = {{"first_sequence", window.first}, {"messages", window.count},
+                                 {"first_market_ns", window.first_market_ns}, {"last_market_ns", window.last_market_ns}};
+    }
     const auto seconds = std::chrono::duration<double>(Clock::now() - start).count();
     return {{"schema", 1}, {"format", "nasdaq-totalview-itch-5.0"},
             {"scope", filter.empty() ? json("all-symbols") : json(filter)},
@@ -127,7 +136,7 @@ json replay(bool verify, std::string_view filter, Sequence limit) {
             {"system_events", milestones}, {"messages", reader.sequence()},
             {"directory_symbols", symbols}, {"updated_symbols", updated.count()}, {"book_updates", updates},
             {"message_types", type_counts}, {"reference_quote_checks", quote_checks},
-            {"reference_state_checked", verify}, {"checkpoints", checkpoints},
+            {"reference_state_checked", verify}, {"checkpoints", checkpoints}, {"windows", captured},
             {"peak_active_orders", peak_orders}, {"peak_rss_bytes", rss_bytes()},
             {"wall_seconds", seconds}, {"messages_per_second", reader.sequence() / seconds}};
 }
@@ -138,24 +147,38 @@ int main(int argc, char** argv) {
         bool verify = false;
         std::string_view filter;
         Sequence limit{};
+        std::filesystem::path capture;
+        Sequence window_count = 40000;
         for (int i = 1; i < argc; ++i) {
             const std::string_view arg = argv[i];
             if (arg == "--verify") verify = true;
             else if (arg == "--symbol" && i + 1 < argc) filter = argv[++i];
-            else if (arg == "--limit" && i + 1 < argc) {
+            else if (arg == "--capture" && i + 1 < argc) capture = argv[++i];
+            else if ((arg == "--limit" || arg == "--window-messages") && i + 1 < argc) {
                 const std::string_view value = argv[++i];
-                const auto [end, error] = std::from_chars(value.data(), value.data() + value.size(), limit);
-                if (error != std::errc{} || end != value.data() + value.size() || !limit)
-                    throw std::runtime_error("--limit requires a positive count");
+                auto& count = arg == "--limit" ? limit : window_count;
+                const auto [end, error] = std::from_chars(value.data(), value.data() + value.size(), count);
+                if (error != std::errc{} || end != value.data() + value.size() || !count)
+                    throw std::runtime_error(std::string(arg) + " requires a positive count");
             }
             else if (arg == "--help") {
-                std::cout << "usage: jitter_itch [--verify] [--symbol TICKER] [--limit N] < historical_binary_file\n";
+                std::cout << "usage: jitter_itch [--verify] [--symbol TICKER] [--limit N]"
+                             " [--capture NEW_DIRECTORY --window-messages N] < historical_binary_file\n";
                 return 0;
             } else throw std::runtime_error("invalid option: " + std::string(arg));
         }
         if (std::setvbuf(stdin, nullptr, _IOFBF, 1u << 20))
             throw std::runtime_error("cannot configure tape buffer");
-        std::cout << replay(verify, filter, limit).dump(2) << '\n';
+        std::vector<Window> windows;
+        if (!capture.empty()) {
+            if (!verify || !filter.empty() || window_count <= recovery_offset || window_count > 1000000)
+                throw std::runtime_error("capture requires all-symbol --verify and 97..1000000 messages per window");
+            if (!std::filesystem::create_directories(capture))
+                throw std::runtime_error("capture directory already exists");
+            windows.push_back({"open", 34200000000000ull, 0, 0, 0, 0, window_count, capture / "open", {}});
+            windows.push_back({"quiet", 43200000000000ull, 0, 0, 0, 0, window_count, capture / "quiet", {}});
+        }
+        std::cout << replay(verify, filter, limit, windows).dump(2) << '\n';
     } catch (const std::exception& error) {
         std::cerr << "jitter_itch: " << error.what() << '\n';
         return 1;
