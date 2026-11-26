@@ -164,7 +164,7 @@ caption { padding-bottom: .65rem; text-align: left; font-weight: 650; }
 caption span { float: right; color: var(--muted); font-size: .83rem; font-weight: 530; }
 th, td { padding: .5rem .1rem; border-top: 1px solid var(--line); text-align: left; font-size: .875rem; font-variant-numeric: tabular-nums; }
 th { color: var(--muted); font-weight: 580; }
-td:nth-child(2) { text-transform: capitalize; }
+#audit-rows td:nth-child(2) { text-transform: capitalize; }
 th:last-child, td:last-child { text-align: right; }
 [data-audit="confirmed"] td:last-child { color: var(--alert); }
 [data-audit="resolved"] td { color: var(--accent); }
